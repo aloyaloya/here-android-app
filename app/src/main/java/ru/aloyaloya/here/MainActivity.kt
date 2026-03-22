@@ -14,8 +14,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import ru.aloyaloya.here.ui.theme.HereTheme
 
 class MainActivity : ComponentActivity() {
+    private lateinit var viewModel: MainViewModel
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        val appComponent = (application as HereApplication).appComponent
+
+        viewModel = appComponent.viewModelFactory.create(MainViewModel::class.java)
+
         enableEdgeToEdge()
         setContent {
             HereTheme {
