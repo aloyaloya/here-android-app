@@ -41,6 +41,8 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:ui"))
+
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
 
