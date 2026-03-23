@@ -1,4 +1,4 @@
-package ru.aloyaloya.here.ui.theme
+package ru.aloyaloya.design_system.theme
 
 import androidx.compose.ui.graphics.Color
 

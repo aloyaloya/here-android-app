@@ -1,6 +1,5 @@
-package ru.aloyaloya.here.ui.theme
+package ru.aloyaloya.design_system.theme
 
-import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.material3.MaterialTheme
