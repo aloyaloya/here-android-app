@@ -8,17 +8,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 
 /**
- * A custom bottom navigation bar component for the Gametracker application.
+ * Кастомный компонент нижней панели навигации для приложения Here.
  *
- * This composable provides a styled bottom navigation bar using Material Design 3's [NavigationBar]
- * with custom appearance settings tailored for the Gametracker app. It serves as a wrapper
- * around the standard NavigationBar with pre-configured styling.
+ * Этот composable предоставляет стилизованную нижнюю панель навигации на основе
+ * Material Design 3 [NavigationBar] с параметрами внешнего вида, настроенными под Here.
+ * По сути это обертка над стандартным [NavigationBar] с преднастроенными стилями.
  *
- * The navigation bar uses the surface color from the current theme and removes tonal elevation
- * to create a flat, modern design that integrates seamlessly with the app's visual language.
+ * Панель использует цвет `surface` из текущей темы и отключает тональную высоту,
+ * чтобы получить плоский современный вид, согласованный с визуальным стилем приложения.
  *
- * @param modifier The [Modifier] to be applied to the underlying NavigationBar component.
- * @param content The content to be displayed inside the navigation bar.
+ * @param modifier [Modifier], применяемый к базовому компоненту [NavigationBar].
+ * @param content Контент, который будет размещен внутри панели навигации.
  */
 @Composable
 fun BottomNavigationBar(

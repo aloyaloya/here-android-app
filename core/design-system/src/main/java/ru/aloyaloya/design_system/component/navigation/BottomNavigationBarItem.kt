@@ -13,17 +13,18 @@ import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.unit.dp
 
 /**
- * A custom bottom navigation bar item component designed for the Gametracker application.
+ * Кастомный элемент нижней панели навигации для приложения Here.
  *
- * This extension function on [RowScope] provides a styled navigation bar item with customized
- * colors and appearance that aligns with the Gametracker design system. It wraps the standard
- * [NavigationBarItem] with pre-configured styling for icons and colors.
+ * Это расширение для [RowScope] предоставляет стилизованный элемент навигации
+ * с кастомными цветами и внешним видом, соответствующим дизайн-системе Here.
+ * Функция оборачивает стандартный [NavigationBarItem] с преднастроенными стилями
+ * для иконки и цветовой схемы.
  *
- * @param painter The [Painter] to use for the icon display. Typically loaded from resource assets.
- * @param label The text label for the navigation item.
- * @param selected Boolean indicating whether this item is currently selected.
- * @param onClick Callback function to be invoked when the item is clicked.
- * @param modifier The [Modifier] to be applied to the underlying NavigationBarItem.
+ * @param painter [Painter] для отображения иконки (обычно загружается из ресурсов).
+ * @param label Текстовая подпись элемента навигации.
+ * @param selected Флаг, показывающий, выбран ли элемент в текущий момент.
+ * @param onClick Колбэк, вызываемый при нажатии на элемент.
+ * @param modifier [Modifier], применяемый к базовому [NavigationBarItem].
  */
 @Composable
 fun RowScope.BottomNavigationBarItem(
