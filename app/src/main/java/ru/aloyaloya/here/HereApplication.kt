@@ -4,6 +4,12 @@ import android.app.Application
 import ru.aloyaloya.here.di.AppComponent
 import ru.aloyaloya.here.di.DaggerAppComponent
 
+/**
+ * Класс приложения Here.
+ *
+ * Создает корневой DI-компонент при старте приложения
+ * и выполняет инъекцию зависимостей в `Application`.
+ */
 class HereApplication : Application() {
 
     lateinit var appComponent: AppComponent
