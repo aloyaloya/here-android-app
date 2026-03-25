@@ -30,21 +30,21 @@ enum class TopLevelDestination(
     MAP(
         iconUnselectedResId = R.drawable.ic_map_outline,
         iconSelectedResId = R.drawable.ic_map_solid,
-        labelResId = R.string.map_screen_title,
+        labelResId = R.string.map_screen_label,
         route = MapRoute::class,
         baseRoute = MapBaseRoute::class,
     ),
     CALENDAR(
         iconUnselectedResId = R.drawable.ic_calendar_outline,
         iconSelectedResId = R.drawable.ic_calendar_solid,
-        labelResId = R.string.calendar_screen_title,
+        labelResId = R.string.calendar_screen_label,
         route = CalendarRoute::class,
         baseRoute = CalendarBaseRoute::class,
     ),
     ANALYTIC(
         iconUnselectedResId = R.drawable.ic_analytic_outline,
         iconSelectedResId = R.drawable.ic_analytic_solid,
-        labelResId = R.string.analytic_screen_title,
+        labelResId = R.string.analytic_screen_label,
         route = AnalyticRoute::class,
         baseRoute = AnalyticBaseRoute::class,
     )

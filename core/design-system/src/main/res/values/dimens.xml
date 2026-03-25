@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <dimen name="bottom_nav_height">96dp</dimen>
+    <dimen name="bottom_nav_tonal_elevation">0dp</dimen>
+
+    <dimen name="bottom_nav_item_padding_horizontal">16dp</dimen>
+    <dimen name="bottom_nav_item_padding_vertical">6dp</dimen>
+
+    <dimen name="bottom_nav_item_icon_size">26dp</dimen>
+    <dimen name="bottom_nav_item_icon_label_spacing">4dp</dimen>
+</resources>

@@ -1,11 +1,13 @@
 package ru.aloyaloya.design_system.component.navigation
 
 import androidx.compose.foundation.layout.RowScope
+import androidx.compose.foundation.layout.height
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
+import ru.aloyaloya.design_system.R
 
 /**
  * Кастомный компонент нижней панели навигации для приложения Here.
@@ -26,9 +28,9 @@ fun BottomNavigationBar(
     content: @Composable RowScope.() -> Unit
 ) {
     NavigationBar(
-        modifier = modifier,
-        containerColor = MaterialTheme.colorScheme.surface,
-        tonalElevation = 0.dp,
+        modifier = modifier.height(dimensionResource(R.dimen.bottom_nav_height)),
+        containerColor = MaterialTheme.colorScheme.secondary,
+        tonalElevation = dimensionResource(R.dimen.bottom_nav_tonal_elevation),
         content = content
     )
 }

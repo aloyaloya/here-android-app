@@ -1,17 +1,32 @@
 package ru.aloyaloya.design_system.component.navigation
 
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.snap
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.core.updateTransition
+import androidx.compose.foundation.background
+import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.interaction.collectIsPressedAsState
 import androidx.compose.foundation.layout.RowScope
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Icon
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.LocalRippleConfiguration
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
-import androidx.compose.animation.Crossfade
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.unit.dp
+import androidx.compose.ui.res.dimensionResource
+import ru.aloyaloya.design_system.R
+import ru.aloyaloya.design_system.theme.HereShapes
 
 /**
  * Кастомный элемент нижней панели навигации для приложения Here.
@@ -37,23 +52,58 @@ fun RowScope.BottomNavigationBarItem(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    NavigationBarItem(
-        onClick = onClick,
-        selected = selected,
-        icon = {
-            Crossfade(targetState = selected, label = "bottom-navigation-icon") { isSelected ->
-                Icon(
-                    modifier = Modifier.size(28.dp),
-                    painter = if (isSelected) selectedPainter else unselectedPainter,
-                    contentDescription = label
+    val interactionSource = remember { MutableInteractionSource() }
+    val pressed by interactionSource.collectIsPressedAsState()
+
+    val transition = updateTransition(targetState = pressed, label = "bottom-nav-pressed")
+    val scale by transition.animateFloat(
+        transitionSpec = {
+            if (targetState) {
+                snap()
+            } else {
+                spring(
+                    dampingRatio = Spring.DampingRatioNoBouncy,
+                    stiffness = Spring.StiffnessMedium,
                 )
             }
         },
-        modifier = modifier,
-        colors = NavigationBarItemDefaults.colors(
-            selectedIconColor = MaterialTheme.colorScheme.surfaceVariant,
-            unselectedIconColor = MaterialTheme.colorScheme.surfaceTint,
-            indicatorColor = Color.Transparent
+        label = "bottom-nav-item-scale",
+    ) { isPressed ->
+        if (isPressed) 1.06f else 1f
+    }
+
+    CompositionLocalProvider(LocalRippleConfiguration provides null) {
+        NavigationBarItem(
+            onClick = onClick,
+            selected = selected,
+            interactionSource = interactionSource,
+            icon = {
+                BottomNavigationBarItemIcon(
+                    selected = selected,
+                    selectedPainter = selectedPainter,
+                    unselectedPainter = unselectedPainter,
+                    label = label
+                )
+            },
+            modifier = modifier
+                .padding(
+                    horizontal = dimensionResource(R.dimen.bottom_nav_item_padding_horizontal),
+                    vertical = dimensionResource(R.dimen.bottom_nav_item_padding_vertical)
+                )
+                .graphicsLayer {
+                    scaleX = scale
+                    scaleY = scale
+                    transformOrigin = TransformOrigin.Center
+                }
+                .clip(HereShapes.extraLarge)
+                .background(
+                    shape = HereShapes.extraLarge,
+                    color = if (selected) MaterialTheme.colorScheme.secondaryContainer
+                    else Color.Transparent
+                ),
+            colors = NavigationBarItemDefaults.colors(
+                indicatorColor = Color.Transparent
+            )
         )
-    )
+    }
 }
