@@ -2,20 +2,20 @@ package ru.aloyaloya.here.ui
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.navigation.NavDestination
-import androidx.navigation.NavDestination.Companion.hasRoute
-import androidx.navigation.NavDestination.Companion.hierarchy
+import ru.aloyaloya.design_system.R
+import ru.aloyaloya.design_system.component.topbar.TopAppBar
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBar
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBarItem
 import ru.aloyaloya.here.navigation.TopLevelDestination
-import kotlin.reflect.KClass
 
 /**
  * Кастомный Scaffold для приложения Here
@@ -24,34 +24,49 @@ import kotlin.reflect.KClass
  * Этот composable создает layout на базе Scaffold с вертикальным
  * градиентным фоном и нижней панелью навигации.
  *
- * Состояние выбора элементов навигации определяется автоматически
- * на основе текущего destination.
+ * Состояние выбора элементов навигации определяется на основе
+ * текущего верхнеуровневого destination.
  *
- * @param currentDestination Текущий destination навигации из NavController.
+ * @param currentTopLevelDestination Текущий верхнеуровневый destination навигации.
  * @param destinations Список объектов [TopLevelDestination].
  * @param onNavigate Колбэк, вызываемый при нажатии на элемент навигации.
+ * @param darkTheme Текущий режим темы, отображаемый в кнопке top bar.
+ * @param onThemeChange Колбэк переключения темы из [TopAppBar].
  * @param modifier [Modifier], применяемый к контейнеру [Box].
  * @param content Основной контент экрана.
  */
 @Composable
 fun HereScaffold(
-    currentDestination: NavDestination?,
+    currentTopLevelDestination: TopLevelDestination,
     destinations: List<TopLevelDestination>,
     onNavigate: (TopLevelDestination) -> Unit,
+    darkTheme: Boolean,
+    onThemeChange: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         Scaffold(
             containerColor = MaterialTheme.colorScheme.primary,
+            topBar = {
+                TopAppBar(
+                    painter = painterResource(currentTopLevelDestination.iconUnselectedResId),
+                    title = stringResource(currentTopLevelDestination.titleResId),
+                    darkTheme = darkTheme,
+                    onThemeChange = onThemeChange,
+                    onOptionsNavigate = {}
+                )
+            },
             bottomBar = {
-                BottomNavigationBar {
+                BottomNavigationBar(
+                    modifier = Modifier.height(dimensionResource(R.dimen.bottom_nav_height))
+                ) {
                     destinations.forEach { destination ->
                         BottomNavigationBarItem(
                             selectedPainter = painterResource(destination.iconSelectedResId),
                             unselectedPainter = painterResource(destination.iconUnselectedResId),
                             label = stringResource(destination.labelResId),
-                            selected = currentDestination.isRouteInHierarchy(destination.baseRoute),
+                            selected = destination == currentTopLevelDestination,
                             onClick = { onNavigate(destination) }
                         )
                     }
@@ -64,13 +79,3 @@ fun HereScaffold(
         }
     }
 }
-
-/**
- * Проходит по иерархии destination, начиная с текущего,
- * и проверяет, есть ли в ней указанный класс маршрута.
- *
- * @param route Kotlin-класс маршрута, который нужно найти в иерархии.
- * @return `true`, если маршрут найден в иерархии текущего destination, иначе `false`.
- */
-private fun NavDestination?.isRouteInHierarchy(route: KClass<*>) =
-    this?.hierarchy?.any { it.hasRoute(route) } ?: false
