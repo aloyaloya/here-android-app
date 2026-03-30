@@ -95,9 +95,9 @@ fun RowScope.BottomNavigationBarItem(
                     scaleY = scale
                     transformOrigin = TransformOrigin.Center
                 }
-                .clip(HereShapes.extraLarge)
+                .clip(HereShapes.large)
                 .background(
-                    shape = HereShapes.extraLarge,
+                    shape = HereShapes.large,
                     color = if (selected) MaterialTheme.colorScheme.secondaryContainer
                     else Color.Transparent
                 ),

@@ -28,7 +28,7 @@ fun BottomNavigationBar(
     content: @Composable RowScope.() -> Unit
 ) {
     NavigationBar(
-        modifier = modifier.height(dimensionResource(R.dimen.bottom_nav_height)),
+        modifier = modifier,
         containerColor = MaterialTheme.colorScheme.secondary,
         tonalElevation = dimensionResource(R.dimen.bottom_nav_tonal_elevation),
         content = content
