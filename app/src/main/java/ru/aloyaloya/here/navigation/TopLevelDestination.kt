@@ -17,6 +17,7 @@ import kotlin.reflect.KClass
  * @property iconUnselectedResId Идентификатор ресурса активной иконки для отображения в панели навигации.
  * @property iconSelectedResId Идентификатор ресурса неактивной иконки для отображения в панели навигации.
  * @property labelResId Идентификатор строкового ресурса подписи для этого раздела.
+ * @property titleResId Идентификатор строкового ресурса для заголовка экрана.
  * @property route Основной класс маршрута раздела, используемый для навигации.
  * @property baseRoute Базовый класс маршрута для проверки иерархии и состояния выбора.
  */
@@ -24,6 +25,7 @@ enum class TopLevelDestination(
     @DrawableRes val iconUnselectedResId: Int,
     @DrawableRes val iconSelectedResId: Int,
     @StringRes val labelResId: Int,
+    @StringRes val titleResId: Int,
     val route: KClass<*>,
     val baseRoute: KClass<*> = route,
 ) {
@@ -31,6 +33,7 @@ enum class TopLevelDestination(
         iconUnselectedResId = R.drawable.ic_map_outline,
         iconSelectedResId = R.drawable.ic_map_solid,
         labelResId = R.string.map_screen_label,
+        titleResId = R.string.map_screen_title,
         route = MapRoute::class,
         baseRoute = MapBaseRoute::class,
     ),
@@ -38,6 +41,7 @@ enum class TopLevelDestination(
         iconUnselectedResId = R.drawable.ic_calendar_outline,
         iconSelectedResId = R.drawable.ic_calendar_solid,
         labelResId = R.string.calendar_screen_label,
+        titleResId = R.string.calendar_screen_title,
         route = CalendarRoute::class,
         baseRoute = CalendarBaseRoute::class,
     ),
@@ -45,6 +49,7 @@ enum class TopLevelDestination(
         iconUnselectedResId = R.drawable.ic_analytic_outline,
         iconSelectedResId = R.drawable.ic_analytic_solid,
         labelResId = R.string.analytic_screen_label,
+        titleResId = R.string.analytic_screen_title,
         route = AnalyticRoute::class,
         baseRoute = AnalyticBaseRoute::class,
     )
