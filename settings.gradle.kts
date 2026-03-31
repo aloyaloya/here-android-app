@@ -26,3 +26,6 @@ rootProject.name = "here"
 include(":app")
 include(":core:ui")
 include(":core:design-system")
+include(":feature:map")
+include(":feature:calendar")
+include(":feature:analytic")

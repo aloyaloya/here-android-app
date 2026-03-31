@@ -1,6 +1,5 @@
 package ru.aloyaloya.here.ui
 
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.util.trace
@@ -12,7 +11,11 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import ru.aloyaloya.analytic.presentation.navigation.navigateToAnalytic
+import ru.aloyaloya.calendar.presentation.navigation.navigateToCalendar
+import ru.aloyaloya.here.navigation.HereNavHost
 import ru.aloyaloya.here.navigation.TopLevelDestination
+import ru.aloyaloya.map.presentation.navigation.navigateToMap
 
 /**
  * Корневой composable приложения Here, который настраивает
@@ -34,7 +37,6 @@ fun HereApp(
     darkTheme: Boolean,
     onThemeChange: () -> Unit
 ) {
-
     val navController = rememberNavController()
 
     val navBackStackEntry by navController.currentBackStackEntryAsState()
@@ -44,11 +46,11 @@ fun HereApp(
     HereScaffold(
         currentTopLevelDestination = currentTopLevelDestination ?: TopLevelDestination.MAP,
         destinations = TopLevelDestination.entries,
-        onNavigate = {}, // navigateToTopLevelDestination(navController, it)
+        onNavigate = { navigateToTopLevelDestination(navController, it) },
         darkTheme = darkTheme,
         onThemeChange = onThemeChange
     ) {
-        Text("Test")
+        HereNavHost(navController)
     }
 }
 
@@ -102,10 +104,9 @@ private fun navigateToTopLevelDestination(
         }
 
         when (topLevelDestination) {
-//            TopLevelDestination.MAP -> navController.navigateToMap(topLevelNavOptions)
-            TopLevelDestination.MAP -> {}
-            TopLevelDestination.CALENDAR -> {}
-            TopLevelDestination.ANALYTIC -> {}
+            TopLevelDestination.MAP -> navController.navigateToMap(topLevelNavOptions)
+            TopLevelDestination.CALENDAR -> navController.navigateToCalendar(topLevelNavOptions)
+            TopLevelDestination.ANALYTIC -> navController.navigateToAnalytic(topLevelNavOptions)
         }
     }
 }
