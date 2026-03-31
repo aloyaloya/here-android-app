@@ -1,9 +1,7 @@
 <resources>
     <string name="app_name">here</string>
 
-    <string name="map_screen_title">Карта эмоций</string>
     <string name="analytic_screen_title">Аналитика</string>
 
-    <string name="map_screen_label">Карта</string>
     <string name="analytic_screen_label">Аналитика</string>
 </resources>
