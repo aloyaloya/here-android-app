@@ -43,6 +43,9 @@ android {
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:design-system"))
+    implementation(project(":feature:map"))
+    implementation(project(":feature:calendar"))
+    implementation(project(":feature:analytic"))
 
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)

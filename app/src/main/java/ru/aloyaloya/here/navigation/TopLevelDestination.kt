@@ -2,8 +2,9 @@ package ru.aloyaloya.here.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import kotlinx.serialization.Serializable
-import ru.aloyaloya.here.R
+import ru.aloyaloya.analytic.presentation.navigation.AnalyticRoute
+import ru.aloyaloya.calendar.presentation.navigation.CalendarRoute
+import ru.aloyaloya.map.presentation.navigation.MapRoute
 import kotlin.reflect.KClass
 
 // TODO: Move all route resources, classes to feature modules
@@ -30,45 +31,24 @@ enum class TopLevelDestination(
     val baseRoute: KClass<*> = route,
 ) {
     MAP(
-        iconUnselectedResId = R.drawable.ic_map_outline,
-        iconSelectedResId = R.drawable.ic_map_solid,
-        labelResId = R.string.map_screen_label,
-        titleResId = R.string.map_screen_title,
-        route = MapRoute::class,
-        baseRoute = MapBaseRoute::class,
+        iconUnselectedResId = ru.aloyaloya.map.R.drawable.ic_map_outline,
+        iconSelectedResId = ru.aloyaloya.map.R.drawable.ic_map_solid,
+        labelResId = ru.aloyaloya.map.R.string.map_screen_label,
+        titleResId = ru.aloyaloya.map.R.string.map_screen_title,
+        route = MapRoute::class
     ),
     CALENDAR(
-        iconUnselectedResId = R.drawable.ic_calendar_outline,
-        iconSelectedResId = R.drawable.ic_calendar_solid,
-        labelResId = R.string.calendar_screen_label,
-        titleResId = R.string.calendar_screen_title,
-        route = CalendarRoute::class,
-        baseRoute = CalendarBaseRoute::class,
+        iconUnselectedResId = ru.aloyaloya.calendar.R.drawable.ic_calendar_outline,
+        iconSelectedResId = ru.aloyaloya.calendar.R.drawable.ic_calendar_solid,
+        labelResId = ru.aloyaloya.calendar.R.string.calendar_screen_label,
+        titleResId = ru.aloyaloya.calendar.R.string.calendar_screen_title,
+        route = CalendarRoute::class
     ),
     ANALYTIC(
-        iconUnselectedResId = R.drawable.ic_analytic_outline,
-        iconSelectedResId = R.drawable.ic_analytic_solid,
-        labelResId = R.string.analytic_screen_label,
-        titleResId = R.string.analytic_screen_title,
-        route = AnalyticRoute::class,
-        baseRoute = AnalyticBaseRoute::class,
+        iconUnselectedResId = ru.aloyaloya.analytic.R.drawable.ic_analytic_outline,
+        iconSelectedResId = ru.aloyaloya.analytic.R.drawable.ic_analytic_solid,
+        labelResId = ru.aloyaloya.analytic.R.string.analytic_screen_label,
+        titleResId = ru.aloyaloya.analytic.R.string.analytic_screen_title,
+        route = AnalyticRoute::class
     )
 }
-
-@Serializable
-data object MapRoute
-
-@Serializable
-data object MapBaseRoute
-
-@Serializable
-data object CalendarRoute
-
-@Serializable
-data object CalendarBaseRoute
-
-@Serializable
-data object AnalyticRoute
-
-@Serializable
-data object AnalyticBaseRoute
