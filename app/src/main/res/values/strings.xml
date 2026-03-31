@@ -1,7 +1,3 @@
 <resources>
     <string name="app_name">here</string>
-
-    <string name="analytic_screen_title">Аналитика</string>
-
-    <string name="analytic_screen_label">Аналитика</string>
 </resources>
