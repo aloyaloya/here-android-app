@@ -4,7 +4,10 @@ import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import dagger.BindsInstance
 import dagger.Component
+import ru.aloyaloya.analytic.di.AnalyticComponent
+import ru.aloyaloya.calendar.di.CalendarComponent
 import ru.aloyaloya.here.HereApplication
+import ru.aloyaloya.map.di.MapComponent
 import javax.inject.Singleton
 
 /**
@@ -37,4 +40,13 @@ interface AppComponent {
 
     /** Фабрика для создания `ViewModel` через Dagger multibinding. */
     val viewModelFactory: ViewModelProvider.Factory
+
+    /** Фабрика подкомпонента фичи карты. */
+    val mapComponentFactory: MapComponent.Factory
+
+    /** Фабрика подкомпонента фичи календаря. */
+    val calendarComponentFactory: CalendarComponent.Factory
+
+    /** Фабрика подкомпонента фичи аналитики. */
+    val analyticComponentFactory: AnalyticComponent.Factory
 }
