@@ -39,12 +39,17 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:ui"))
+
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
 
     implementation(libs.androidx.navigation.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
+    implementation(libs.androidx.lifecycle.runtime.compose)
+    implementation(libs.androidx.lifecycle.viewmodel.compose)
+    implementation(libs.maplibre.android.sdk)
     implementation(libs.androidx.activity.compose)
     implementation(libs.androidx.compose.ui)
     implementation(libs.androidx.compose.ui.graphics)
