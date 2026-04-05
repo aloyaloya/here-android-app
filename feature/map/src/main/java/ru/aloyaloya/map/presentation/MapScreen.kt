@@ -1,76 +1,53 @@
 package ru.aloyaloya.map.presentation
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.DisposableEffect
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.viewinterop.AndroidView
-import androidx.lifecycle.Lifecycle
-import androidx.lifecycle.LifecycleEventObserver
-import androidx.lifecycle.compose.LocalLifecycleOwner
-import org.maplibre.android.MapLibre
-import org.maplibre.android.camera.CameraPosition
-import org.maplibre.android.geometry.LatLng
-import org.maplibre.android.maps.MapView
+import androidx.core.content.ContextCompat
+import ru.aloyaloya.mapkit.ui.YandexMap
 
-private const val MAP_STYLE_URL =
-    "https://demotiles.maplibre.org/styles/osm-bright-gl-style/style.json"
+private val locationPermissions = arrayOf(
+    Manifest.permission.ACCESS_FINE_LOCATION,
+    Manifest.permission.ACCESS_COARSE_LOCATION,
+)
 
-@Composable
-fun MapScreen(
-    uiState: MapUiState
-) {
-    MapContent(uiState = uiState)
-}
+private fun Context.hasLocationPermission(): Boolean =
+    locationPermissions.any { perm ->
+        ContextCompat.checkSelfPermission(this, perm) == PackageManager.PERMISSION_GRANTED
+    }
 
 @Composable
-private fun MapContent(
-    uiState: MapUiState,
-    modifier: Modifier = Modifier,
-) {
+fun MapScreen(uiState: MapUiState) {
     val context = LocalContext.current
-    val lifecycleOwner = LocalLifecycleOwner.current
-
-    // MapLibre.getInstance() вызываем до создания MapView,
-    // а getMapAsync() — после добавления View в иерархию (в AndroidView factory).
-    val mapView = remember(context) {
-        MapLibre.getInstance(context)
-        MapView(context)
+    var locationGranted by remember {
+        mutableStateOf(context.hasLocationPermission())
+    }
+    val launcher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestMultiplePermissions(),
+    ) { result ->
+        locationGranted = result.values.any { it }
     }
 
-    DisposableEffect(lifecycleOwner) {
-        val observer = LifecycleEventObserver { _, event ->
-            when (event) {
-                Lifecycle.Event.ON_START -> mapView.onStart()
-                Lifecycle.Event.ON_RESUME -> mapView.onResume()
-                Lifecycle.Event.ON_PAUSE -> mapView.onPause()
-                Lifecycle.Event.ON_STOP -> mapView.onStop()
-                Lifecycle.Event.ON_DESTROY -> mapView.onDestroy()
-                else -> Unit
-            }
-        }
-        lifecycleOwner.lifecycle.addObserver(observer)
-        onDispose {
-            lifecycleOwner.lifecycle.removeObserver(observer)
+    LaunchedEffect(Unit) {
+        if (!locationGranted) {
+            launcher.launch(locationPermissions)
         }
     }
 
-    AndroidView(
-        factory = { _ ->
-            // В этот момент View добавляется в иерархию, поэтому getMapAsync() безопасен;
-            // это аналог вызова после setContentView/findViewById в примере с Activity.
-            mapView.apply {
-                getMapAsync { map ->
-                    map.setStyle(MAP_STYLE_URL)
-                    map.cameraPosition = CameraPosition.Builder()
-                        .target(LatLng(40.0, 30.0))
-                        .zoom(1.0)
-                        .build()
-                }
-            }
-        },
-        modifier = modifier.fillMaxSize(),
+    YandexMap(
+        modifier = Modifier.fillMaxSize(),
+        config = uiState.mapConfig,
+        locationEnabled = locationGranted,
     )
 }
