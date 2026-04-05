@@ -1,6 +1,7 @@
 package ru.aloyaloya.here
 
 import android.app.Application
+import ru.aloyaloya.mapkit.MapKitInitializer
 import ru.aloyaloya.here.di.AppComponent
 import ru.aloyaloya.here.di.DaggerAppComponent
 import ru.aloyaloya.ui.di.ComponentProvider
@@ -18,6 +19,8 @@ class HereApplication : ComponentProvider, Application() {
 
     override fun onCreate() {
         super.onCreate()
+
+        MapKitInitializer.init(this)
 
         appComponent = DaggerAppComponent.factory().create(this)
 
