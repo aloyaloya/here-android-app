@@ -11,7 +11,8 @@ import dagger.Subcomponent
  */
 @Subcomponent(
     modules = [
-        MapModule::class
+        MapModule::class,
+        MapProvideModule::class,
     ]
 )
 interface MapComponent {
