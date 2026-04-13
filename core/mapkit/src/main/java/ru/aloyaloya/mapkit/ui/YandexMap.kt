@@ -1,5 +1,6 @@
 package ru.aloyaloya.mapkit.ui
 
+import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
@@ -17,15 +18,17 @@ import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
+import ru.aloyaloya.mapkit.R
 import ru.aloyaloya.mapkit.internal.UserLocationBinder
 import ru.aloyaloya.mapkit.model.YandexMapConfig
 
-/** [MapView] в Compose: lifecycle, зум, геослой при [locationEnabled]. Пермишны — снаружи. */
+/** [MapView] в Compose: lifecycle, зум, стиль по [isDarkTheme], геослой при [locationEnabled]. Пермишны — снаружи. */
 @Composable
 fun YandexMap(
     modifier: Modifier = Modifier,
     config: YandexMapConfig = YandexMapConfig.Default,
     locationEnabled: Boolean = false,
+    isDarkTheme: Boolean = false
 ) {
     val context = LocalContext.current
     val appContext = remember(context) { context.applicationContext }
@@ -35,7 +38,15 @@ fun YandexMap(
         UserLocationBinder(mapView, config.userLocationZoom, appContext)
     }
 
+    val styleLightJson = remember(appContext) {
+        readRawJson(appContext, R.raw.light_theme_style)
+    }
+    val styleDarkJson = remember(appContext) {
+        readRawJson(appContext, R.raw.dark_theme_style)
+    }
+
     val locationEnabledState = rememberUpdatedState(locationEnabled)
+    val isDarkThemeState = rememberUpdatedState(isDarkTheme)
 
     LaunchedEffect(mapView, binder, config.minZoom, config.maxZoom, config.userLocationZoom) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
@@ -45,6 +56,12 @@ fun YandexMap(
             try {
                 applyCameraZoomBounds(mapView, config)
                 coroutineScope {
+                    val mapStyleJob = launch {
+                        snapshotFlow { isDarkThemeState.value }.collectLatest { dark ->
+                            val json = if (dark) styleDarkJson else styleLightJson
+                            mapView.mapWindow.map.setMapStyle(json)
+                        }
+                    }
                     val locationJob = launch {
                         snapshotFlow { locationEnabledState.value }.collectLatest { enabled ->
                             if (enabled) binder.attach() else binder.detach()
@@ -53,6 +70,7 @@ fun YandexMap(
                     try {
                         awaitCancellation()
                     } finally {
+                        mapStyleJob.cancel()
                         locationJob.cancel()
                     }
                 }
@@ -66,7 +84,7 @@ fun YandexMap(
 
     AndroidView(
         factory = { mapView },
-        modifier = modifier,
+        modifier = modifier
     )
 }
 
@@ -76,3 +94,6 @@ private fun applyCameraZoomBounds(mapView: MapView, config: YandexMapConfig) {
         setMaxZoomPreference(config.maxZoom)
     }
 }
+
+private fun readRawJson(context: Context, resId: Int): String =
+    context.resources.openRawResource(resId).bufferedReader(Charsets.UTF_8).use { it.readText() }

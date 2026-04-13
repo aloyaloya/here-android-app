@@ -16,6 +16,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
 import ru.aloyaloya.mapkit.ui.YandexMap
+import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 
 private val locationPermissions = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -29,6 +30,7 @@ private fun Context.hasLocationPermission(): Boolean =
 
 @Composable
 fun MapScreen(uiState: MapUiState) {
+    val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
     var locationGranted by remember {
         mutableStateOf(context.hasLocationPermission())
@@ -49,5 +51,6 @@ fun MapScreen(uiState: MapUiState) {
         modifier = Modifier.fillMaxSize(),
         config = uiState.mapConfig,
         locationEnabled = locationGranted,
+        isDarkTheme = isDarkTheme
     )
 }
