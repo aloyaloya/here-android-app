@@ -43,6 +43,7 @@ android {
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:design-system"))
+    implementation(project(":core:database"))
     implementation(project(":feature:map"))
     implementation(project(":feature:calendar"))
     implementation(project(":feature:analytic"))

@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import dagger.BindsInstance
 import dagger.Component
+import ru.aloyaloya.database.di.DatabaseModule
 import ru.aloyaloya.here.HereApplication
 import javax.inject.Singleton
 
@@ -17,7 +18,8 @@ import javax.inject.Singleton
 @Singleton
 @Component(
     modules = [
-        AppModule::class
+        AppModule::class,
+        DatabaseModule::class
     ]
 )
 interface AppComponent {
