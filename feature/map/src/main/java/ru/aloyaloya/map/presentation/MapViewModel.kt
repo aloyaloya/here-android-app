@@ -4,19 +4,16 @@ import androidx.lifecycle.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.aloyaloya.map.model.MapUiState
 import ru.aloyaloya.mapkit.model.YandexMapConfig
 import javax.inject.Inject
 
-// TODO: последняя камера из БД вместо дефолтного конфига
-data class MapUiState(
-    val isLoading: Boolean = false,
-    val mapConfig: YandexMapConfig,
-)
-
 class MapViewModel @Inject constructor(
-    mapConfig: YandexMapConfig,
+    mapConfig: YandexMapConfig
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(MapUiState(mapConfig = mapConfig))
+    private val _uiState = MutableStateFlow(
+        MapUiState.Content(mapConfig = mapConfig)
+    )
     val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
 }

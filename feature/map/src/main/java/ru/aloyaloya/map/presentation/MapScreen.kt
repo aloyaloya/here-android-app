@@ -6,6 +6,7 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -15,6 +16,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import ru.aloyaloya.map.model.MapUiState
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 
@@ -47,10 +49,33 @@ fun MapScreen(uiState: MapUiState) {
         }
     }
 
+    when (uiState) {
+        MapUiState.Loading -> {
+            CircularProgressIndicator()
+        }
+
+        is MapUiState.Content -> {
+            MapContent(
+                uiState = uiState,
+                locationEnabled = locationGranted,
+                isDarkTheme = isDarkTheme,
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+}
+
+@Composable
+private fun MapContent(
+    uiState: MapUiState.Content,
+    locationEnabled: Boolean,
+    isDarkTheme: Boolean,
+    modifier: Modifier
+) {
     YandexMap(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier,
         config = uiState.mapConfig,
-        locationEnabled = locationGranted,
+        locationEnabled = locationEnabled,
         isDarkTheme = isDarkTheme
     )
 }
