@@ -25,6 +25,7 @@ dependencyResolutionManagement {
 rootProject.name = "here"
 include(":app")
 include(":core:ui")
+include(":core:mapkit")
 include(":core:design-system")
 include(":feature:map")
 include(":feature:calendar")

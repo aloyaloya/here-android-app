@@ -16,9 +16,9 @@ gen/
 # Local configuration file (sdk path, etc)
 local.properties
 
-# Local secrets configuration file (API key, etc)
+# API keys and other secrets (copy from secret.properties.example)
 secret.properties
-                        
+
 # Windows thumbnail db
 Thumbs.db
                 
