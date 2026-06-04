@@ -6,6 +6,7 @@ import dagger.BindsInstance
 import dagger.Component
 import ru.aloyaloya.analytic.di.AnalyticComponent
 import ru.aloyaloya.calendar.di.CalendarComponent
+import ru.aloyaloya.database.di.DatabaseModule
 import ru.aloyaloya.here.HereApplication
 import ru.aloyaloya.map.di.MapComponent
 import javax.inject.Singleton
@@ -20,7 +21,8 @@ import javax.inject.Singleton
 @Singleton
 @Component(
     modules = [
-        AppModule::class
+        AppModule::class,
+        DatabaseModule::class
     ]
 )
 interface AppComponent {
