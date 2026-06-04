@@ -1,6 +1,7 @@
 package ru.aloyaloya.here.ui
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.util.trace
 import androidx.navigation.NavController
@@ -16,6 +17,7 @@ import ru.aloyaloya.calendar.presentation.navigation.navigateToCalendar
 import ru.aloyaloya.here.navigation.HereNavHost
 import ru.aloyaloya.here.navigation.TopLevelDestination
 import ru.aloyaloya.map.presentation.navigation.navigateToMap
+import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 
 /**
  * Корневой composable приложения Here, который настраивает
@@ -43,14 +45,16 @@ fun HereApp(
     val currentDestination = navBackStackEntry?.destination
     val currentTopLevelDestination = currentDestination.toTopLevelDestination()
 
-    HereScaffold(
-        currentTopLevelDestination = currentTopLevelDestination ?: TopLevelDestination.MAP,
-        destinations = TopLevelDestination.entries,
-        onNavigate = { navigateToTopLevelDestination(navController, it) },
-        darkTheme = darkTheme,
-        onThemeChange = onThemeChange
-    ) {
-        HereNavHost(navController)
+    CompositionLocalProvider(LocalAppDarkTheme provides darkTheme) {
+        HereScaffold(
+            currentTopLevelDestination = currentTopLevelDestination ?: TopLevelDestination.MAP,
+            destinations = TopLevelDestination.entries,
+            onNavigate = { navigateToTopLevelDestination(navController, it) },
+            darkTheme = darkTheme,
+            onThemeChange = onThemeChange
+        ) {
+            HereNavHost(navController = navController)
+        }
     }
 }
 

@@ -7,8 +7,6 @@ import ru.aloyaloya.calendar.presentation.navigation.CalendarRoute
 import ru.aloyaloya.map.presentation.navigation.MapRoute
 import kotlin.reflect.KClass
 
-// TODO: Move all route resources, classes to feature modules
-
 /**
  * Перечисление верхнеуровневых разделов навигации в приложении Here.
  *

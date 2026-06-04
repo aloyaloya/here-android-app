@@ -35,9 +35,10 @@ fun TopAppBar(
     Row(
         modifier = modifier
             .statusBarsPadding()
+            .padding(horizontal = dimensionResource(R.dimen.medium_padding))
             .padding(
-                horizontal = dimensionResource(R.dimen.medium_padding),
-                vertical = dimensionResource(R.dimen.small_padding)
+                top = dimensionResource(R.dimen.small_padding),
+                bottom = dimensionResource(R.dimen.medium_padding)
             )
             .background(MaterialTheme.colorScheme.primary),
         horizontalArrangement = Arrangement.SpaceBetween,

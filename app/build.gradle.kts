@@ -42,6 +42,7 @@ android {
 
 dependencies {
     implementation(project(":core:ui"))
+    implementation(project(":core:mapkit"))
     implementation(project(":core:design-system"))
     implementation(project(":feature:map"))
     implementation(project(":feature:calendar"))
