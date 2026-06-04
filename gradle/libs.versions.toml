@@ -15,9 +15,11 @@ appcompat = "1.7.1"
 material = "1.13.0"
 yandexMapsMobile = "4.33.1-lite"
 room = "2.7.1"
+coroutines = "1.10.2"
 
 [libraries]
 yandex-maps-mobile = { module = "com.yandex.android:maps.mobile", version.ref = "yandexMapsMobile" }
+kotlinx-coroutines-core = { group = "org.jetbrains.kotlinx", name = "kotlinx-coroutines-core", version.ref = "coroutines" }
 room-runtime = { group = "androidx.room", name = "room-runtime", version.ref = "room" }
 room-ktx = { group = "androidx.room", name = "room-ktx", version.ref = "room" }
 room-compiler = { group = "androidx.room", name = "room-compiler", version.ref = "room" }
