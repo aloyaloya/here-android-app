@@ -7,9 +7,9 @@ package ru.aloyaloya.database.entity
  */
 enum class Emotion {
     HAPPY,
-    SAD,
-    EXCITED,
+    TENDER,
+    SURPRISED,
     CALM,
-    ANGRY,
-    SURPRISED
+    SAD,
+    ANGRY
 }

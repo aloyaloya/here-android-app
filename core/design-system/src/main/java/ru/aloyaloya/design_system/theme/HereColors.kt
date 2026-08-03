@@ -26,7 +26,7 @@ data class EmotionColor(
 data class EmotionColors(
     val happy: EmotionColor,
     val tender: EmotionColor,
-    val excited: EmotionColor,
+    val surprised: EmotionColor,
     val calm: EmotionColor,
     val sad: EmotionColor,
     val angry: EmotionColor
@@ -72,7 +72,7 @@ val LightHereColors = HereColors(
     emotions = EmotionColors(
         happy = EmotionColor(LightHappySolid, LightHappySoft),
         tender = EmotionColor(LightTenderSolid, LightTenderSoft),
-        excited = EmotionColor(LightExcitedSolid, LightExcitedSoft),
+        surprised = EmotionColor(LightSurprisedSolid, LightSurprisedSoft),
         calm = EmotionColor(LightCalmSolid, LightCalmSoft),
         sad = EmotionColor(LightSadSolid, LightSadSoft),
         angry = EmotionColor(LightAngrySolid, LightAngrySoft)
@@ -95,7 +95,7 @@ val DarkHereColors = HereColors(
     emotions = EmotionColors(
         happy = EmotionColor(DarkHappySolid, DarkHappySoft),
         tender = EmotionColor(DarkTenderSolid, DarkTenderSoft),
-        excited = EmotionColor(DarkExcitedSolid, DarkExcitedSoft),
+        surprised = EmotionColor(DarkSurprisedSolid, DarkSurprisedSoft),
         calm = EmotionColor(DarkCalmSolid, DarkCalmSoft),
         sad = EmotionColor(DarkSadSolid, DarkSadSoft),
         angry = EmotionColor(DarkAngrySolid, DarkAngrySoft)

@@ -54,20 +54,20 @@ internal object MemoryMapper {
 
     private fun EntityEmotion.toDomain(): Emotion = when (this) {
         EntityEmotion.HAPPY -> Emotion.HAPPY
-        EntityEmotion.SAD -> Emotion.SAD
-        EntityEmotion.EXCITED -> Emotion.EXCITED
-        EntityEmotion.CALM -> Emotion.CALM
-        EntityEmotion.ANGRY -> Emotion.ANGRY
+        EntityEmotion.TENDER -> Emotion.TENDER
         EntityEmotion.SURPRISED -> Emotion.SURPRISED
+        EntityEmotion.CALM -> Emotion.CALM
+        EntityEmotion.SAD -> Emotion.SAD
+        EntityEmotion.ANGRY -> Emotion.ANGRY
     }
 
     private fun Emotion.toEntity(): EntityEmotion = when (this) {
         Emotion.HAPPY -> EntityEmotion.HAPPY
-        Emotion.SAD -> EntityEmotion.SAD
-        Emotion.EXCITED -> EntityEmotion.EXCITED
-        Emotion.CALM -> EntityEmotion.CALM
-        Emotion.ANGRY -> EntityEmotion.ANGRY
+        Emotion.TENDER -> EntityEmotion.TENDER
         Emotion.SURPRISED -> EntityEmotion.SURPRISED
+        Emotion.CALM -> EntityEmotion.CALM
+        Emotion.SAD -> EntityEmotion.SAD
+        Emotion.ANGRY -> EntityEmotion.ANGRY
     }
 
     private fun EntityMediaType.toDomain(): MediaType = when (this) {
