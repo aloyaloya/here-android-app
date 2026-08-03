@@ -40,6 +40,7 @@ android {
 
 dependencies {
     implementation(project(":core:ui"))
+    implementation(project(":core:domain"))
     implementation(project(":core:mapkit"))
     implementation(project(":core:design-system"))
 

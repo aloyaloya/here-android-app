@@ -38,11 +38,15 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:domain"))
+    implementation(project(":core:design-system"))
+
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
 
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.androidx.compose.runtime)
+    implementation(libs.androidx.compose.ui.graphics)
 
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
