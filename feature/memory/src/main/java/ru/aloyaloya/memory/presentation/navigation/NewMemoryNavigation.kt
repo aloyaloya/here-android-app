@@ -20,17 +20,25 @@ import ru.aloyaloya.ui.di.ComponentProvider
  * Маршрут экрана нового воспоминания.
  *
  * @property emotion Эмоция, выбранная в листе на карте.
+ * @property latitude Широта точки, на которой открылся лист.
+ * @property longitude Долгота точки, на которой открылся лист.
  */
 @Serializable
-data class NewMemoryRoute(val emotion: Emotion)
+data class NewMemoryRoute(
+    val emotion: Emotion,
+    val latitude: Double,
+    val longitude: Double
+)
 
 /**
  * Выполняет переход на экран нового воспоминания.
  *
  * @param emotion Эмоция, с которой открывается экран.
+ * @param latitude Широта будущего воспоминания.
+ * @param longitude Долгота будущего воспоминания.
  */
-fun NavController.navigateToNewMemory(emotion: Emotion) =
-    navigate(route = NewMemoryRoute(emotion))
+fun NavController.navigateToNewMemory(emotion: Emotion, latitude: Double, longitude: Double) =
+    navigate(route = NewMemoryRoute(emotion, latitude, longitude))
 
 /**
  * Регистрирует экран нового воспоминания как destination в [NavGraphBuilder].
@@ -54,8 +62,12 @@ fun NavGraphBuilder.newMemoryScreen(onClose: () -> Unit) {
             factory = factory
         )
 
-        LaunchedEffect(route.emotion) {
-            viewModel.setInitialEmotion(route.emotion)
+        LaunchedEffect(route) {
+            viewModel.setInitialArgs(
+                emotion = route.emotion,
+                latitude = route.latitude,
+                longitude = route.longitude
+            )
         }
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()

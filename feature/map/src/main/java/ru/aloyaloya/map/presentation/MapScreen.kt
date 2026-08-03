@@ -52,10 +52,21 @@ private fun Context.hasLocationPermission(): Boolean =
         ContextCompat.checkSelfPermission(this, perm) == PackageManager.PERMISSION_GRANTED
     }
 
+/**
+ * Экран карты.
+ *
+ * Точка воспоминания — центр камеры в момент нажатия на FAB, а не в момент
+ * подтверждения эмоции: пользователь выбирает место на той карте, которую видит
+ * до открытия листа.
+ *
+ * @param uiState Состояние экрана.
+ * @param onEmotionConfirmed Колбэк выбора эмоции в листе: отдает наверх эмоцию
+ * и точку, на которой открылся лист.
+ */
 @Composable
 fun MapScreen(
     uiState: MapUiState,
-    onEmotionConfirmed: (Emotion) -> Unit
+    onEmotionConfirmed: (Emotion, MapPoint) -> Unit
 ) {
     val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
@@ -101,7 +112,10 @@ fun MapScreen(
                 )
 
                 HereFab(
-                    onClick = { emotionPickerVisible = true },
+                    onClick = {
+                        pickedPoint = mapState.cameraTarget
+                        emotionPickerVisible = true
+                    },
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .navigationBarsPadding()
@@ -117,7 +131,7 @@ fun MapScreen(
                     onDismissRequest = { emotionPickerVisible = false },
                     onEmotionConfirmed = { emotion ->
                         emotionPickerVisible = false
-                        onEmotionConfirmed(emotion)
+                        pickedPoint?.let { point -> onEmotionConfirmed(emotion, point) }
                     }
                 )
             }

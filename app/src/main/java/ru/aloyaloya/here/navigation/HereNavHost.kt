@@ -30,7 +30,15 @@ fun HereNavHost(
         startDestination = MapRoute,
         modifier = modifier
     ) {
-        mapScreen(onEmotionConfirmed = navController::navigateToNewMemory)
+        mapScreen(
+            onEmotionConfirmed = { emotion, point ->
+                navController.navigateToNewMemory(
+                    emotion = emotion,
+                    latitude = point.latitude,
+                    longitude = point.longitude
+                )
+            }
+        )
         newMemoryScreen(onClose = { navController.popBackStack() })
         calendarScreen()
         analyticScreen()

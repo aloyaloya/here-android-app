@@ -16,10 +16,6 @@ import javax.inject.Inject
 /** Адрес-заглушка: геокодер к экрану еще не подключен. */
 private const val MOCK_ADDRESS = "Малая Бронная, 22"
 
-/** Точка-заглушка: экран пока не получает координаты с карты. */
-private const val MOCK_LATITUDE = 55.762_5
-private const val MOCK_LONGITUDE = 37.593_2
-
 class NewMemoryViewModel @Inject constructor(
     private val memoryRepository: MemoryRepository
 ) : ViewModel() {
@@ -27,13 +23,21 @@ class NewMemoryViewModel @Inject constructor(
     private val _uiState = MutableStateFlow(NewMemoryUiState(address = MOCK_ADDRESS))
     val uiState: StateFlow<NewMemoryUiState> = _uiState.asStateFlow()
 
+    private var latitude: Double? = null
+    private var longitude: Double? = null
+
     /**
-     * Ставит эмоцию, выбранную в листе на карте.
+     * Принимает то, с чем экран открыли: эмоцию из листа и точку на карте.
      *
-     * Вызывается при открытии экрана, поэтому уже выбранную эмоцию не трогает:
-     * иначе поворот экрана вернул бы ее к исходной.
+     * Вызывается при каждом появлении экрана, поэтому уже принятые аргументы не
+     * трогает: иначе поворот экрана вернул бы смененную эмоцию к исходной.
+     * Координаты в состоянии не лежат — экран их не показывает и не меняет.
      */
-    fun setInitialEmotion(emotion: Emotion) {
+    fun setInitialArgs(emotion: Emotion, latitude: Double, longitude: Double) {
+        if (this.latitude == null) {
+            this.latitude = latitude
+            this.longitude = longitude
+        }
         _uiState.update { state ->
             if (state.emotion == null) state.copy(emotion = emotion) else state
         }
@@ -60,7 +64,9 @@ class NewMemoryViewModel @Inject constructor(
     fun onSave() {
         val state = _uiState.value
         val emotion = state.emotion
-        if (!state.saveEnabled || emotion == null) return
+        val latitude = latitude
+        val longitude = longitude
+        if (!state.saveEnabled || emotion == null || latitude == null || longitude == null) return
 
         _uiState.update { it.copy(saving = true) }
 
@@ -69,8 +75,8 @@ class NewMemoryViewModel @Inject constructor(
                 Memory(
                     title = state.title.trim(),
                     description = state.description.trim(),
-                    latitude = MOCK_LATITUDE,
-                    longitude = MOCK_LONGITUDE,
+                    latitude = latitude,
+                    longitude = longitude,
                     emotion = emotion,
                     createdAt = System.currentTimeMillis()
                 )

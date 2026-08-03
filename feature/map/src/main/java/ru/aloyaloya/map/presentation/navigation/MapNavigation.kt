@@ -10,6 +10,7 @@ import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
 import ru.aloyaloya.map.di.MapComponent
+import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.map.presentation.MapScreen
 import ru.aloyaloya.map.presentation.MapViewModel
 import ru.aloyaloya.domain.model.Emotion
@@ -34,9 +35,10 @@ fun NavController.navigateToMap(navOptions: NavOptions) =
  * Внутри функции добавляется composable-маршрут [MapRoute] и
  * размещается UI-контент экрана карты.
  *
- * @param onEmotionConfirmed Колбэк выбора эмоции в листе: дальше идет экран нового места.
+ * @param onEmotionConfirmed Колбэк выбора эмоции в листе: вместе с эмоцией отдает
+ * точку на карте, дальше идет экран нового места.
  */
-fun NavGraphBuilder.mapScreen(onEmotionConfirmed: (Emotion) -> Unit) {
+fun NavGraphBuilder.mapScreen(onEmotionConfirmed: (Emotion, MapPoint) -> Unit) {
     composable<MapRoute> { navBackStackEntry ->
 
         val context = LocalContext.current.applicationContext
