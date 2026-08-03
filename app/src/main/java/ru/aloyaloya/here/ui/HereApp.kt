@@ -51,7 +51,9 @@ fun HereApp(
             destinations = TopLevelDestination.entries,
             onNavigate = { navigateToTopLevelDestination(navController, it) },
             darkTheme = darkTheme,
-            onThemeChange = onThemeChange
+            onThemeChange = onThemeChange,
+            fabVisible = currentTopLevelDestination == TopLevelDestination.MAP,
+            onEmotionSelected = { /* TODO: создать воспоминание с выбранной эмоцией */ }
         ) {
             HereNavHost(navController = navController)
         }

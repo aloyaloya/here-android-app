@@ -11,18 +11,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.dimensionResource
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.R
-import ru.aloyaloya.design_system.component.topbar.TopAppBar
+import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBar
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBarItem
+import ru.aloyaloya.design_system.component.topbar.TopAppBar
 import ru.aloyaloya.here.navigation.TopLevelDestination
 
 /**
  * Кастомный Scaffold для приложения Here
  * с градиентным фоном и нижней навигацией.
- *
- * Этот composable создает layout на базе Scaffold с вертикальным
- * градиентным фоном и нижней панелью навигации.
  *
  * Состояние выбора элементов навигации определяется на основе
  * текущего верхнеуровневого destination.
@@ -33,6 +32,8 @@ import ru.aloyaloya.here.navigation.TopLevelDestination
  * @param darkTheme Текущий режим темы, отображаемый в кнопке top bar.
  * @param onThemeChange Колбэк переключения темы из [TopAppBar].
  * @param modifier [Modifier], применяемый к контейнеру [Box].
+ * @param fabVisible Показывать ли FAB-кнопку.
+ * @param onEmotionSelected Колбэк выбора эмодзи в FAB. Принимает символ эмодзи.
  * @param content Основной контент экрана.
  */
 @Composable
@@ -43,11 +44,21 @@ fun HereScaffold(
     darkTheme: Boolean,
     onThemeChange: () -> Unit,
     modifier: Modifier = Modifier,
+    fabVisible: Boolean = false,
+    onEmotionSelected: (String) -> Unit = {},
     content: @Composable () -> Unit
 ) {
     Box(modifier = modifier.fillMaxSize()) {
         Scaffold(
             containerColor = MaterialTheme.colorScheme.primary,
+            floatingActionButton = {
+                if (fabVisible) {
+                    HereFab(
+                        onEmotionSelected = onEmotionSelected,
+                        modifier = Modifier.padding(bottom = 8.dp)
+                    )
+                }
+            },
             topBar = {
                 TopAppBar(
                     painter = painterResource(currentTopLevelDestination.iconUnselectedResId),
