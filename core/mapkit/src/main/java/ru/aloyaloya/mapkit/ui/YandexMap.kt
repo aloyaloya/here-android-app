@@ -22,6 +22,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.aloyaloya.mapkit.R
 import ru.aloyaloya.mapkit.internal.UserLocationBinder
+import ru.aloyaloya.mapkit.model.UserLocationStyle
 import ru.aloyaloya.mapkit.model.YandexMapConfig
 
 /**
@@ -30,9 +31,12 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
  *
  * @param logoTopInset Отступ логотипа Яндекса от верха карты. По умолчанию логотип опущен
  * под верхнюю панель, а экран добавляет к отступу системные insets.
+ * @param userLocationStyle Цвета маркера текущего положения: модуль берет их снаружи,
+ * чтобы маркер следовал за темой приложения.
  */
 @Composable
 fun YandexMap(
+    userLocationStyle: UserLocationStyle,
     modifier: Modifier = Modifier,
     config: YandexMapConfig = YandexMapConfig.Default,
     locationEnabled: Boolean = false,
@@ -48,8 +52,16 @@ fun YandexMap(
         mapView.applyHereLogoPlacement(topInsetDp = logoTopInset.value.toInt())
     }
 
+    val userLocationStyleState = rememberUpdatedState(userLocationStyle)
+
     val binder = remember(mapView, config.userLocationZoom, appContext) {
-        UserLocationBinder(mapView, config.userLocationZoom, appContext)
+        UserLocationBinder(mapView, config.userLocationZoom, appContext) {
+            userLocationStyleState.value
+        }
+    }
+
+    LaunchedEffect(binder, userLocationStyle) {
+        binder.applyStyle()
     }
 
     val styleLightJson = remember(appContext) {

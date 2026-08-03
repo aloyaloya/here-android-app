@@ -30,9 +30,13 @@ import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.map.model.MapUiState
+import ru.aloyaloya.mapkit.model.UserLocationStyle
 import ru.aloyaloya.mapkit.ui.HERE_LOGO_TOP_INSET_DP
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
+
+/** Прозрачность круга точности вокруг маркера. */
+private const val USER_LOCATION_ACCURACY_ALPHA = 0.10f
 
 private val locationPermissions = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -125,7 +129,17 @@ private fun MapContent(
         .asPaddingValues()
         .calculateTopPadding()
 
+    val colors = HereTheme.colors
+    val userLocationStyle = remember(colors) {
+        UserLocationStyle(
+            fill = colors.accent,
+            outline = colors.surface,
+            accuracy = colors.accent.copy(alpha = USER_LOCATION_ACCURACY_ALPHA)
+        )
+    }
+
     YandexMap(
+        userLocationStyle = userLocationStyle,
         modifier = modifier,
         config = uiState.mapConfig,
         locationEnabled = locationEnabled,
