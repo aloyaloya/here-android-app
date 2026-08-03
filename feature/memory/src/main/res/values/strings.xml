@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="new_memory_title">Новое место</string>
+    <string name="new_memory_cancel">Отмена</string>
+    <string name="new_memory_done">Готово</string>
+
+    <string name="new_memory_emotion_label">Что чувствуешь</string>
+    <string name="new_memory_title_placeholder">Как назовем место?</string>
+    <string name="new_memory_description_placeholder">Что запомнилось?</string>
+    <string name="new_memory_save">Сохранить воспоминание</string>
+</resources>
