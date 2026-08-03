@@ -29,7 +29,7 @@ object HereSize {
     object TopAppBar {
         val height = 74.dp
         val horizontalMargin = 18.dp
-        val topMargin = 10.dp
+        val topMargin = 4.dp
         val contentPadding = 11.dp
         val titlePadding = 24.dp
         val actionSize = 52.dp
@@ -40,7 +40,7 @@ object HereSize {
     object NavBar {
         val height = 82.dp
         val horizontalMargin = 22.dp
-        val bottomMargin = 30.dp
+        val bottomMargin = 20.dp
         val itemIconSize = 28.dp
         val itemIconLabelSpacing = 5.dp
     }
@@ -50,7 +50,7 @@ object HereSize {
         val size = 72.dp
         val iconSize = 28.dp
         val endMargin = 18.dp
-        val bottomMargin = 136.dp
+        val bottomMargin = 126.dp
     }
 
     /** Нижний лист. */
