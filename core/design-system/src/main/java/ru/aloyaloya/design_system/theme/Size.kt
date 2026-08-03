@@ -88,6 +88,14 @@ object HereSize {
         val emojiSize = 28.sp
     }
 
+    /** Превью выбранного места. */
+    object PlacePreview {
+        val height = 169.dp
+        val addressMargin = 14.dp
+        val addressVerticalPadding = 8.dp
+        val addressHorizontalPadding = 14.dp
+    }
+
     /** Панель модального экрана. */
     object ModalTopBar {
         val horizontalPadding = 27.dp
