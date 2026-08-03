@@ -9,6 +9,7 @@ import ru.aloyaloya.calendar.di.CalendarComponent
 import ru.aloyaloya.database.di.DatabaseModule
 import ru.aloyaloya.here.HereApplication
 import ru.aloyaloya.map.di.MapComponent
+import ru.aloyaloya.memory.di.MemoryComponent
 import javax.inject.Singleton
 
 /**
@@ -45,6 +46,9 @@ interface AppComponent {
 
     /** Фабрика подкомпонента фичи карты. */
     val mapComponentFactory: MapComponent.Factory
+
+    /** Фабрика подкомпонента фичи воспоминаний. */
+    val memoryComponentFactory: MemoryComponent.Factory
 
     /** Фабрика подкомпонента фичи календаря. */
     val calendarComponentFactory: CalendarComponent.Factory
