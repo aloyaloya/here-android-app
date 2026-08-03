@@ -29,6 +29,7 @@ import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
+import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.map.model.MapUiState
 import ru.aloyaloya.mapkit.model.UserLocationStyle
 import ru.aloyaloya.mapkit.ui.HERE_LOGO_TOP_INSET_DP
@@ -49,7 +50,10 @@ private fun Context.hasLocationPermission(): Boolean =
     }
 
 @Composable
-fun MapScreen(uiState: MapUiState) {
+fun MapScreen(
+    uiState: MapUiState,
+    onEmotionConfirmed: (Emotion) -> Unit
+) {
     val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
     var locationGranted by remember {
@@ -105,7 +109,10 @@ fun MapScreen(uiState: MapUiState) {
             if (emotionPickerVisible) {
                 EmotionPickerSheet(
                     onDismissRequest = { emotionPickerVisible = false },
-                    onEmotionConfirmed = { emotionPickerVisible = false }
+                    onEmotionConfirmed = { emotion ->
+                        emotionPickerVisible = false
+                        onEmotionConfirmed(emotion)
+                    }
                 )
             }
         }

@@ -12,6 +12,7 @@ import kotlinx.serialization.Serializable
 import ru.aloyaloya.map.di.MapComponent
 import ru.aloyaloya.map.presentation.MapScreen
 import ru.aloyaloya.map.presentation.MapViewModel
+import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.ui.di.ComponentProvider
 
 @Serializable
@@ -32,8 +33,10 @@ fun NavController.navigateToMap(navOptions: NavOptions) =
  *
  * Внутри функции добавляется composable-маршрут [MapRoute] и
  * размещается UI-контент экрана карты.
+ *
+ * @param onEmotionConfirmed Колбэк выбора эмоции в листе: дальше идет экран нового места.
  */
-fun NavGraphBuilder.mapScreen() {
+fun NavGraphBuilder.mapScreen(onEmotionConfirmed: (Emotion) -> Unit) {
     composable<MapRoute> { navBackStackEntry ->
 
         val context = LocalContext.current.applicationContext
@@ -49,6 +52,9 @@ fun NavGraphBuilder.mapScreen() {
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        MapScreen(uiState)
+        MapScreen(
+            uiState = uiState,
+            onEmotionConfirmed = onEmotionConfirmed
+        )
     }
 }
