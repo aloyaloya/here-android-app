@@ -46,6 +46,7 @@ dependencies {
     implementation(project(":core:design-system"))
     implementation(project(":core:database"))
     implementation(project(":core:domain"))
+    implementation(project(":core:data"))
     implementation(project(":feature:map"))
     implementation(project(":feature:memory"))
     implementation(project(":feature:calendar"))

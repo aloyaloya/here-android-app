@@ -35,7 +35,8 @@ fun NavController.navigateToNewMemory(emotion: Emotion) =
 /**
  * Регистрирует экран нового воспоминания как destination в [NavGraphBuilder].
  *
- * @param onClose Колбэк закрытия экрана: и по отмене, и после сохранения.
+ * @param onClose Колбэк закрытия экрана: и по отмене, и после того,
+ * как воспоминание записано.
  */
 fun NavGraphBuilder.newMemoryScreen(onClose: () -> Unit) {
     composable<NewMemoryRoute> { navBackStackEntry ->
@@ -59,13 +60,17 @@ fun NavGraphBuilder.newMemoryScreen(onClose: () -> Unit) {
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+        LaunchedEffect(uiState.saved) {
+            if (uiState.saved) onClose()
+        }
+
         NewMemoryScreen(
             uiState = uiState,
             onEmotionSelected = viewModel::onEmotionSelected,
             onTitleChanged = viewModel::onTitleChanged,
             onDescriptionChanged = viewModel::onDescriptionChanged,
             onAddMediaClick = {},
-            onSaveClick = onClose,
+            onSaveClick = viewModel::onSave,
             onCancelClick = onClose
         )
     }
