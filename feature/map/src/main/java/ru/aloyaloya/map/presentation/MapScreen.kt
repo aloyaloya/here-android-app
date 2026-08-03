@@ -24,16 +24,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.map.model.MapUiState
+import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.model.UserLocationStyle
 import ru.aloyaloya.mapkit.ui.HERE_LOGO_TOP_INSET_DP
 import ru.aloyaloya.mapkit.ui.YandexMap
+import ru.aloyaloya.mapkit.ui.YandexMapState
+import ru.aloyaloya.mapkit.ui.rememberYandexMapState
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 
 /** Прозрачность круга точности вокруг маркера. */
@@ -85,10 +88,13 @@ fun MapScreen(
 
         is MapUiState.Content -> {
             var emotionPickerVisible by rememberSaveable { mutableStateOf(false) }
+            var pickedPoint by remember { mutableStateOf<MapPoint?>(null) }
+            val mapState = rememberYandexMapState()
 
             Box(modifier = Modifier.fillMaxSize()) {
                 MapContent(
                     uiState = uiState,
+                    mapState = mapState,
                     locationEnabled = locationGranted,
                     isDarkTheme = isDarkTheme,
                     modifier = Modifier.fillMaxSize()
@@ -128,6 +134,7 @@ fun MapScreen(
 @Composable
 private fun MapContent(
     uiState: MapUiState.Content,
+    mapState: YandexMapState,
     locationEnabled: Boolean,
     isDarkTheme: Boolean,
     modifier: Modifier
@@ -146,6 +153,7 @@ private fun MapContent(
     }
 
     YandexMap(
+        state = mapState,
         userLocationStyle = userLocationStyle,
         modifier = modifier,
         config = uiState.mapConfig,

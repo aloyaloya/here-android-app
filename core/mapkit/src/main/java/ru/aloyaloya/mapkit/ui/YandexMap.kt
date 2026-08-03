@@ -2,6 +2,7 @@ package ru.aloyaloya.mapkit.ui
 
 import android.content.Context
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
@@ -29,6 +30,7 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
  * [MapView] в Compose: lifecycle, зум, стиль по [isDarkTheme], геослой при [locationEnabled].
  * Пермишны — снаружи.
  *
+ * @param state Держатель карты: через него экран спрашивает, куда наведена камера.
  * @param logoTopInset Отступ логотипа Яндекса от верха карты. По умолчанию логотип опущен
  * под верхнюю панель, а экран добавляет к отступу системные insets.
  * @param userLocationStyle Цвета маркера текущего положения: модуль берет их снаружи,
@@ -38,6 +40,7 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
 fun YandexMap(
     userLocationStyle: UserLocationStyle,
     modifier: Modifier = Modifier,
+    state: YandexMapState = rememberYandexMapState(),
     config: YandexMapConfig = YandexMapConfig.Default,
     locationEnabled: Boolean = false,
     isDarkTheme: Boolean = false,
@@ -47,6 +50,11 @@ fun YandexMap(
     val appContext = remember(context) { context.applicationContext }
     val lifecycleOwner = LocalLifecycleOwner.current
     val mapView = remember(context) { MapView(context) }
+
+    DisposableEffect(state, mapView) {
+        state.mapView = mapView
+        onDispose { state.mapView = null }
+    }
 
     LaunchedEffect(mapView, logoTopInset) {
         mapView.applyHereLogoPlacement(topInsetDp = logoTopInset.value.toInt())
