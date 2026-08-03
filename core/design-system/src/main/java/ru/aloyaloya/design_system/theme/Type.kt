@@ -42,6 +42,12 @@ val Typography = Typography(
         fontSize = 15.sp,
         lineHeight = 20.sp
     ),
+    titleSmall = TextStyle(
+        fontFamily = FontFamily.Default,
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 18.sp,
+        lineHeight = 22.sp
+    ),
     labelLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Bold,
@@ -52,8 +58,8 @@ val Typography = Typography(
     bodyLarge = TextStyle(
         fontFamily = FontFamily.Default,
         fontWeight = FontWeight.Normal,
-        fontSize = 15.sp,
-        lineHeight = 23.sp
+        fontSize = 18.sp,
+        lineHeight = 27.sp
     ),
     bodyMedium = TextStyle(
         fontFamily = FontFamily.Default,
@@ -69,10 +75,10 @@ val Typography = Typography(
     ),
     labelMedium = TextStyle(
         fontFamily = FontFamily.Default,
-        fontWeight = FontWeight.Bold,
-        fontSize = 10.5f.sp,
-        lineHeight = 14.sp,
-        letterSpacing = 1.1.sp
+        fontWeight = FontWeight.SemiBold,
+        fontSize = 14.5f.sp,
+        lineHeight = 18.sp,
+        letterSpacing = 0.6.sp
     ),
     labelSmall = TextStyle(
         fontFamily = FontFamily.Default,

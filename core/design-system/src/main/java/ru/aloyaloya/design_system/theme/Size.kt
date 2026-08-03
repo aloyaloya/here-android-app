@@ -73,6 +73,44 @@ object HereSize {
         val emojiSize = 36.sp
     }
 
+    /** Квадратная плитка эмоции в ряду. */
+    object EmotionChip {
+        val size = 65.dp
+        val spacing = 11.dp
+        val selectedBorder = 2.dp
+        val emojiSize = 31.sp
+    }
+
+    /** Круглый пин эмоции. */
+    object EmotionPin {
+        val size = 58.dp
+        val border = 4.dp
+        val emojiSize = 28.sp
+    }
+
+    /** Панель модального экрана. */
+    object ModalTopBar {
+        val horizontalPadding = 27.dp
+        val topPadding = 19.dp
+        val bottomPadding = 12.dp
+    }
+
+    /** Поле ввода. */
+    object TextField {
+        val verticalPadding = 18.dp
+        val horizontalPadding = 20.dp
+        val multilineMinHeight = 111.dp
+    }
+
+    /** Плитка медиа: превью снимка и кнопка добавления. */
+    object MediaTile {
+        val size = 87.dp
+        val spacing = 12.dp
+        val addBorder = 2.dp
+        val addDash = 6.dp
+        val addGap = 5.dp
+    }
+
     /** Основная кнопка. */
     object PrimaryButton {
         val height = 65.dp
