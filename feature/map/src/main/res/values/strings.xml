@@ -2,4 +2,14 @@
 <resources>
     <string name="map_screen_title">Карта эмоций</string>
     <string name="map_screen_label">Карта</string>
+
+    <string name="emotion_picker_title">Что чувствуешь здесь?</string>
+    <string name="emotion_picker_next">Дальше</string>
+
+    <string name="emotion_happy">Радость</string>
+    <string name="emotion_tender">Нежность</string>
+    <string name="emotion_excited">Восторг</string>
+    <string name="emotion_calm">Покой</string>
+    <string name="emotion_sad">Грусть</string>
+    <string name="emotion_angry">Злость</string>
 </resources>
