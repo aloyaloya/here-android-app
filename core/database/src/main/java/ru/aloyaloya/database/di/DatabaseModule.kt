@@ -9,18 +9,27 @@ import ru.aloyaloya.database.dao.MemoryDao
 import ru.aloyaloya.database.dao.MemoryMediaDao
 import javax.inject.Singleton
 
+/**
+ * Dagger-модуль базы данных.
+ *
+ * Предоставляет синглтон [HereDatabase] и DAO для доступа
+ * к таблицам воспоминаний и медиафайлов.
+ */
 @Module
 object DatabaseModule {
 
+    /** Создаёт и предоставляет экземпляр [HereDatabase]. */
     @Provides
     @Singleton
     fun provideHereDatabase(context: Context): HereDatabase =
         Room.databaseBuilder(context, HereDatabase::class.java, "here.db").build()
 
+    /** Предоставляет [MemoryDao] из экземпляра базы данных. */
     @Provides
     @Singleton
     fun provideMemoryDao(db: HereDatabase): MemoryDao = db.memoryDao()
 
+    /** Предоставляет [MemoryMediaDao] из экземпляра базы данных. */
     @Provides
     @Singleton
     fun provideMemoryMediaDao(db: HereDatabase): MemoryMediaDao = db.memoryMediaDao()
