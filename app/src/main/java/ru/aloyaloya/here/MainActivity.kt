@@ -7,6 +7,7 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.collectAsState
 import ru.aloyaloya.design_system.theme.HereTheme
+import ru.aloyaloya.design_system.theme.ThemeMode
 import ru.aloyaloya.here.ui.HereApp
 
 /**
@@ -29,7 +30,7 @@ class MainActivity : ComponentActivity() {
         setContent {
             val darkTheme by viewModel.darkTheme.collectAsState()
 
-            HereTheme(darkTheme = darkTheme) {
+            HereTheme(themeMode = if (darkTheme) ThemeMode.DARK else ThemeMode.LIGHT) {
                 HereApp(
                     darkTheme = darkTheme,
                     onThemeChange = viewModel::onThemeChange
