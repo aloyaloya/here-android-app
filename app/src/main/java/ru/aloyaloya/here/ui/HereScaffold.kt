@@ -25,7 +25,11 @@ import ru.aloyaloya.here.navigation.TopLevelDestination
  * должна оставаться видна сама карта. Отступы под плавающими элементами экраны
  * задают себе сами. Свои кнопки поверх контента экраны тоже размещают сами.
  *
- * @param currentTopLevelDestination Текущий верхнеуровневый destination навигации.
+ * Панель и навигация принадлежат разделам приложения, поэтому на экранах поверх
+ * них — например на новом воспоминании — каркас рисует только контент.
+ *
+ * @param currentTopLevelDestination Текущий верхнеуровневый destination навигации
+ * или `null`, если открыт экран вне разделов.
  * @param destinations Список объектов [TopLevelDestination].
  * @param onNavigate Колбэк, вызываемый при нажатии на элемент навигации.
  * @param darkTheme Текущее состояние темы для кнопки в верхней панели.
@@ -35,7 +39,7 @@ import ru.aloyaloya.here.navigation.TopLevelDestination
  */
 @Composable
 fun HereScaffold(
-    currentTopLevelDestination: TopLevelDestination,
+    currentTopLevelDestination: TopLevelDestination?,
     destinations: List<TopLevelDestination>,
     onNavigate: (TopLevelDestination) -> Unit,
     darkTheme: Boolean,
@@ -50,28 +54,30 @@ fun HereScaffold(
     ) {
         content()
 
-        TopAppBar(
-            title = stringResource(currentTopLevelDestination.titleResId),
-            darkTheme = darkTheme,
-            onThemeChange = onThemeChange,
-            modifier = Modifier.align(Alignment.TopCenter)
-        )
+        if (currentTopLevelDestination != null) {
+            TopAppBar(
+                title = stringResource(currentTopLevelDestination.titleResId),
+                darkTheme = darkTheme,
+                onThemeChange = onThemeChange,
+                modifier = Modifier.align(Alignment.TopCenter)
+            )
 
-        BottomNavigationBar(
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .navigationBarsPadding()
-                .padding(horizontal = HereSize.NavBar.horizontalMargin)
-                .padding(bottom = HereSize.NavBar.bottomMargin)
-        ) {
-            destinations.forEach { destination ->
-                BottomNavigationBarItem(
-                    selectedPainter = painterResource(destination.iconSelectedResId),
-                    unselectedPainter = painterResource(destination.iconUnselectedResId),
-                    label = stringResource(destination.labelResId),
-                    selected = destination == currentTopLevelDestination,
-                    onClick = { onNavigate(destination) }
-                )
+            BottomNavigationBar(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(horizontal = HereSize.NavBar.horizontalMargin)
+                    .padding(bottom = HereSize.NavBar.bottomMargin)
+            ) {
+                destinations.forEach { destination ->
+                    BottomNavigationBarItem(
+                        selectedPainter = painterResource(destination.iconSelectedResId),
+                        unselectedPainter = painterResource(destination.iconUnselectedResId),
+                        label = stringResource(destination.labelResId),
+                        selected = destination == currentTopLevelDestination,
+                        onClick = { onNavigate(destination) }
+                    )
+                }
             }
         }
     }

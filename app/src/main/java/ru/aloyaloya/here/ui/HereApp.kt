@@ -47,7 +47,7 @@ fun HereApp(
 
     CompositionLocalProvider(LocalAppDarkTheme provides darkTheme) {
         HereScaffold(
-            currentTopLevelDestination = currentTopLevelDestination ?: TopLevelDestination.MAP,
+            currentTopLevelDestination = currentTopLevelDestination,
             destinations = TopLevelDestination.entries,
             onNavigate = { navigateToTopLevelDestination(navController, it) },
             darkTheme = darkTheme,
