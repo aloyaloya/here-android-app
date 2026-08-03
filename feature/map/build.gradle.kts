@@ -41,6 +41,7 @@ android {
 dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:mapkit"))
+    implementation(project(":core:design-system"))
 
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)

@@ -5,18 +5,32 @@ import android.content.Context
 import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.core.content.ContextCompat
+import androidx.compose.ui.unit.dp
+import ru.aloyaloya.design_system.component.button.HereFab
+import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.map.model.MapUiState
+import ru.aloyaloya.mapkit.ui.HERE_LOGO_TOP_INSET_DP
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 
@@ -51,20 +65,55 @@ fun MapScreen(uiState: MapUiState) {
 
     when (uiState) {
         MapUiState.Loading -> {
-            CircularProgressIndicator()
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(HereTheme.colors.background),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator(color = HereTheme.colors.accent)
+            }
         }
 
         is MapUiState.Content -> {
-            MapContent(
-                uiState = uiState,
-                locationEnabled = locationGranted,
-                isDarkTheme = isDarkTheme,
-                modifier = Modifier.fillMaxSize()
-            )
+            var emotionPickerVisible by rememberSaveable { mutableStateOf(false) }
+
+            Box(modifier = Modifier.fillMaxSize()) {
+                MapContent(
+                    uiState = uiState,
+                    locationEnabled = locationGranted,
+                    isDarkTheme = isDarkTheme,
+                    modifier = Modifier.fillMaxSize()
+                )
+
+                HereFab(
+                    onClick = { emotionPickerVisible = true },
+                    modifier = Modifier
+                        .align(Alignment.BottomEnd)
+                        .navigationBarsPadding()
+                        .padding(
+                            end = HereSize.Fab.endMargin,
+                            bottom = HereSize.Fab.bottomMargin
+                        )
+                )
+            }
+
+            if (emotionPickerVisible) {
+                EmotionPickerSheet(
+                    onDismissRequest = { emotionPickerVisible = false },
+                    onEmotionConfirmed = { emotionPickerVisible = false }
+                )
+            }
         }
     }
 }
 
+/**
+ * Карта на весь экран.
+ *
+ * Логотип Яндекса должен оставаться под верхней панелью, а карта рисуется под
+ * системными панелями, поэтому к отступу логотипа добавляется высота статус-бара.
+ */
 @Composable
 private fun MapContent(
     uiState: MapUiState.Content,
@@ -72,10 +121,15 @@ private fun MapContent(
     isDarkTheme: Boolean,
     modifier: Modifier
 ) {
+    val statusBarInset = WindowInsets.statusBars
+        .asPaddingValues()
+        .calculateTopPadding()
+
     YandexMap(
         modifier = modifier,
         config = uiState.mapConfig,
         locationEnabled = locationEnabled,
-        isDarkTheme = isDarkTheme
+        isDarkTheme = isDarkTheme,
+        logoTopInset = HERE_LOGO_TOP_INSET_DP.dp + statusBarInset
     )
 }

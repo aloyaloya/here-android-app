@@ -1,4 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="theme_toggle_content_description">Сменить тему</string>
+    <string name="fab_add_memory_content_description">Добавить воспоминание</string>
 </resources>

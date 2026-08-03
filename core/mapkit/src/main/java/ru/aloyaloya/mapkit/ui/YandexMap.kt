@@ -8,6 +8,8 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -22,18 +24,30 @@ import ru.aloyaloya.mapkit.R
 import ru.aloyaloya.mapkit.internal.UserLocationBinder
 import ru.aloyaloya.mapkit.model.YandexMapConfig
 
-/** [MapView] в Compose: lifecycle, зум, стиль по [isDarkTheme], геослой при [locationEnabled]. Пермишны — снаружи. */
+/**
+ * [MapView] в Compose: lifecycle, зум, стиль по [isDarkTheme], геослой при [locationEnabled].
+ * Пермишны — снаружи.
+ *
+ * @param logoTopInset Отступ логотипа Яндекса от верха карты. По умолчанию логотип опущен
+ * под верхнюю панель, а экран добавляет к отступу системные insets.
+ */
 @Composable
 fun YandexMap(
     modifier: Modifier = Modifier,
     config: YandexMapConfig = YandexMapConfig.Default,
     locationEnabled: Boolean = false,
-    isDarkTheme: Boolean = false
+    isDarkTheme: Boolean = false,
+    logoTopInset: Dp = HERE_LOGO_TOP_INSET_DP.dp
 ) {
     val context = LocalContext.current
     val appContext = remember(context) { context.applicationContext }
     val lifecycleOwner = LocalLifecycleOwner.current
     val mapView = remember(context) { MapView(context) }
+
+    LaunchedEffect(mapView, logoTopInset) {
+        mapView.applyHereLogoPlacement(topInsetDp = logoTopInset.value.toInt())
+    }
+
     val binder = remember(mapView, config.userLocationZoom, appContext) {
         UserLocationBinder(mapView, config.userLocationZoom, appContext)
     }

@@ -11,16 +11,15 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.painter.Painter
-import androidx.compose.ui.res.dimensionResource
-import ru.aloyaloya.design_system.R
+import androidx.compose.ui.text.font.FontWeight
+import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
- * Кастомный контент иконки элемента нижней панели навигации для приложения Here.
+ * Содержимое элемента нижней панели навигации: иконка и подпись под ней.
  *
- * Компонент отображает иконку и текстовую подпись в вертикальной компоновке, а также
- * анимирует переключение между выбранным и невыбранным состояниями через [Crossfade].
- * Цвет иконки и текста подбирается из текущей темы [MaterialTheme] в зависимости от
- * состояния выбора.
+ * Смена состояния анимируется через [Crossfade]. У выбранного элемента иконка
+ * и подпись акцентного цвета, у невыбранного — приглушенного.
  *
  * @param selected Флаг, показывающий, выбран ли элемент в текущий момент.
  * @param selectedPainter [Painter] иконки для выбранного состояния.
@@ -34,18 +33,16 @@ fun BottomNavigationBarItemIcon(
     unselectedPainter: Painter,
     label: String
 ) {
-    val selectedColor = MaterialTheme.colorScheme.onSecondaryFixed
-    val unselectedColor = MaterialTheme.colorScheme.onSecondary
+    val selectedColor = HereTheme.colors.accent
+    val unselectedColor = HereTheme.colors.textTertiary
 
     Crossfade(targetState = selected, label = "bottom-navigation-icon") { isSelected ->
         Column(
             horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.spacedBy(
-                dimensionResource(R.dimen.bottom_nav_item_icon_label_spacing)
-            )
+            verticalArrangement = Arrangement.spacedBy(HereSize.NavBar.itemIconLabelSpacing)
         ) {
             Icon(
-                modifier = Modifier.size(dimensionResource(R.dimen.bottom_nav_item_icon_size)),
+                modifier = Modifier.size(HereSize.NavBar.itemIconSize),
                 painter = if (isSelected) selectedPainter else unselectedPainter,
                 tint = if (isSelected) selectedColor else unselectedColor,
                 contentDescription = label
@@ -53,7 +50,8 @@ fun BottomNavigationBarItemIcon(
             Text(
                 text = label,
                 style = MaterialTheme.typography.labelSmall,
-                color = if (selected) selectedColor else unselectedColor,
+                fontWeight = if (isSelected) FontWeight.Bold else FontWeight.SemiBold,
+                color = if (isSelected) selectedColor else unselectedColor
             )
         }
     }
