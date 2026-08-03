@@ -19,7 +19,9 @@ private val DarkColorScheme = darkColorScheme(
     tertiary = DarkTertiary,
     onTertiary = DarkOnTertiary,
     onTertiaryFixed = DarkOnTertiaryFixed,
-    tertiaryContainer = DarkTertiaryContainer
+    tertiaryContainer = DarkTertiaryContainer,
+    onTertiaryFixedVariant = DarkOnTertiaryFixedVariant,
+    onTertiaryContainer = DarkOnTertiaryContainer
 )
 
 private val LightColorScheme = lightColorScheme(
@@ -35,7 +37,9 @@ private val LightColorScheme = lightColorScheme(
     tertiary = LightTertiary,
     onTertiary = LightOnTertiary,
     onTertiaryFixed = LightOnTertiaryFixed,
-    tertiaryContainer = LightTertiaryContainer
+    tertiaryContainer = LightTertiaryContainer,
+    onTertiaryFixedVariant = LightOnTertiaryFixedVariant,
+    onTertiaryContainer = LightOnTertiaryContainer
 )
 
 @Composable
