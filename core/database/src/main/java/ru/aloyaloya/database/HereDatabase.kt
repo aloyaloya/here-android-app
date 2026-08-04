@@ -15,7 +15,7 @@ import ru.aloyaloya.database.entity.MemoryMediaEntity
  */
 @Database(
     entities = [MemoryEntity::class, MemoryMediaEntity::class],
-    version = 1
+    version = 2
 )
 abstract class HereDatabase : RoomDatabase() {
 

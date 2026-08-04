@@ -7,6 +7,7 @@ import dagger.Provides
 import ru.aloyaloya.database.HereDatabase
 import ru.aloyaloya.database.dao.MemoryDao
 import ru.aloyaloya.database.dao.MemoryMediaDao
+import ru.aloyaloya.database.migration.MIGRATION_1_2
 import javax.inject.Singleton
 
 /**
@@ -21,8 +22,10 @@ object DatabaseModule {
     /** Создаёт и предоставляет экземпляр [HereDatabase]. */
     @Provides
     @Singleton
-    fun provideHereDatabase(context: Context): HereDatabase =
-        Room.databaseBuilder(context, HereDatabase::class.java, "here.db").build()
+    fun provideHereDatabase(context: Context): HereDatabase = Room
+        .databaseBuilder(context, HereDatabase::class.java, "here.db")
+        .addMigrations(MIGRATION_1_2)
+        .build()
 
     /** Предоставляет [MemoryDao] из экземпляра базы данных. */
     @Provides

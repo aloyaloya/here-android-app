@@ -79,6 +79,7 @@ class NewMemoryViewModel @Inject constructor(
         _uiState.update { it.copy(saving = true) }
 
         viewModelScope.launch {
+            val now = System.currentTimeMillis()
             memoryRepository.create(
                 Memory(
                     title = state.title.trim(),
@@ -86,7 +87,8 @@ class NewMemoryViewModel @Inject constructor(
                     latitude = latitude,
                     longitude = longitude,
                     emotion = emotion,
-                    createdAt = System.currentTimeMillis()
+                    createdAt = now,
+                    happenedAt = now
                 )
             )
             _uiState.update { it.copy(saving = false, saved = true) }
