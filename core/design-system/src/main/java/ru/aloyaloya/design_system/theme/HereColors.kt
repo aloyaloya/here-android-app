@@ -44,6 +44,10 @@ data class HereColors(
     val surface: Color,
     val surfaceMuted: Color,
     val outline: Color,
+
+    /** Обводка заметнее [outline]: ею обведены элементы без заливки, вроде плашек даты и времени. */
+    val outlineStrong: Color,
+
     val textPrimary: Color,
     val textSecondary: Color,
     val textTertiary: Color,
@@ -62,6 +66,7 @@ val LightHereColors = HereColors(
     surface = LightSurface,
     surfaceMuted = LightSurfaceMuted,
     outline = LightOutline,
+    outlineStrong = LightOutlineStrong,
     textPrimary = LightTextPrimary,
     textSecondary = LightTextSecondary,
     textTertiary = LightTextTertiary,
@@ -85,6 +90,7 @@ val DarkHereColors = HereColors(
     surface = DarkSurface,
     surfaceMuted = DarkSurfaceMuted,
     outline = DarkOutline,
+    outlineStrong = DarkOutlineStrong,
     textPrimary = DarkTextPrimary,
     textSecondary = DarkTextSecondary,
     textTertiary = DarkTextTertiary,

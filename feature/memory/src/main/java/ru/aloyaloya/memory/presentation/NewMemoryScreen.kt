@@ -30,6 +30,7 @@ import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.emotion.EmotionChip
 import ru.aloyaloya.design_system.component.emotion.EmotionPin
+import ru.aloyaloya.design_system.component.field.HereDateTimeField
 import ru.aloyaloya.design_system.component.field.HereTextField
 import ru.aloyaloya.design_system.component.media.MediaAddTile
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
@@ -45,9 +46,20 @@ import ru.aloyaloya.memory.R
 import ru.aloyaloya.memory.model.NewMemoryUiState
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+import ru.aloyaloya.design_system.R as DesignSystemR
 
 /** Масштаб, с которого плашка адреса вырастает до полного размера. */
 private const val ADDRESS_INITIAL_SCALE = 0.8f
+
+/** Дата занимает больше места, чем время: «15 июля 2026» против «19:30». */
+private const val DATE_WEIGHT = 1.35f
+private const val TIME_WEIGHT = 1f
+
+private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru"))
+private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"))
 
 /**
  * Экран нового воспоминания.
@@ -119,6 +131,8 @@ fun NewMemoryScreen(
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.m)) {
+                DateTimeSection(happenedAt = uiState.happenedAt)
+
                 HereTextField(
                     value = uiState.title,
                     onValueChange = onTitleChanged,
@@ -208,6 +222,32 @@ private fun PlacePreview(
                     )
             )
         }
+    }
+}
+
+/**
+ * Дата и время события.
+ *
+ * Обе плашки открывают свой лист выбора, листов пока нет.
+ */
+@Composable
+private fun DateTimeSection(happenedAt: LocalDateTime) {
+    Row(horizontalArrangement = Arrangement.spacedBy(HereSize.DateTimeField.spacing)) {
+        HereDateTimeField(
+            label = stringResource(R.string.new_memory_date_label),
+            value = DateFormat.format(happenedAt),
+            icon = DesignSystemR.drawable.ic_calendar_outline,
+            onClick = {},
+            modifier = Modifier.weight(DATE_WEIGHT)
+        )
+
+        HereDateTimeField(
+            label = stringResource(R.string.new_memory_time_label),
+            value = TimeFormat.format(happenedAt),
+            icon = DesignSystemR.drawable.ic_clock_outline,
+            onClick = {},
+            modifier = Modifier.weight(TIME_WEIGHT)
+        )
     }
 }
 

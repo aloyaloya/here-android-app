@@ -12,6 +12,8 @@ import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.repository.AddressRepository
 import ru.aloyaloya.domain.repository.MemoryRepository
 import ru.aloyaloya.memory.model.NewMemoryUiState
+import java.time.LocalDateTime
+import java.time.ZoneId
 import javax.inject.Inject
 
 class NewMemoryViewModel @Inject constructor(
@@ -19,7 +21,7 @@ class NewMemoryViewModel @Inject constructor(
     private val addressRepository: AddressRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NewMemoryUiState())
+    private val _uiState = MutableStateFlow(NewMemoryUiState(happenedAt = LocalDateTime.now()))
     val uiState: StateFlow<NewMemoryUiState> = _uiState.asStateFlow()
 
     private var latitude: Double? = null
@@ -79,7 +81,6 @@ class NewMemoryViewModel @Inject constructor(
         _uiState.update { it.copy(saving = true) }
 
         viewModelScope.launch {
-            val now = System.currentTimeMillis()
             memoryRepository.create(
                 Memory(
                     title = state.title.trim(),
@@ -87,11 +88,20 @@ class NewMemoryViewModel @Inject constructor(
                     latitude = latitude,
                     longitude = longitude,
                     emotion = emotion,
-                    createdAt = now,
-                    happenedAt = now
+                    createdAt = System.currentTimeMillis(),
+                    happenedAt = state.happenedAt.toEpochMilli()
                 )
             )
             _uiState.update { it.copy(saving = false, saved = true) }
         }
     }
 }
+
+/**
+ * Переводит время события в миллисекунды для базы.
+ *
+ * [LocalDateTime] — это показания календаря и часов без привязки к поясу, поэтому
+ * момент из них получается только вместе с поясом устройства.
+ */
+private fun LocalDateTime.toEpochMilli(): Long =
+    atZone(ZoneId.systemDefault()).toInstant().toEpochMilli()

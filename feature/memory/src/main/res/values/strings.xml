@@ -4,6 +4,9 @@
     <string name="new_memory_cancel">Отмена</string>
     <string name="new_memory_done">Готово</string>
 
+    <string name="new_memory_date_label">Дата</string>
+    <string name="new_memory_time_label">Время</string>
+
     <string name="new_memory_emotion_label">Что чувствуешь</string>
     <string name="new_memory_title_placeholder">Как назовем место?</string>
     <string name="new_memory_description_placeholder">Что запомнилось?</string>
