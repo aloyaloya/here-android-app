@@ -11,8 +11,11 @@ import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.repository.AddressRepository
 import ru.aloyaloya.domain.repository.MemoryRepository
+import ru.aloyaloya.memory.model.NewMemorySheet
 import ru.aloyaloya.memory.model.NewMemoryUiState
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.ZoneId
 import javax.inject.Inject
 
@@ -63,6 +66,28 @@ class NewMemoryViewModel @Inject constructor(
 
     fun onDescriptionChanged(description: String) {
         _uiState.update { it.copy(description = description) }
+    }
+
+    fun onDateFieldClick() {
+        _uiState.update { it.copy(activeSheet = NewMemorySheet.DATE) }
+    }
+
+    fun onTimeFieldClick() {
+        _uiState.update { it.copy(activeSheet = NewMemorySheet.TIME) }
+    }
+
+    fun onSheetDismiss() {
+        _uiState.update { it.copy(activeSheet = null) }
+    }
+
+    /** Применяет дату из листа и закрывает его. Время события остается прежним. */
+    fun onDateSelected(date: LocalDate) {
+        _uiState.update { it.copy(happenedAt = it.happenedAt.with(date), activeSheet = null) }
+    }
+
+    /** Применяет время из листа и закрывает его. Дата события остается прежней. */
+    fun onTimeSelected(time: LocalTime) {
+        _uiState.update { it.copy(happenedAt = it.happenedAt.with(time), activeSheet = null) }
     }
 
     /**

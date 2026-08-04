@@ -24,7 +24,8 @@ data class NewMemoryUiState(
     val description: String = "",
     val address: String? = null,
     val saving: Boolean = false,
-    val saved: Boolean = false
+    val saved: Boolean = false,
+    val activeSheet: NewMemorySheet? = null
 ) {
     /** Сохранять есть что, когда выбрана эмоция и заполнен заголовок. */
     val saveEnabled: Boolean

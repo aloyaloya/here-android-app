@@ -43,10 +43,15 @@ import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.memory.R
+import ru.aloyaloya.memory.model.NewMemorySheet
 import ru.aloyaloya.memory.model.NewMemoryUiState
+import ru.aloyaloya.memory.presentation.component.DateSheet
+import ru.aloyaloya.memory.presentation.component.TimeSheet
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
+import java.time.LocalDate
 import java.time.LocalDateTime
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import ru.aloyaloya.design_system.R as DesignSystemR
@@ -72,6 +77,11 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
  * @param onEmotionSelected Колбэк смены эмоции.
  * @param onTitleChanged Колбэк ввода заголовка.
  * @param onDescriptionChanged Колбэк ввода описания.
+ * @param onDateFieldClick Колбэк открытия листа даты.
+ * @param onTimeFieldClick Колбэк открытия листа времени.
+ * @param onSheetDismiss Колбэк закрытия листа без выбора.
+ * @param onDateSelected Колбэк выбранной даты.
+ * @param onTimeSelected Колбэк выбранного времени.
  * @param onAddMediaClick Колбэк добавления фото или видео.
  * @param onSaveClick Колбэк сохранения.
  * @param onCancelClick Колбэк отмены.
@@ -83,6 +93,11 @@ fun NewMemoryScreen(
     onEmotionSelected: (Emotion) -> Unit,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
+    onDateFieldClick: () -> Unit,
+    onTimeFieldClick: () -> Unit,
+    onSheetDismiss: () -> Unit,
+    onDateSelected: (LocalDate) -> Unit,
+    onTimeSelected: (LocalTime) -> Unit,
     onAddMediaClick: () -> Unit,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
@@ -131,7 +146,11 @@ fun NewMemoryScreen(
             )
 
             Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.m)) {
-                DateTimeSection(happenedAt = uiState.happenedAt)
+                DateTimeSection(
+                    happenedAt = uiState.happenedAt,
+                    onDateClick = onDateFieldClick,
+                    onTimeClick = onTimeFieldClick
+                )
 
                 HereTextField(
                     value = uiState.title,
@@ -161,6 +180,22 @@ fun NewMemoryScreen(
                 .padding(horizontal = HereSpacing.screenHorizontal)
                 .padding(bottom = HereSpacing.xl)
         )
+    }
+
+    when (uiState.activeSheet) {
+        NewMemorySheet.DATE -> DateSheet(
+            initialDate = uiState.happenedAt.toLocalDate(),
+            onDismissRequest = onSheetDismiss,
+            onDateSelected = onDateSelected
+        )
+
+        NewMemorySheet.TIME -> TimeSheet(
+            initialTime = uiState.happenedAt.toLocalTime(),
+            onDismissRequest = onSheetDismiss,
+            onTimeSelected = onTimeSelected
+        )
+
+        null -> Unit
     }
 }
 
@@ -225,19 +260,19 @@ private fun PlacePreview(
     }
 }
 
-/**
- * Дата и время события.
- *
- * Обе плашки открывают свой лист выбора, листов пока нет.
- */
+/** Дата и время события: обе плашки открывают свой лист выбора. */
 @Composable
-private fun DateTimeSection(happenedAt: LocalDateTime) {
+private fun DateTimeSection(
+    happenedAt: LocalDateTime,
+    onDateClick: () -> Unit,
+    onTimeClick: () -> Unit
+) {
     Row(horizontalArrangement = Arrangement.spacedBy(HereSize.DateTimeField.spacing)) {
         HereDateTimeField(
             label = stringResource(R.string.new_memory_date_label),
             value = DateFormat.format(happenedAt),
             icon = DesignSystemR.drawable.ic_calendar_outline,
-            onClick = {},
+            onClick = onDateClick,
             modifier = Modifier.weight(DATE_WEIGHT)
         )
 
@@ -245,7 +280,7 @@ private fun DateTimeSection(happenedAt: LocalDateTime) {
             label = stringResource(R.string.new_memory_time_label),
             value = TimeFormat.format(happenedAt),
             icon = DesignSystemR.drawable.ic_clock_outline,
-            onClick = {},
+            onClick = onTimeClick,
             modifier = Modifier.weight(TIME_WEIGHT)
         )
     }

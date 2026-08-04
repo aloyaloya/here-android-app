@@ -81,6 +81,11 @@ fun NavGraphBuilder.newMemoryScreen(onClose: () -> Unit) {
             onEmotionSelected = viewModel::onEmotionSelected,
             onTitleChanged = viewModel::onTitleChanged,
             onDescriptionChanged = viewModel::onDescriptionChanged,
+            onDateFieldClick = viewModel::onDateFieldClick,
+            onTimeFieldClick = viewModel::onTimeFieldClick,
+            onSheetDismiss = viewModel::onSheetDismiss,
+            onDateSelected = viewModel::onDateSelected,
+            onTimeSelected = viewModel::onTimeSelected,
             onAddMediaClick = {},
             onSaveClick = viewModel::onSave,
             onCancelClick = onClose
