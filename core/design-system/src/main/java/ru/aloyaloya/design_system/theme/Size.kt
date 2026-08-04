@@ -61,6 +61,44 @@ object HereSize {
         val handleWidth = 48.dp
         val handleHeight = 5.dp
         val handleVerticalPadding = 17.dp
+        val actionHeight = 52.dp
+        val actionSpacing = 10.dp
+        val titleSpacing = 3.dp
+        val titleLabelSize = 10.5f.sp
+        val titleLabelLetterSpacing = 1.2f.sp
+        val titleValueSize = 28.sp
+    }
+
+    /** Календарь в листе выбора даты. */
+    object Calendar {
+        val gridSpacing = 6.dp
+        val navButtonSize = 36.dp
+        val navButtonSpacing = 8.dp
+        val selectedBorder = 1.5.dp
+        val legendDotSize = 9.dp
+        val legendSpacing = 8.dp
+        val monthSize = 16.sp
+        val weekdaySize = 10.5f.sp
+        val daySize = 16.sp
+        val legendSize = 11.5f.sp
+    }
+
+    /** Барабаны в листе выбора времени. */
+    object TimeWheel {
+        val cardHeight = 172.dp
+        val itemHeight = 36.dp
+        val bandHeight = 52.dp
+        val bandHorizontalMargin = 14.dp
+        val fadeHeight = 44.dp
+        val colonWidth = 22.dp
+        val chipSpacing = 6.dp
+        val chipVerticalPadding = 9.dp
+        val chipHorizontalPadding = 12.dp
+        val selectedSize = 30.sp
+        val nearSize = 19.sp
+        val farSize = 15.sp
+        val colonSize = 26.sp
+        val chipSize = 12.5f.sp
     }
 
     /** Плитка эмоции. */
@@ -105,7 +143,7 @@ object HereSize {
 
     /** Поле ввода. */
     object TextField {
-        val verticalPadding = 18.dp
+        val verticalPadding = 16.dp
         val horizontalPadding = 20.dp
         val multilineMinHeight = 111.dp
     }

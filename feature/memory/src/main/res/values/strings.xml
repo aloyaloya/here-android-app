@@ -11,4 +11,12 @@
     <string name="new_memory_title_placeholder">Как назовем место?</string>
     <string name="new_memory_description_placeholder">Что запомнилось?</string>
     <string name="new_memory_save">Сохранить воспоминание</string>
+
+    <string name="sheet_cancel">Отмена</string>
+    <string name="sheet_confirm">Выбрать</string>
+
+    <string name="date_sheet_label">Когда это было</string>
+
+    <string name="time_sheet_label">Во сколько</string>
+    <string name="time_sheet_now">Сейчас</string>
 </resources>
