@@ -9,18 +9,17 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.domain.repository.AddressRepository
 import ru.aloyaloya.domain.repository.MemoryRepository
 import ru.aloyaloya.memory.model.NewMemoryUiState
 import javax.inject.Inject
 
-/** Адрес-заглушка: геокодер к экрану еще не подключен. */
-private const val MOCK_ADDRESS = "Малая Бронная, 22"
-
 class NewMemoryViewModel @Inject constructor(
-    private val memoryRepository: MemoryRepository
+    private val memoryRepository: MemoryRepository,
+    private val addressRepository: AddressRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(NewMemoryUiState(address = MOCK_ADDRESS))
+    private val _uiState = MutableStateFlow(NewMemoryUiState())
     val uiState: StateFlow<NewMemoryUiState> = _uiState.asStateFlow()
 
     private var latitude: Double? = null
@@ -32,11 +31,20 @@ class NewMemoryViewModel @Inject constructor(
      * Вызывается при каждом появлении экрана, поэтому уже принятые аргументы не
      * трогает: иначе поворот экрана вернул бы смененную эмоцию к исходной.
      * Координаты в состоянии не лежат — экран их не показывает и не меняет.
+     * По ним же один раз спрашивается адрес: он приходит позже самого экрана.
      */
     fun setInitialArgs(emotion: Emotion, latitude: Double, longitude: Double) {
         if (this.latitude == null) {
             this.latitude = latitude
             this.longitude = longitude
+
+            viewModelScope.launch {
+                val address = addressRepository.resolve(
+                    latitude = latitude,
+                    longitude = longitude
+                )
+                _uiState.update { it.copy(address = address) }
+            }
         }
         _uiState.update { state ->
             if (state.emotion == null) state.copy(emotion = emotion) else state

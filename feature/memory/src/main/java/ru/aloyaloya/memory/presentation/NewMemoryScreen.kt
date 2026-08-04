@@ -1,5 +1,10 @@
 package ru.aloyaloya.memory.presentation
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.spring
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
@@ -20,6 +25,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.emotion.EmotionChip
@@ -39,6 +45,9 @@ import ru.aloyaloya.memory.R
 import ru.aloyaloya.memory.model.NewMemoryUiState
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
+
+/** Масштаб, с которого плашка адреса вырастает до полного размера. */
+private const val ADDRESS_INITIAL_SCALE = 0.8f
 
 /**
  * Экран нового воспоминания.
@@ -145,11 +154,14 @@ fun NewMemoryScreen(
  * Превью выбранного места: пин эмоции и адрес.
  *
  * Карты в превью пока нет, под пином лежит приглушенная подложка.
+ *
+ * Адрес приходит от геокодера позже самого экрана, поэтому плашка не появляется
+ * рывком, а вырастает из своего угла.
  */
 @Composable
 private fun PlacePreview(
     emotion: Emotion?,
-    address: String
+    address: String?
 ) {
     val colors = HereTheme.colors
 
@@ -169,20 +181,33 @@ private fun PlacePreview(
             )
         }
 
-        Text(
-            text = address,
-            style = MaterialTheme.typography.titleMedium,
-            color = colors.textPrimary,
+        AnimatedVisibility(
+            visible = address != null,
+            enter = scaleIn(
+                animationSpec = spring(
+                    dampingRatio = Spring.DampingRatioMediumBouncy,
+                    stiffness = Spring.StiffnessLow
+                ),
+                initialScale = ADDRESS_INITIAL_SCALE,
+                transformOrigin = TransformOrigin(0f, 1f)
+            ) + fadeIn(),
             modifier = Modifier
                 .align(Alignment.BottomStart)
                 .padding(HereSize.PlacePreview.addressMargin)
-                .clip(HereShape.chip)
-                .background(colors.surface)
-                .padding(
-                    vertical = HereSize.PlacePreview.addressVerticalPadding,
-                    horizontal = HereSize.PlacePreview.addressHorizontalPadding
-                )
-        )
+        ) {
+            Text(
+                text = address.orEmpty(),
+                style = MaterialTheme.typography.titleMedium,
+                color = colors.textPrimary,
+                modifier = Modifier
+                    .clip(HereShape.chip)
+                    .background(colors.surface)
+                    .padding(
+                        vertical = HereSize.PlacePreview.addressVerticalPadding,
+                        horizontal = HereSize.PlacePreview.addressHorizontalPadding
+                    )
+            )
+        }
     }
 }
 

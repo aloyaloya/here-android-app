@@ -10,7 +10,7 @@ import ru.aloyaloya.domain.model.Emotion
  * @property emotion Выбранная эмоция. Приходит из листа на карте, но ее можно сменить.
  * @property title Заголовок воспоминания.
  * @property description Описание воспоминания.
- * @property address Адрес выбранной точки.
+ * @property address Адрес выбранной точки или null, пока он не определён или определить не удалось.
  * @property saving Идет запись в базу.
  * @property saved Воспоминание записано — экран пора закрывать.
  */
@@ -18,7 +18,7 @@ data class NewMemoryUiState(
     val emotion: Emotion? = null,
     val title: String = "",
     val description: String = "",
-    val address: String = "",
+    val address: String? = null,
     val saving: Boolean = false,
     val saved: Boolean = false
 ) {
