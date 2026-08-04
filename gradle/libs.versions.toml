@@ -13,7 +13,7 @@ ksp = "2.3.6"
 navigationCompose = "2.9.7"
 appcompat = "1.7.1"
 material = "1.13.0"
-yandexMapsMobile = "4.33.1-lite"
+yandexMapsMobile = "4.33.1-full"
 room = "2.7.1"
 coroutines = "1.10.2"
 

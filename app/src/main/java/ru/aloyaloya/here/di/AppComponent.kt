@@ -10,6 +10,7 @@ import ru.aloyaloya.data.di.DataModule
 import ru.aloyaloya.database.di.DatabaseModule
 import ru.aloyaloya.here.HereApplication
 import ru.aloyaloya.map.di.MapComponent
+import ru.aloyaloya.mapkit.di.MapKitModule
 import ru.aloyaloya.memory.di.MemoryComponent
 import javax.inject.Singleton
 
@@ -25,7 +26,8 @@ import javax.inject.Singleton
     modules = [
         AppModule::class,
         DatabaseModule::class,
-        DataModule::class
+        DataModule::class,
+        MapKitModule::class
     ]
 )
 interface AppComponent {
