@@ -151,12 +151,12 @@ object HereSize {
     /** Плашка даты или времени события. */
     object DateTimeField {
         val border = 1.5.dp
-        val verticalPadding = 16.dp
+        val verticalPadding = 14.dp
         val horizontalPadding = 14.dp
         val labelSpacing = 1.dp
         val iconSize = 24.dp
         val spacing = 8.dp
-        val labelSize = 12.sp
+        val labelSize = 11.sp
         val labelLetterSpacing = 0.8.sp
     }
 
