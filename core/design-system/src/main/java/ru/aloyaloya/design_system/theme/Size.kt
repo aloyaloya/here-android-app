@@ -125,7 +125,7 @@ object HereSize {
 
     /** Превью выбранного места. */
     object PlacePreview {
-        val height = 169.dp
+        val height = 180.dp
         val addressMargin = 14.dp
         val addressVerticalPadding = 8.dp
         val addressHorizontalPadding = 14.dp
@@ -148,12 +148,12 @@ object HereSize {
     /** Плашка даты или времени события. */
     object DateTimeField {
         val border = 1.5.dp
-        val verticalPadding = 14.dp
+        val verticalPadding = 12.dp
         val horizontalPadding = 14.dp
         val labelSpacing = 1.dp
         val iconSize = 24.dp
         val spacing = 8.dp
-        val labelSize = 11.sp
+        val labelSize = 10.sp
         val labelLetterSpacing = 0.8.sp
     }
 
