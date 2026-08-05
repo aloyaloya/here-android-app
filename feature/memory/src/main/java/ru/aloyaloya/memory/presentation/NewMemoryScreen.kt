@@ -286,11 +286,7 @@ private fun DateTimeSection(
     }
 }
 
-/**
- * Ряд эмоций с подписью секции.
- *
- * Все шесть эмоций в ширину экрана не помещаются, поэтому ряд скроллится вбок.
- */
+/** Ряд эмоций с подписью секции. */
 @Composable
 private fun EmotionSection(
     selectedEmotion: Emotion?,

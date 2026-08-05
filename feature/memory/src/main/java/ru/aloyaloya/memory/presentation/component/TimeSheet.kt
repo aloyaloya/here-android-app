@@ -82,7 +82,12 @@ fun TimeSheet(
     onTimeSelected: (LocalTime) -> Unit
 ) {
     var selectedTime by rememberSaveable {
-        mutableStateOf(LocalTime.of(initialTime.hour, initialTime.minute / MINUTE_STEP * MINUTE_STEP))
+        mutableStateOf(
+            LocalTime.of(
+                initialTime.hour,
+                initialTime.minute / MINUTE_STEP * MINUTE_STEP
+            )
+        )
     }
 
     HereBottomSheet(onDismissRequest = onDismissRequest) {
@@ -177,7 +182,7 @@ private fun TimeWheels(
 /**
  * Один барабан.
  *
- * Прокрутка «липнет» к значениям через [rememberSnapFlingBehavior], а выбранным
+ * Прокрутка липнет к значениям через [rememberSnapFlingBehavior], а выбранным
  * считается то, что оказалось в середине. Пустые отступы сверху и снизу нужны,
  * чтобы первое и последнее значение тоже могли встать по центру.
  */
@@ -277,14 +282,15 @@ private fun WheelFades() {
     }
 }
 
-/** Чипы частого времени: «Сейчас» и три круглых часа. */
+/** Чипы частого времени */
 @Composable
 private fun QuickTimeChips(
     selectedTime: LocalTime,
     onTimeClick: (LocalTime) -> Unit
 ) {
     val now = remember { LocalTime.now() }
-    val roundedNow = remember(now) { LocalTime.of(now.hour, now.minute / MINUTE_STEP * MINUTE_STEP) }
+    val roundedNow =
+        remember(now) { LocalTime.of(now.hour, now.minute / MINUTE_STEP * MINUTE_STEP) }
 
     Row(
         horizontalArrangement = Arrangement.spacedBy(HereSize.TimeWheel.chipSpacing),

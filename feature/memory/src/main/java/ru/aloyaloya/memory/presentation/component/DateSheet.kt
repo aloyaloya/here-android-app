@@ -111,7 +111,9 @@ private fun MonthHeader(
         modifier = Modifier.fillMaxWidth()
     ) {
         Text(
-            text = MonthFormat.format(month.atDay(1)).replaceFirstChar { it.uppercase() },
+            text = MonthFormat.format(
+                month.atDay(1)
+            ).replaceFirstChar { it.uppercase() },
             style = MaterialTheme.typography.titleMedium.copy(
                 fontSize = HereSize.Calendar.monthSize
             ),
@@ -232,7 +234,11 @@ private fun DayCell(
             .then(if (selected) Modifier.background(colors.accent) else Modifier)
             .then(
                 if (today && !selected) {
-                    Modifier.border(HereSize.Calendar.selectedBorder, colors.accent, HereShape.pill)
+                    Modifier.border(
+                        HereSize.Calendar.selectedBorder,
+                        colors.accent,
+                        HereShape.pill
+                    )
                 } else {
                     Modifier
                 }

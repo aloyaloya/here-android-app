@@ -28,6 +28,9 @@ private val SheetScrim = Color(0x57241F1C)
  * Обертка над [ModalBottomSheet] с формой, цветами и хэндлом из дизайн-системы.
  * Отступы контента задает вызывающая сторона.
  *
+ * Промежуточной высоты у листа нет: он сразу раскрывается под свой контент. Иначе
+ * высокие листы вроде календаря открывались бы наполовину.
+ *
  * Фон, обводку и хэндл лист рисует сам, а [ModalBottomSheet] остается прозрачным:
  * его собственный контейнер сдвигается при перетаскивании отдельно от переданного
  * модификатора, и обводка на нем уезжает от края листа.
@@ -46,7 +49,7 @@ fun HereBottomSheet(
     ModalBottomSheet(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
-        sheetState = rememberModalBottomSheetState(),
+        sheetState = rememberModalBottomSheetState(skipPartiallyExpanded = true),
         shape = HereShape.sheet,
         containerColor = Color.Transparent,
         scrimColor = SheetScrim,
