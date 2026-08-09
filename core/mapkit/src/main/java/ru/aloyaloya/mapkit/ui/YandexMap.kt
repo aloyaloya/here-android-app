@@ -65,7 +65,23 @@ fun YandexMap(
     val context = LocalContext.current
     val appContext = remember(context) { context.applicationContext }
     val lifecycleOwner = LocalLifecycleOwner.current
-    val mapView = remember(context, movable) { createMapView(context, movable) }
+
+    val styleLightJson = remember(appContext) {
+        readRawJson(appContext, R.raw.light_theme_style)
+    }
+    val styleDarkJson = remember(appContext) {
+        readRawJson(appContext, R.raw.dark_theme_style)
+    }
+
+    val mapView = remember(context, movable) {
+        createMapView(context, movable).also { view ->
+            applyMapTheme(
+                mapView = view,
+                isDark = isDarkTheme,
+                styleJson = if (isDarkTheme) styleDarkJson else styleLightJson
+            )
+        }
+    }
 
     DisposableEffect(state, mapView) {
         state.mapView = mapView
@@ -86,13 +102,6 @@ fun YandexMap(
 
     LaunchedEffect(binder, userLocationStyle) {
         binder.applyStyle()
-    }
-
-    val styleLightJson = remember(appContext) {
-        readRawJson(appContext, R.raw.light_theme_style)
-    }
-    val styleDarkJson = remember(appContext) {
-        readRawJson(appContext, R.raw.dark_theme_style)
     }
 
     val locationEnabledState = rememberUpdatedState(locationEnabled)
@@ -117,8 +126,11 @@ fun YandexMap(
                 coroutineScope {
                     val mapStyleJob = launch {
                         snapshotFlow { isDarkThemeState.value }.collectLatest { dark ->
-                            val json = if (dark) styleDarkJson else styleLightJson
-                            mapView.mapWindow.map.setMapStyle(json)
+                            applyMapTheme(
+                                mapView = mapView,
+                                isDark = dark,
+                                styleJson = if (dark) styleDarkJson else styleLightJson
+                            )
                         }
                     }
                     val locationJob = launch {
@@ -173,6 +185,17 @@ private fun createMapView(context: Context, movable: Boolean): MapView =
     } else {
         MapView(context)
     }
+
+/**
+ * Приводит карту к теме приложения.
+ * Вызывается сразу после создания карты, до первого кадра, и потом на каждую смену темы.
+ */
+private fun applyMapTheme(mapView: MapView, isDark: Boolean, styleJson: String) {
+    mapView.mapWindow.map.apply {
+        isNightModeEnabled = isDark
+        setMapStyle(styleJson)
+    }
+}
 
 private fun applyCameraZoomBounds(mapView: MapView, config: YandexMapConfig) {
     mapView.mapWindow.map.cameraBounds.apply {
