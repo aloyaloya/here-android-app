@@ -228,9 +228,8 @@ private fun PlacePreview(
             .background(colors.surfaceMuted)
     ) {
         YandexMap(
-            modifier = Modifier
-                .fillMaxSize()
-                .clip(HereShape.card),
+            modifier = Modifier.fillMaxSize(),
+            movable = true,
             interactive = false,
             locationEnabled = false,
             isDarkTheme = LocalAppDarkTheme.current,
