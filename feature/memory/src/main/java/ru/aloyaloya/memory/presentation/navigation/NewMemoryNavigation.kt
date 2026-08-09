@@ -11,6 +11,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.memory.di.MemoryComponent
 import ru.aloyaloya.memory.presentation.NewMemoryScreen
 import ru.aloyaloya.memory.presentation.NewMemoryViewModel
@@ -78,6 +79,7 @@ fun NavGraphBuilder.newMemoryScreen(onClose: () -> Unit) {
 
         NewMemoryScreen(
             uiState = uiState,
+            point = MapPoint(route.latitude, route.longitude),
             onEmotionSelected = viewModel::onEmotionSelected,
             onTitleChanged = viewModel::onTitleChanged,
             onDescriptionChanged = viewModel::onDescriptionChanged,

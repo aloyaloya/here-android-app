@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.emotion.EmotionChip
 import ru.aloyaloya.design_system.component.emotion.EmotionPin
@@ -42,6 +43,8 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.mapkit.model.MapPoint
+import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.memory.R
 import ru.aloyaloya.memory.model.NewMemorySheet
 import ru.aloyaloya.memory.model.NewMemoryUiState
@@ -49,6 +52,7 @@ import ru.aloyaloya.memory.presentation.component.DateSheet
 import ru.aloyaloya.memory.presentation.component.TimeSheet
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
+import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -90,6 +94,7 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
 @Composable
 fun NewMemoryScreen(
     uiState: NewMemoryUiState,
+    point: MapPoint,
     onEmotionSelected: (Emotion) -> Unit,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
@@ -136,6 +141,7 @@ fun NewMemoryScreen(
                 .padding(vertical = HereSpacing.s)
         ) {
             PlacePreview(
+                point = point,
                 emotion = uiState.emotion,
                 address = uiState.address
             )
@@ -202,13 +208,12 @@ fun NewMemoryScreen(
 /**
  * Превью выбранного места: пин эмоции и адрес.
  *
- * Карты в превью пока нет, под пином лежит приглушенная подложка.
- *
  * Адрес приходит от геокодера позже самого экрана, поэтому плашка не появляется
  * рывком, а вырастает из своего угла.
  */
 @Composable
 private fun PlacePreview(
+    point: MapPoint,
     emotion: Emotion?,
     address: String?
 ) {
@@ -222,6 +227,18 @@ private fun PlacePreview(
             .clip(HereShape.card)
             .background(colors.surfaceMuted)
     ) {
+        YandexMap(
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(HereShape.card),
+            interactive = false,
+            locationEnabled = false,
+            isDarkTheme = LocalAppDarkTheme.current,
+            startPosition = point,
+            startZoom = 16f,
+            logoTopInset = 4.dp
+        )
+
         if (emotion != null) {
             EmotionPin(
                 emoji = emotion.emoji,

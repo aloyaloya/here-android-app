@@ -1,6 +1,7 @@
 package ru.aloyaloya.mapkit.ui
 
 import android.content.Context
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -8,6 +9,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
@@ -16,6 +18,8 @@ import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.yandex.mapkit.MapKitFactory
+import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.mapview.MapView
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
@@ -23,6 +27,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.aloyaloya.mapkit.R
 import ru.aloyaloya.mapkit.internal.UserLocationBinder
+import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.model.UserLocationStyle
 import ru.aloyaloya.mapkit.model.YandexMapConfig
 
@@ -31,17 +36,23 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
  * Пермишны — снаружи.
  *
  * @param state Держатель карты: через него экран спрашивает, куда наведена камера.
+ * @param startPosition Точка, на которую наводится камера. Наводится заново при каждом
+ * появлении карты, а не только на первом кадре. При `null` камера остается как есть.
+ * @param startZoom Зум, с которым камера встает на [startPosition].
  * @param logoTopInset Отступ логотипа Яндекса от верха карты. По умолчанию логотип опущен
  * под верхнюю панель, а экран добавляет к отступу системные insets.
  * @param userLocationStyle Цвета маркера текущего положения: модуль берет их снаружи,
- * чтобы маркер следовал за темой приложения.
+ * чтобы маркер следовал за темой приложения. При `null` маркер не показывается.
  */
 @Composable
 fun YandexMap(
-    userLocationStyle: UserLocationStyle,
     modifier: Modifier = Modifier,
     state: YandexMapState = rememberYandexMapState(),
     config: YandexMapConfig = YandexMapConfig.Default,
+    interactive: Boolean = true,
+    startPosition: MapPoint? = null,
+    startZoom: Float = 16f,
+    userLocationStyle: UserLocationStyle? = null,
     locationEnabled: Boolean = false,
     isDarkTheme: Boolean = false,
     logoTopInset: Dp = HERE_LOGO_TOP_INSET_DP.dp
@@ -82,13 +93,22 @@ fun YandexMap(
     val locationEnabledState = rememberUpdatedState(locationEnabled)
     val isDarkThemeState = rememberUpdatedState(isDarkTheme)
 
-    LaunchedEffect(mapView, binder, config.minZoom, config.maxZoom, config.userLocationZoom) {
+    LaunchedEffect(
+        mapView,
+        binder,
+        config.minZoom,
+        config.maxZoom,
+        config.userLocationZoom,
+        startPosition,
+        startZoom
+    ) {
         lifecycleOwner.lifecycle.repeatOnLifecycle(Lifecycle.State.STARTED) {
             val mapKit = MapKitFactory.getInstance()
             mapKit.onStart()
             mapView.onStart()
             try {
                 applyCameraZoomBounds(mapView, config)
+                applyStartPosition(mapView, startPosition, startZoom)
                 coroutineScope {
                     val mapStyleJob = launch {
                         snapshotFlow { isDarkThemeState.value }.collectLatest { dark ->
@@ -116,10 +136,24 @@ fun YandexMap(
         }
     }
 
-    AndroidView(
-        factory = { mapView },
-        modifier = modifier
-    )
+    Box(modifier = modifier) {
+        AndroidView(
+            factory = { mapView },
+            modifier = Modifier.matchParentSize()
+        )
+
+        if (!interactive) {
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .pointerInput(Unit) {
+                        awaitPointerEventScope {
+                            while (true) awaitPointerEvent()
+                        }
+                    }
+            )
+        }
+    }
 }
 
 private fun applyCameraZoomBounds(mapView: MapView, config: YandexMapConfig) {
@@ -127,6 +161,15 @@ private fun applyCameraZoomBounds(mapView: MapView, config: YandexMapConfig) {
         setMinZoomPreference(config.minZoom)
         setMaxZoomPreference(config.maxZoom)
     }
+}
+
+private fun applyStartPosition(mapView: MapView, startPosition: MapPoint?, startZoom: Float) {
+    if (startPosition == null) return
+
+    val target = Point(startPosition.latitude, startPosition.longitude)
+    val cameraPosition = CameraPosition(target, startZoom, 0f, 0f)
+
+    mapView.mapWindow.map.move(cameraPosition)
 }
 
 private fun readRawJson(context: Context, resId: Int): String =

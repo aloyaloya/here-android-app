@@ -42,6 +42,7 @@ dependencies {
     implementation(project(":core:ui"))
     implementation(project(":core:domain"))
     implementation(project(":core:design-system"))
+    implementation(project(":core:mapkit"))
 
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
