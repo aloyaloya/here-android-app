@@ -19,14 +19,15 @@ import com.yandex.mapkit.location.Location as MapKitLocation
 /**
  * Геолокация: last-known, слой пользователя, один фикс MapKit.
  *
- * @param style Текущие цвета маркера. Читается лямбдой, а не значением: слой с одним ID
- * можно создать только раз, поэтому биндер переживает смену темы и просто перекрашивает маркер.
+ * @param style Текущие цвета маркера или `null`, если маркер не показывается. Читается
+ * лямбдой, а не значением: слой с одним ID можно создать только раз, поэтому биндер
+ * переживает смену темы и просто перекрашивает маркер.
  */
 internal class UserLocationBinder(
     private val mapView: MapView,
     private val userLocationZoom: Float,
     private val appContext: Context,
-    private val style: () -> UserLocationStyle
+    private val style: () -> UserLocationStyle?
 ) {
     private val mapKit get() = MapKitFactory.getInstance()
 
@@ -93,7 +94,7 @@ internal class UserLocationBinder(
      * между ними, поэтому задаются обе.
      */
     private fun applyStyle(view: UserLocationView) {
-        val style = style()
+        val style = style() ?: return
         view.arrow.setIcon(UserLocationIcons.arrow(appContext, style))
         view.pin.setIcon(UserLocationIcons.pin(appContext, style))
         view.accuracyCircle.fillColor = style.accuracy.toArgb()

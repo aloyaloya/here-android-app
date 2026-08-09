@@ -10,7 +10,7 @@ import ru.aloyaloya.domain.model.Memory
  */
 interface MemoryRepository {
 
-    /** Возвращает все воспоминания, отсортированные по дате создания. */
+    /** Возвращает все воспоминания, от недавних событий к давним. */
     fun observeAll(): Flow<List<Memory>>
 
     /** Возвращает воспоминание по [id], или `null` если не найдено. */

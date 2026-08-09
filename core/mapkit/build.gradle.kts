@@ -1,6 +1,7 @@
 plugins {
     alias(libs.plugins.android.library)
     alias(libs.plugins.kotlin.compose)
+    alias(libs.plugins.ksp)
 }
 
 val mapkitApiKey: String by rootProject.extra
@@ -40,7 +41,15 @@ android {
 }
 
 dependencies {
+    implementation(project(":core:domain"))
+
     implementation(libs.yandex.maps.mobile)
+    implementation(libs.kotlinx.coroutines.core)
+
+    implementation(libs.dagger)
+    implementation(libs.androidx.compose.foundation.layout)
+    ksp(libs.dagger.compiler)
+
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.lifecycle.runtime.ktx)
     implementation(libs.androidx.lifecycle.runtime.compose)

@@ -15,7 +15,9 @@ import androidx.room.PrimaryKey
  * @property latitude Широта точки на карте.
  * @property longitude Долгота точки на карте.
  * @property emotion Эмоция, связанная с воспоминанием.
- * @property createdAt Время создания в миллисекундах (Unix timestamp).
+ * @property createdAt Когда запись создана, в миллисекундах (Unix timestamp).
+ * @property happenedAt Когда событие произошло, в миллисекундах (Unix timestamp).
+ * Задается пользователем: записать воспоминание можно и на следующий день.
  */
 @Entity(tableName = "memories")
 data class MemoryEntity(
@@ -25,5 +27,6 @@ data class MemoryEntity(
     val latitude: Double,
     val longitude: Double,
     val emotion: Emotion,
-    val createdAt: Long
+    val createdAt: Long,
+    val happenedAt: Long
 )

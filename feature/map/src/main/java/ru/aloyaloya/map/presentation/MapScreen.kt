@@ -24,15 +24,19 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.core.content.ContextCompat
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
+import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.map.model.MapUiState
+import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.model.UserLocationStyle
 import ru.aloyaloya.mapkit.ui.HERE_LOGO_TOP_INSET_DP
 import ru.aloyaloya.mapkit.ui.YandexMap
+import ru.aloyaloya.mapkit.ui.YandexMapState
+import ru.aloyaloya.mapkit.ui.rememberYandexMapState
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 
 /** Прозрачность круга точности вокруг маркера. */
@@ -48,8 +52,22 @@ private fun Context.hasLocationPermission(): Boolean =
         ContextCompat.checkSelfPermission(this, perm) == PackageManager.PERMISSION_GRANTED
     }
 
+/**
+ * Экран карты.
+ *
+ * Точка воспоминания — центр камеры в момент нажатия на FAB, а не в момент
+ * подтверждения эмоции: пользователь выбирает место на той карте, которую видит
+ * до открытия листа.
+ *
+ * @param uiState Состояние экрана.
+ * @param onEmotionConfirmed Колбэк выбора эмоции в листе: отдает наверх эмоцию
+ * и точку, на которой открылся лист.
+ */
 @Composable
-fun MapScreen(uiState: MapUiState) {
+fun MapScreen(
+    uiState: MapUiState,
+    onEmotionConfirmed: (Emotion, MapPoint) -> Unit
+) {
     val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
     var locationGranted by remember {
@@ -81,17 +99,23 @@ fun MapScreen(uiState: MapUiState) {
 
         is MapUiState.Content -> {
             var emotionPickerVisible by rememberSaveable { mutableStateOf(false) }
+            var pickedPoint by remember { mutableStateOf<MapPoint?>(null) }
+            val mapState = rememberYandexMapState()
 
             Box(modifier = Modifier.fillMaxSize()) {
                 MapContent(
                     uiState = uiState,
+                    mapState = mapState,
                     locationEnabled = locationGranted,
                     isDarkTheme = isDarkTheme,
                     modifier = Modifier.fillMaxSize()
                 )
 
                 HereFab(
-                    onClick = { emotionPickerVisible = true },
+                    onClick = {
+                        pickedPoint = mapState.cameraTarget
+                        emotionPickerVisible = true
+                    },
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .navigationBarsPadding()
@@ -105,7 +129,10 @@ fun MapScreen(uiState: MapUiState) {
             if (emotionPickerVisible) {
                 EmotionPickerSheet(
                     onDismissRequest = { emotionPickerVisible = false },
-                    onEmotionConfirmed = { emotionPickerVisible = false }
+                    onEmotionConfirmed = { emotion ->
+                        emotionPickerVisible = false
+                        pickedPoint?.let { point -> onEmotionConfirmed(emotion, point) }
+                    }
                 )
             }
         }
@@ -121,6 +148,7 @@ fun MapScreen(uiState: MapUiState) {
 @Composable
 private fun MapContent(
     uiState: MapUiState.Content,
+    mapState: YandexMapState,
     locationEnabled: Boolean,
     isDarkTheme: Boolean,
     modifier: Modifier
@@ -139,6 +167,7 @@ private fun MapContent(
     }
 
     YandexMap(
+        state = mapState,
         userLocationStyle = userLocationStyle,
         modifier = modifier,
         config = uiState.mapConfig,

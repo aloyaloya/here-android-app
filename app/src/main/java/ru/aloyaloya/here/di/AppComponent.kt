@@ -6,9 +6,12 @@ import dagger.BindsInstance
 import dagger.Component
 import ru.aloyaloya.analytic.di.AnalyticComponent
 import ru.aloyaloya.calendar.di.CalendarComponent
+import ru.aloyaloya.data.di.DataModule
 import ru.aloyaloya.database.di.DatabaseModule
 import ru.aloyaloya.here.HereApplication
 import ru.aloyaloya.map.di.MapComponent
+import ru.aloyaloya.mapkit.di.MapKitModule
+import ru.aloyaloya.memory.di.MemoryComponent
 import javax.inject.Singleton
 
 /**
@@ -22,7 +25,9 @@ import javax.inject.Singleton
 @Component(
     modules = [
         AppModule::class,
-        DatabaseModule::class
+        DatabaseModule::class,
+        DataModule::class,
+        MapKitModule::class
     ]
 )
 interface AppComponent {
@@ -45,6 +50,9 @@ interface AppComponent {
 
     /** Фабрика подкомпонента фичи карты. */
     val mapComponentFactory: MapComponent.Factory
+
+    /** Фабрика подкомпонента фичи воспоминаний. */
+    val memoryComponentFactory: MemoryComponent.Factory
 
     /** Фабрика подкомпонента фичи календаря. */
     val calendarComponentFactory: CalendarComponent.Factory

@@ -78,6 +78,16 @@ fun Modifier.buttonShadow(shape: Shape): Modifier =
         offsetY = 8.dp
     )
 
+/** Тень выбранного дня в календаре, окрашенная в акцентный цвет. */
+@Composable
+fun Modifier.calendarDayShadow(shape: Shape): Modifier =
+    dropShadow(
+        shape = shape,
+        color = HereTheme.colors.accent.copy(alpha = 0.4f),
+        blur = 12.dp,
+        offsetY = 4.dp
+    )
+
 /**
  * Мягкая тень в светлой теме и обводка в темной.
  *

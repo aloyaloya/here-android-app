@@ -61,6 +61,41 @@ object HereSize {
         val handleWidth = 48.dp
         val handleHeight = 5.dp
         val handleVerticalPadding = 17.dp
+        val actionHeight = 52.dp
+        val actionSpacing = 10.dp
+        val titleSpacing = 3.dp
+        val titleLabelSize = 12f.sp
+        val titleLabelLetterSpacing = 1.2f.sp
+        val titleValueSize = 28.sp
+    }
+
+    /** Календарь в листе выбора даты. */
+    object Calendar {
+        val gridSpacing = 6.dp
+        val navButtonSize = 40.dp
+        val navButtonSpacing = 8.dp
+        val selectedBorder = 1.5.dp
+        val monthSize = 18.sp
+        val weekdaySize = 10.5f.sp
+        val daySize = 17.sp
+    }
+
+    /** Барабаны в листе выбора времени. */
+    object TimeWheel {
+        val cardHeight = 172.dp
+        val itemHeight = 36.dp
+        val bandHeight = 48.dp
+        val bandHorizontalMargin = 14.dp
+        val fadeHeight = 44.dp
+        val colonWidth = 22.dp
+        val chipSpacing = 6.dp
+        val chipVerticalPadding = 10.dp
+        val chipHorizontalPadding = 12.dp
+        val selectedSize = 30.sp
+        val nearSize = 19.sp
+        val farSize = 15.sp
+        val colonSize = 26.sp
+        val chipSize = 16f.sp
     }
 
     /** Плитка эмоции. */
@@ -71,6 +106,64 @@ object HereSize {
         val contentSpacing = 10.dp
         val selectedBorder = 2.dp
         val emojiSize = 36.sp
+    }
+
+    /** Квадратная плитка эмоции в ряду. */
+    object EmotionChip {
+        val size = 65.dp
+        val spacing = 11.dp
+        val selectedBorder = 2.dp
+        val emojiSize = 31.sp
+    }
+
+    /** Круглый пин эмоции. */
+    object EmotionPin {
+        val size = 58.dp
+        val border = 4.dp
+        val emojiSize = 28.sp
+    }
+
+    /** Превью выбранного места. */
+    object PlacePreview {
+        val height = 180.dp
+        val addressMargin = 14.dp
+        val addressVerticalPadding = 8.dp
+        val addressHorizontalPadding = 14.dp
+    }
+
+    /** Панель модального экрана. */
+    object ModalTopBar {
+        val horizontalPadding = 27.dp
+        val topPadding = 19.dp
+        val bottomPadding = 12.dp
+    }
+
+    /** Поле ввода. */
+    object TextField {
+        val verticalPadding = 16.dp
+        val horizontalPadding = 20.dp
+        val multilineMinHeight = 111.dp
+    }
+
+    /** Плашка даты или времени события. */
+    object DateTimeField {
+        val border = 1.5.dp
+        val verticalPadding = 12.dp
+        val horizontalPadding = 14.dp
+        val labelSpacing = 1.dp
+        val iconSize = 24.dp
+        val spacing = 8.dp
+        val labelSize = 10.sp
+        val labelLetterSpacing = 0.8.sp
+    }
+
+    /** Плитка медиа: превью снимка и кнопка добавления. */
+    object MediaTile {
+        val size = 87.dp
+        val spacing = 12.dp
+        val addBorder = 2.dp
+        val addDash = 6.dp
+        val addGap = 5.dp
     }
 
     /** Основная кнопка. */

@@ -1,7 +1,5 @@
 package ru.aloyaloya.data.mapper
 
-import ru.aloyaloya.database.entity.Emotion as EntityEmotion
-import ru.aloyaloya.database.entity.MediaType as EntityMediaType
 import ru.aloyaloya.database.entity.MemoryEntity
 import ru.aloyaloya.database.entity.MemoryMediaEntity
 import ru.aloyaloya.database.entity.MemoryWithMedia
@@ -9,6 +7,8 @@ import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.model.MemoryMedia
+import ru.aloyaloya.database.entity.Emotion as EntityEmotion
+import ru.aloyaloya.database.entity.MediaType as EntityMediaType
 
 /**
  * Маппер между Entity-слоем (Room) и Domain-слоем.
@@ -23,6 +23,7 @@ internal object MemoryMapper {
         longitude = memory.longitude,
         emotion = memory.emotion.toDomain(),
         createdAt = memory.createdAt,
+        happenedAt = memory.happenedAt,
         media = media.map { it.toDomain() }
     )
 
@@ -33,7 +34,8 @@ internal object MemoryMapper {
         latitude = latitude,
         longitude = longitude,
         emotion = emotion.toEntity(),
-        createdAt = createdAt
+        createdAt = createdAt,
+        happenedAt = happenedAt
     )
 
     fun Memory.toMediaEntities(memoryId: Long): List<MemoryMediaEntity> =

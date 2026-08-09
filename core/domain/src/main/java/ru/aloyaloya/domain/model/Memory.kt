@@ -9,7 +9,9 @@ package ru.aloyaloya.domain.model
  * @property latitude Широта точки на карте.
  * @property longitude Долгота точки на карте.
  * @property emotion Эмоция, связанная с воспоминанием.
- * @property createdAt Время создания в миллисекундах (Unix timestamp).
+ * @property createdAt Когда запись создана, в миллисекундах (Unix timestamp).
+ * @property happenedAt Когда событие произошло, в миллисекундах (Unix timestamp).
+ * Задается пользователем: записать воспоминание можно и на следующий день.
  * @property media Список прикреплённых медиафайлов.
  */
 data class Memory(
@@ -20,5 +22,6 @@ data class Memory(
     val longitude: Double,
     val emotion: Emotion,
     val createdAt: Long,
+    val happenedAt: Long,
     val media: List<MemoryMedia> = emptyList()
 )

@@ -20,9 +20,9 @@ import ru.aloyaloya.database.entity.MemoryWithMedia
 @Dao
 interface MemoryDao {
 
-    /** Возвращает все воспоминания с медиа, отсортированные по дате создания. */
+    /** Возвращает все воспоминания с медиа, от недавних событий к давним. */
     @Transaction
-    @Query("SELECT * FROM memories ORDER BY createdAt DESC")
+    @Query("SELECT * FROM memories ORDER BY happenedAt DESC")
     fun observeAll(): Flow<List<MemoryWithMedia>>
 
     /** Возвращает воспоминание с медиа по [id], или `null` если не найдено. */
