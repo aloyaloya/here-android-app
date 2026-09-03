@@ -27,7 +27,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.emotion.EmotionChip
 import ru.aloyaloya.design_system.component.emotion.EmotionPin
@@ -43,6 +42,7 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.memory.R
@@ -235,7 +235,7 @@ private fun PlacePreview(
             isDarkTheme = LocalAppDarkTheme.current,
             startPosition = point,
             startZoom = 16f,
-            logoTopInset = 4.dp
+            logoPlacement = MapLogoPlacement.Card
         )
 
         if (emotion != null) {
