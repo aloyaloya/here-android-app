@@ -29,13 +29,18 @@ import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.map.model.MapUiState
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
+import ru.aloyaloya.mapkit.model.MapMarker
+import ru.aloyaloya.mapkit.model.MapMarkerIcon
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.model.UserLocationStyle
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.mapkit.ui.YandexMapState
 import ru.aloyaloya.mapkit.ui.rememberYandexMapState
+import ru.aloyaloya.ui.emotion.color
+import ru.aloyaloya.ui.emotion.emoji
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 
 /** Прозрачность круга точности вокруг маркера. */
@@ -159,6 +164,7 @@ private fun MapContent(
     val logoPlacement = MapLogoPlacement.UnderTopBar
 
     val colors = HereTheme.colors
+    val markers = uiState.memories.toMarkers()
     val userLocationStyle = remember(colors) {
         UserLocationStyle(
             fill = colors.accent,
@@ -174,8 +180,31 @@ private fun MapContent(
         config = uiState.mapConfig,
         locationEnabled = locationEnabled,
         isDarkTheme = isDarkTheme,
+        markers = markers,
         logoPlacement = logoPlacement.copy(
             verticalInset = logoPlacement.verticalInset + statusBarInset
         )
     )
+}
+
+/**
+ * Переводит воспоминания в метки карты.
+ *
+ * Цвета эмоций живут в теме, поэтому метки собираются здесь, а не во вьюмодели.
+ */
+@Composable
+private fun List<Memory>.toMarkers(): List<MapMarker> {
+    val outline = HereTheme.colors.surface
+
+    return map { memory ->
+        MapMarker(
+            id = memory.id,
+            point = MapPoint(memory.latitude, memory.longitude),
+            icon = MapMarkerIcon(
+                emoji = memory.emotion.emoji,
+                fill = memory.emotion.color.solid,
+                outline = outline
+            )
+        )
+    }
 }

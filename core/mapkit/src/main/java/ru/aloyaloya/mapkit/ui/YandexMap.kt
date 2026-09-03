@@ -25,8 +25,10 @@ import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.aloyaloya.mapkit.R
+import ru.aloyaloya.mapkit.internal.MarkersBinder
 import ru.aloyaloya.mapkit.internal.UserLocationBinder
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
+import ru.aloyaloya.mapkit.model.MapMarker
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.model.UserLocationStyle
 import ru.aloyaloya.mapkit.model.YandexMapConfig
@@ -43,6 +45,7 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
  * под верхнюю панель, а экран добавляет к отступу системные insets.
  * @param userLocationStyle Цвета маркера текущего положения: модуль берет их снаружи,
  * чтобы маркер следовал за темой приложения. При `null` маркер не показывается.
+ * @param markers Метки, которые карта показывает поверх тайлов.
  * @param movable Карта рисуется во вьюху, которая подчиняется скруглению и другим
  * преобразованиям родителя, а до первого кадра остается прозрачной. Нужна там, где карта
  * лежит в карточке. Стоит дороже обычной, поэтому на весь экран берется обычная.
@@ -59,6 +62,7 @@ fun YandexMap(
     userLocationStyle: UserLocationStyle? = null,
     locationEnabled: Boolean = false,
     isDarkTheme: Boolean = false,
+    markers: List<MapMarker> = emptyList(),
     logoPlacement: MapLogoPlacement = MapLogoPlacement.UnderTopBar
 ) {
     val context = LocalContext.current
@@ -101,6 +105,14 @@ fun YandexMap(
 
     LaunchedEffect(binder, userLocationStyle) {
         binder.applyStyle()
+    }
+
+    val markersBinder = remember(mapView, appContext) {
+        MarkersBinder(mapView, appContext)
+    }
+
+    LaunchedEffect(markersBinder, markers) {
+        markersBinder.apply(markers)
     }
 
     val locationEnabledState = rememberUpdatedState(locationEnabled)
