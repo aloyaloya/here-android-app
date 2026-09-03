@@ -24,16 +24,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.dp
 import androidx.core.content.ContextCompat
 import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.map.model.MapUiState
+import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.model.UserLocationStyle
-import ru.aloyaloya.mapkit.ui.HERE_LOGO_TOP_INSET_DP
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.mapkit.ui.YandexMapState
 import ru.aloyaloya.mapkit.ui.rememberYandexMapState
@@ -157,6 +156,8 @@ private fun MapContent(
         .asPaddingValues()
         .calculateTopPadding()
 
+    val logoPlacement = MapLogoPlacement.UnderTopBar
+
     val colors = HereTheme.colors
     val userLocationStyle = remember(colors) {
         UserLocationStyle(
@@ -173,6 +174,8 @@ private fun MapContent(
         config = uiState.mapConfig,
         locationEnabled = locationEnabled,
         isDarkTheme = isDarkTheme,
-        logoTopInset = HERE_LOGO_TOP_INSET_DP.dp + statusBarInset
+        logoPlacement = logoPlacement.copy(
+            verticalInset = logoPlacement.verticalInset + statusBarInset
+        )
     )
 }

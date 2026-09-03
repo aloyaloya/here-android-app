@@ -12,8 +12,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.platform.LocalContext
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.compose.LocalLifecycleOwner
@@ -28,6 +26,7 @@ import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import ru.aloyaloya.mapkit.R
 import ru.aloyaloya.mapkit.internal.UserLocationBinder
+import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.model.UserLocationStyle
 import ru.aloyaloya.mapkit.model.YandexMapConfig
@@ -40,7 +39,7 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
  * @param startPosition Точка, на которую наводится камера. Наводится заново при каждом
  * появлении карты, а не только на первом кадре. При `null` камера остается как есть.
  * @param startZoom Зум, с которым камера встает на [startPosition].
- * @param logoTopInset Отступ логотипа Яндекса от верха карты. По умолчанию логотип опущен
+ * @param logoPlacement Место логотипа Яндекса на карте. По умолчанию логотип опущен
  * под верхнюю панель, а экран добавляет к отступу системные insets.
  * @param userLocationStyle Цвета маркера текущего положения: модуль берет их снаружи,
  * чтобы маркер следовал за темой приложения. При `null` маркер не показывается.
@@ -60,7 +59,7 @@ fun YandexMap(
     userLocationStyle: UserLocationStyle? = null,
     locationEnabled: Boolean = false,
     isDarkTheme: Boolean = false,
-    logoTopInset: Dp = HERE_LOGO_TOP_INSET_DP.dp
+    logoPlacement: MapLogoPlacement = MapLogoPlacement.UnderTopBar
 ) {
     val context = LocalContext.current
     val appContext = remember(context) { context.applicationContext }
@@ -88,8 +87,8 @@ fun YandexMap(
         onDispose { state.mapView = null }
     }
 
-    LaunchedEffect(mapView, logoTopInset) {
-        mapView.applyHereLogoPlacement(topInsetDp = logoTopInset.value.toInt())
+    LaunchedEffect(mapView, logoPlacement) {
+        mapView.applyHereLogoPlacement(logoPlacement)
     }
 
     val userLocationStyleState = rememberUpdatedState(userLocationStyle)
