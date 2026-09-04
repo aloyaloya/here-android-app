@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
+import ru.aloyaloya.memory.presentation.MemoryViewModel
 import ru.aloyaloya.memory.presentation.NewMemoryViewModel
 import ru.aloyaloya.ui.di.ViewModelKey
 
@@ -20,4 +21,9 @@ interface MemoryModule {
     @IntoMap
     @ViewModelKey(NewMemoryViewModel::class)
     fun bindsNewMemoryViewModel(vm: NewMemoryViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(MemoryViewModel::class)
+    fun bindsMemoryViewModel(vm: MemoryViewModel): ViewModel
 }
