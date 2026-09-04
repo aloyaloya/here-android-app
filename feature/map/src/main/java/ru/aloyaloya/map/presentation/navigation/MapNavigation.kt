@@ -37,8 +37,12 @@ fun NavController.navigateToMap(navOptions: NavOptions) =
  *
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: вместе с эмоцией отдает
  * точку на карте, дальше идет экран нового места.
+ * @param onMemoryOpenClick Колбэк перехода к воспоминанию из листа на карте.
  */
-fun NavGraphBuilder.mapScreen(onEmotionConfirmed: (Emotion, MapPoint) -> Unit) {
+fun NavGraphBuilder.mapScreen(
+    onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
+    onMemoryOpenClick: (Long) -> Unit
+) {
     composable<MapRoute> { navBackStackEntry ->
 
         val context = LocalContext.current.applicationContext
@@ -56,7 +60,10 @@ fun NavGraphBuilder.mapScreen(onEmotionConfirmed: (Emotion, MapPoint) -> Unit) {
 
         MapScreen(
             uiState = uiState,
-            onEmotionConfirmed = onEmotionConfirmed
+            onEmotionConfirmed = onEmotionConfirmed,
+            onMarkerClick = viewModel::onMarkerClick,
+            onMemorySheetDismiss = viewModel::onMemorySheetDismiss,
+            onMemoryOpenClick = onMemoryOpenClick
         )
     }
 }

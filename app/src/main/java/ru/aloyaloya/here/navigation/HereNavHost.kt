@@ -37,7 +37,8 @@ fun HereNavHost(
                     latitude = point.latitude,
                     longitude = point.longitude
                 )
-            }
+            },
+            onMemoryOpenClick = {}
         )
         newMemoryScreen(onClose = { navController.popBackStack() })
         calendarScreen()

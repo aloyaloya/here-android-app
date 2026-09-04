@@ -5,4 +5,14 @@
 
     <string name="emotion_picker_title">Что чувствуешь здесь?</string>
     <string name="emotion_picker_next">Дальше</string>
+
+    <string name="memory_preview_open">Открыть</string>
+    <string name="memory_preview_note">заметка</string>
+
+    <plurals name="memory_preview_photos">
+        <item quantity="one">%d фото</item>
+        <item quantity="few">%d фото</item>
+        <item quantity="many">%d фото</item>
+        <item quantity="other">%d фото</item>
+    </plurals>
 </resources>

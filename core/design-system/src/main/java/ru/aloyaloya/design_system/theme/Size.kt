@@ -166,6 +166,31 @@ object HereSize {
         val addGap = 5.dp
     }
 
+    /** Компактная кнопка на приглушенном акцентном фоне. */
+    object TonalButton {
+        val height = 52.dp
+        val horizontalPadding = 22.dp
+        val iconSize = 20.dp
+        val iconSpacing = 8.dp
+    }
+
+    /** Квадратная плитка эмоции без выбора: иконка воспоминания. */
+    object EmotionBadge {
+        val size = 62.dp
+        val emojiSize = 30.sp
+    }
+
+    /** Карточка воспоминания в листе на карте. */
+    object MemoryPreview {
+        val headerSpacing = 14.dp
+        val titleSpacing = 4.dp
+        val dividerSpacing = 18.dp
+        val mediaTileSize = 34.dp
+        val mediaTileSpacing = 4.dp
+        val mediaTextSpacing = 12.dp
+        val mediaTileShape = 10.dp
+    }
+
     /** Основная кнопка. */
     object PrimaryButton {
         val height = 65.dp

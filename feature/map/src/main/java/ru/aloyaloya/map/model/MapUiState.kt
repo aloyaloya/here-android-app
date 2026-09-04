@@ -11,9 +11,9 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
  */
 sealed class MapUiState {
     data object Loading : MapUiState()
-
     data class Content(
         val mapConfig: YandexMapConfig,
-        val memories: List<Memory>
+        val memories: List<Memory>,
+        val selected: SelectedMemory? = null
     ) : MapUiState()
 }

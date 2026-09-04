@@ -46,6 +46,7 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
  * @param userLocationStyle Цвета маркера текущего положения: модуль берет их снаружи,
  * чтобы маркер следовал за темой приложения. При `null` маркер не показывается.
  * @param markers Метки, которые карта показывает поверх тайлов.
+ * @param onMarkerClick Колбэк нажатия на метку, отдает идентификатор объекта.
  * @param movable Карта рисуется во вьюху, которая подчиняется скруглению и другим
  * преобразованиям родителя, а до первого кадра остается прозрачной. Нужна там, где карта
  * лежит в карточке. Стоит дороже обычной, поэтому на весь экран берется обычная.
@@ -63,6 +64,7 @@ fun YandexMap(
     locationEnabled: Boolean = false,
     isDarkTheme: Boolean = false,
     markers: List<MapMarker> = emptyList(),
+    onMarkerClick: (Long) -> Unit = {},
     logoPlacement: MapLogoPlacement = MapLogoPlacement.UnderTopBar
 ) {
     val context = LocalContext.current
@@ -107,8 +109,10 @@ fun YandexMap(
         binder.applyStyle()
     }
 
+    val onMarkerClickState = rememberUpdatedState(onMarkerClick)
+
     val markersBinder = remember(mapView, appContext) {
-        MarkersBinder(mapView, appContext)
+        MarkersBinder(mapView, appContext) { id -> onMarkerClickState.value(id) }
     }
 
     LaunchedEffect(markersBinder, markers) {

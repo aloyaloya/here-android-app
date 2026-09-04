@@ -66,11 +66,17 @@ private fun Context.hasLocationPermission(): Boolean =
  * @param uiState Состояние экрана.
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: отдает наверх эмоцию
  * и точку, на которой открылся лист.
+ * @param onMarkerClick Колбэк нажатия на метку воспоминания.
+ * @param onMemorySheetDismiss Колбэк закрытия листа воспоминания.
+ * @param onMemoryOpenClick Колбэк перехода к выбранному воспоминанию.
  */
 @Composable
 fun MapScreen(
     uiState: MapUiState,
-    onEmotionConfirmed: (Emotion, MapPoint) -> Unit
+    onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
+    onMarkerClick: (Long) -> Unit,
+    onMemorySheetDismiss: () -> Unit,
+    onMemoryOpenClick: (Long) -> Unit
 ) {
     val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
@@ -112,6 +118,7 @@ fun MapScreen(
                     mapState = mapState,
                     locationEnabled = locationGranted,
                     isDarkTheme = isDarkTheme,
+                    onMarkerClick = onMarkerClick,
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -127,6 +134,14 @@ fun MapScreen(
                             end = HereSize.Fab.endMargin,
                             bottom = HereSize.Fab.bottomMargin
                         )
+                )
+            }
+
+            uiState.selected?.let { selected ->
+                MemoryPreviewSheet(
+                    selected = selected,
+                    onDismissRequest = onMemorySheetDismiss,
+                    onOpenClick = { onMemoryOpenClick(selected.memory.id) }
                 )
             }
 
@@ -155,6 +170,7 @@ private fun MapContent(
     mapState: YandexMapState,
     locationEnabled: Boolean,
     isDarkTheme: Boolean,
+    onMarkerClick: (Long) -> Unit,
     modifier: Modifier
 ) {
     val statusBarInset = WindowInsets.statusBars
@@ -181,6 +197,7 @@ private fun MapContent(
         locationEnabled = locationEnabled,
         isDarkTheme = isDarkTheme,
         markers = markers,
+        onMarkerClick = onMarkerClick,
         logoPlacement = logoPlacement.copy(
             verticalInset = logoPlacement.verticalInset + statusBarInset
         )
