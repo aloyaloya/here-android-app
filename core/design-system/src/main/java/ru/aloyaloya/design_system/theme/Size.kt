@@ -174,6 +174,21 @@ object HereSize {
         val iconSpacing = 8.dp
     }
 
+    /** Круглая кнопка с иконкой поверх карты или фотографии. */
+    object IconButton {
+        val size = 48.dp
+        val iconSize = 22.dp
+        val backgroundAlpha = 0.94f
+    }
+
+    /** Эмоция строкой: эмодзи и название. */
+    object EmotionTag {
+        val spacing = 10.dp
+        val verticalPadding = 7.dp
+        val horizontalPadding = 13.dp
+        val emojiSize = 18.sp
+    }
+
     /** Квадратная плитка эмоции без выбора: иконка воспоминания. */
     object EmotionBadge {
         val size = 62.dp
