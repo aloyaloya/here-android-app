@@ -76,6 +76,7 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
  * @param uiState Состояние экрана.
  * @param onBackClick Колбэк возврата назад.
  * @param onMoreClick Колбэк открытия меню действий.
+ * @param onEditClick Колбэк выбора редактирования в меню.
  * @param onDeleteClick Колбэк выбора удаления в меню.
  * @param onDeleteConfirm Колбэк подтверждения удаления.
  * @param onSheetDismiss Колбэк закрытия открытого листа.
@@ -86,6 +87,7 @@ fun MemoryScreen(
     uiState: MemoryUiState,
     onBackClick: () -> Unit,
     onMoreClick: () -> Unit,
+    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onDeleteConfirm: () -> Unit,
     onSheetDismiss: () -> Unit,
@@ -112,6 +114,7 @@ fun MemoryScreen(
 
             when (uiState.activeSheet) {
                 MemorySheet.ACTIONS -> MemoryActionsSheet(
+                    onEditClick = onEditClick,
                     onDeleteClick = onDeleteClick,
                     onDismissRequest = onSheetDismiss
                 )

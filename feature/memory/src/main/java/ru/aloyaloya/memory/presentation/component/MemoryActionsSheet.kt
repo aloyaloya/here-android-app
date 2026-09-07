@@ -27,12 +27,14 @@ import ru.aloyaloya.design_system.R as DesignSystemR
 /**
  * Меню действий над воспоминанием.
  *
+ * @param onEditClick Колбэк выбора редактирования.
  * @param onDeleteClick Колбэк выбора удаления.
  * @param onDismissRequest Колбэк закрытия листа.
  * @param modifier [Modifier], применяемый к листу.
  */
 @Composable
 fun MemoryActionsSheet(
+    onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
@@ -47,6 +49,13 @@ fun MemoryActionsSheet(
                 .padding(horizontal = HereSize.Sheet.horizontalPadding)
                 .padding(bottom = HereSize.Sheet.bottomPadding)
         ) {
+            MemoryAction(
+                icon = DesignSystemR.drawable.ic_edit,
+                text = stringResource(R.string.memory_action_edit),
+                color = HereTheme.colors.textPrimary,
+                onClick = onEditClick
+            )
+
             MemoryAction(
                 icon = DesignSystemR.drawable.ic_trash,
                 text = stringResource(R.string.memory_action_delete),

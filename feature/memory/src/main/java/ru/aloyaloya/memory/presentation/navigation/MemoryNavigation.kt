@@ -31,8 +31,14 @@ fun NavController.navigateToMemory(memoryId: Long) =
 
 /**
  * Регистрирует экран воспоминания как destination в [NavGraphBuilder].
+ *
+ * @param onBackClick Колбэк возврата назад.
+ * @param onEditClick Колбэк перехода на редактирование воспоминания.
  */
-fun NavGraphBuilder.memoryScreen(onBackClick: () -> Unit) {
+fun NavGraphBuilder.memoryScreen(
+    onBackClick: () -> Unit,
+    onEditClick: (Long) -> Unit
+) {
     composable<MemoryRoute> { navBackStackEntry ->
 
         val route = navBackStackEntry.toRoute<MemoryRoute>()
@@ -58,6 +64,10 @@ fun NavGraphBuilder.memoryScreen(onBackClick: () -> Unit) {
             uiState = uiState,
             onBackClick = onBackClick,
             onMoreClick = viewModel::onMoreClick,
+            onEditClick = {
+                viewModel.onSheetDismiss()
+                onEditClick(route.memoryId)
+            },
             onDeleteClick = viewModel::onDeleteClick,
             onDeleteConfirm = viewModel::onDeleteConfirm,
             onSheetDismiss = viewModel::onSheetDismiss

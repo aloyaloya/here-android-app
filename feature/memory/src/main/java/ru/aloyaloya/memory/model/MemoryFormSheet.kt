@@ -1,7 +1,7 @@
 package ru.aloyaloya.memory.model
 
 /** Лист, открытый поверх экрана нового воспоминания. */
-enum class NewMemorySheet {
+enum class MemoryFormSheet {
     DATE,
     TIME
 }

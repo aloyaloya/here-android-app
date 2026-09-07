@@ -1,33 +1,36 @@
 package ru.aloyaloya.memory.model
 
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.mapkit.model.MapPoint
 import java.time.LocalDateTime
 
 /**
- * Состояние UI экрана [ru.aloyaloya.memory.presentation.NewMemoryScreen].
- *
- * Экран — это форма, поэтому состояние одно: то, что пользователь успел заполнить.
+ * Состояние UI экрана [ru.aloyaloya.memory.presentation.MemoryFormScreen].
  *
  * @property emotion Выбранная эмоция. Приходит из листа на карте, но ее можно сменить.
  * @property happenedAt Когда событие произошло. По умолчанию — момент открытия экрана,
  * дату и время можно поменять. В миллисекунды переводится при сохранении.
  * @property title Заголовок воспоминания.
  * @property description Описание воспоминания.
+ * @property point Точка воспоминания: у нового приходит из маршрута, у существующего
+ * читается из базы, поэтому до загрузки ее нет.
  * @property address Адрес выбранной точки или null, пока он не определён или определить не удалось.
+ * @property editing Форма открыта на существующем воспоминании.
  * @property saving Идет запись в базу.
  * @property saved Воспоминание записано — экран пора закрывать.
  */
-data class NewMemoryUiState(
+data class MemoryFormUiState(
     val happenedAt: LocalDateTime,
     val emotion: Emotion? = null,
     val title: String = "",
     val description: String = "",
+    val point: MapPoint? = null,
     val address: String? = null,
+    val editing: Boolean = false,
     val saving: Boolean = false,
     val saved: Boolean = false,
-    val activeSheet: NewMemorySheet? = null
+    val activeSheet: MemoryFormSheet? = null
 ) {
-    /** Сохранять есть что, когда выбрана эмоция и заполнен заголовок. */
     val saveEnabled: Boolean
-        get() = emotion != null && title.isNotBlank() && !saving
+        get() = emotion != null && point != null && title.isNotBlank() && !saving
 }

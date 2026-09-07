@@ -8,10 +8,11 @@ import ru.aloyaloya.analytic.presentation.navigation.analyticScreen
 import ru.aloyaloya.calendar.presentation.navigation.calendarScreen
 import ru.aloyaloya.map.presentation.navigation.MapRoute
 import ru.aloyaloya.map.presentation.navigation.mapScreen
+import ru.aloyaloya.memory.presentation.navigation.memoryFormScreen
 import ru.aloyaloya.memory.presentation.navigation.memoryScreen
+import ru.aloyaloya.memory.presentation.navigation.navigateToEditMemory
 import ru.aloyaloya.memory.presentation.navigation.navigateToMemory
 import ru.aloyaloya.memory.presentation.navigation.navigateToNewMemory
-import ru.aloyaloya.memory.presentation.navigation.newMemoryScreen
 
 /**
  * Корневой навигационный граф приложения Here.
@@ -42,8 +43,11 @@ fun HereNavHost(
             },
             onMemoryOpenClick = { memoryId -> navController.navigateToMemory(memoryId) }
         )
-        newMemoryScreen(onClose = { navController.popBackStack() })
-        memoryScreen(onBackClick = { navController.popBackStack() })
+        memoryFormScreen(onClose = { navController.popBackStack() })
+        memoryScreen(
+            onBackClick = { navController.popBackStack() },
+            onEditClick = { memoryId -> navController.navigateToEditMemory(memoryId) }
+        )
         calendarScreen()
         analyticScreen()
     }
