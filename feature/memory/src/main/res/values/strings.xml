@@ -15,6 +15,11 @@
     <string name="memory_back">Назад</string>
     <string name="memory_no_media_title">Фотографий нет</string>
     <string name="memory_no_media_subtitle">Можно добавить позже</string>
+    <string name="memory_more">Действия</string>
+    <string name="memory_action_delete">Удалить</string>
+    <string name="memory_delete_title">Удалить «%1$s»?</string>
+    <string name="memory_delete_message">Воспоминание и его фотографии исчезнут с карты навсегда.</string>
+    <string name="memory_delete_confirm">Удалить навсегда</string>
 
     <string name="sheet_cancel">Отмена</string>
     <string name="sheet_confirm">Выбрать</string>

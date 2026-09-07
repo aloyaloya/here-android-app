@@ -47,7 +47,10 @@ import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.memory.R
+import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
+import ru.aloyaloya.memory.presentation.component.DeleteMemorySheet
+import ru.aloyaloya.memory.presentation.component.MemoryActionsSheet
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
 import ru.aloyaloya.ui.emotion.labelResId
@@ -72,12 +75,20 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
  *
  * @param uiState Состояние экрана.
  * @param onBackClick Колбэк возврата назад.
+ * @param onMoreClick Колбэк открытия меню действий.
+ * @param onDeleteClick Колбэк выбора удаления в меню.
+ * @param onDeleteConfirm Колбэк подтверждения удаления.
+ * @param onSheetDismiss Колбэк закрытия открытого листа.
  * @param modifier [Modifier], применяемый к экрану.
  */
 @Composable
 fun MemoryScreen(
     uiState: MemoryUiState,
     onBackClick: () -> Unit,
+    onMoreClick: () -> Unit,
+    onDeleteClick: () -> Unit,
+    onDeleteConfirm: () -> Unit,
+    onSheetDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     when (uiState) {
@@ -90,12 +101,30 @@ fun MemoryScreen(
             CircularProgressIndicator(color = HereTheme.colors.accent)
         }
 
-        is MemoryUiState.Content -> MemoryContent(
-            memory = uiState.memory,
-            address = uiState.address,
-            onBackClick = onBackClick,
-            modifier = modifier
-        )
+        is MemoryUiState.Content -> {
+            MemoryContent(
+                memory = uiState.memory,
+                address = uiState.address,
+                onBackClick = onBackClick,
+                onMoreClick = onMoreClick,
+                modifier = modifier
+            )
+
+            when (uiState.activeSheet) {
+                MemorySheet.ACTIONS -> MemoryActionsSheet(
+                    onDeleteClick = onDeleteClick,
+                    onDismissRequest = onSheetDismiss
+                )
+
+                MemorySheet.DELETE -> DeleteMemorySheet(
+                    title = uiState.memory.title,
+                    onConfirmClick = onDeleteConfirm,
+                    onDismissRequest = onSheetDismiss
+                )
+
+                null -> Unit
+            }
+        }
 
         MemoryUiState.NotFound -> LaunchedEffect(Unit) { onBackClick() }
     }
@@ -109,6 +138,7 @@ private fun MemoryContent(
     memory: Memory,
     address: String?,
     onBackClick: () -> Unit,
+    onMoreClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val density = LocalDensity.current
@@ -154,7 +184,20 @@ private fun MemoryContent(
                 )
         )
 
-        MemorySheet(
+        HereIconButton(
+            icon = DesignSystemR.drawable.ic_more,
+            contentDescription = stringResource(R.string.memory_more),
+            onClick = onMoreClick,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(
+                    top = HereSize.Memory.actionsTopPadding,
+                    end = HereSize.Memory.actionsHorizontalPadding
+                )
+        )
+
+        MemoryDetailSheet(
             memory = memory,
             address = address,
             modifier = Modifier
@@ -214,7 +257,7 @@ private fun TopScrim(modifier: Modifier = Modifier) {
 
 /** Лист с рассказом: эмоция, заголовок, когда и где это было, текст и медиа. */
 @Composable
-private fun MemorySheet(
+private fun MemoryDetailSheet(
     memory: Memory,
     address: String?,
     modifier: Modifier = Modifier

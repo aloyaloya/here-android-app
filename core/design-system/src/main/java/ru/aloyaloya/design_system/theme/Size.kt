@@ -225,6 +225,20 @@ object HereSize {
         val dividerThickness = 1.dp
     }
 
+    /** Лист подтверждения необратимого действия. */
+    object ConfirmSheet {
+        val iconSize = 68.dp
+        val iconSymbolSize = 31.sp
+        val contentSpacing = 14.dp
+        val actionSpacing = 10.dp
+    }
+
+    /** Пункт меню в листе действий. */
+    object SheetAction {
+        val height = 60.dp
+        val iconSpacing = 14.dp
+    }
+
     /** Основная кнопка. */
     object PrimaryButton {
         val height = 65.dp

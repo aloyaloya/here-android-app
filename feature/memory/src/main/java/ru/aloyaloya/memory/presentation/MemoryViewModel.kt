@@ -10,6 +10,7 @@ import kotlinx.coroutines.launch
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.repository.AddressRepository
 import ru.aloyaloya.domain.repository.MemoryRepository
+import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
 import javax.inject.Inject
 
@@ -25,9 +26,6 @@ class MemoryViewModel @Inject constructor(
 
     private var addressRequested = false
 
-    /**
-     * Принимает идентификатор воспоминания и подписывается на него.
-     */
     fun setMemoryId(memoryId: Long) {
         if (this.memoryId != null) return
         this.memoryId = memoryId
@@ -46,9 +44,26 @@ class MemoryViewModel @Inject constructor(
         }
     }
 
-    /**
-     * Спрашивает адрес точки один раз за жизнь экрана.
-     */
+    fun onMoreClick() = showSheet(MemorySheet.ACTIONS)
+
+    fun onDeleteClick() = showSheet(MemorySheet.DELETE)
+
+    fun onSheetDismiss() = showSheet(null)
+
+    fun onDeleteConfirm() {
+        val memory = (_uiState.value as? MemoryUiState.Content)?.memory ?: return
+
+        viewModelScope.launch {
+            memoryRepository.delete(memory)
+        }
+    }
+
+    private fun showSheet(sheet: MemorySheet?) {
+        _uiState.update { state ->
+            if (state is MemoryUiState.Content) state.copy(activeSheet = sheet) else state
+        }
+    }
+
     private fun resolveAddress(memory: Memory) {
         if (addressRequested) return
         addressRequested = true

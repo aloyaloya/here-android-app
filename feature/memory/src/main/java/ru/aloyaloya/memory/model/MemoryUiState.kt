@@ -11,7 +11,8 @@ sealed class MemoryUiState {
 
     data class Content(
         val memory: Memory,
-        val address: String? = null
+        val address: String? = null,
+        val activeSheet: MemorySheet? = null
     ) : MemoryUiState()
 
     data object NotFound : MemoryUiState()
