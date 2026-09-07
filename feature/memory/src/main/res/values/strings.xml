@@ -12,6 +12,10 @@
     <string name="new_memory_description_placeholder">Что запомнилось?</string>
     <string name="new_memory_save">Сохранить воспоминание</string>
 
+    <string name="memory_back">Назад</string>
+    <string name="memory_no_media_title">Фотографий нет</string>
+    <string name="memory_no_media_subtitle">Можно добавить позже</string>
+
     <string name="sheet_cancel">Отмена</string>
     <string name="sheet_confirm">Выбрать</string>
 
