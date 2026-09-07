@@ -41,7 +41,7 @@ fun HereNavHost(
                     longitude = point.longitude
                 )
             },
-            onMemoryOpenClick = { memoryId -> navController.navigateToMemory(memoryId) }
+            onMemoryClick = { memoryId -> navController.navigateToMemory(memoryId) }
         )
         memoryFormScreen(onClose = { navController.popBackStack() })
         memoryScreen(

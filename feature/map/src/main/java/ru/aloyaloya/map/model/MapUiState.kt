@@ -13,7 +13,6 @@ sealed class MapUiState {
     data object Loading : MapUiState()
     data class Content(
         val mapConfig: YandexMapConfig,
-        val memories: List<Memory>,
-        val selected: SelectedMemory? = null
+        val memories: List<Memory>
     ) : MapUiState()
 }

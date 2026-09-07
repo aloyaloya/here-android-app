@@ -195,17 +195,6 @@ object HereSize {
         val emojiSize = 30.sp
     }
 
-    /** Карточка воспоминания в листе на карте. */
-    object MemoryPreview {
-        val headerSpacing = 14.dp
-        val titleSpacing = 4.dp
-        val dividerSpacing = 18.dp
-        val mediaTileSize = 34.dp
-        val mediaTileSpacing = 4.dp
-        val mediaTextSpacing = 12.dp
-        val mediaTileShape = 10.dp
-    }
-
     /** Экран воспоминания. */
     object Memory {
         val haloSize = 143.dp

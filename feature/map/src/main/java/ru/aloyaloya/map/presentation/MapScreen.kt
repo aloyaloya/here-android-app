@@ -66,17 +66,14 @@ private fun Context.hasLocationPermission(): Boolean =
  * @param uiState Состояние экрана.
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: отдает наверх эмоцию
  * и точку, на которой открылся лист.
- * @param onMarkerClick Колбэк нажатия на метку воспоминания.
- * @param onMemorySheetDismiss Колбэк закрытия листа воспоминания.
- * @param onMemoryOpenClick Колбэк перехода к выбранному воспоминанию.
+ * @param onMemoryClick Колбэк нажатия на метку воспоминания: с карты сразу
+ * открывается экран воспоминания.
  */
 @Composable
 fun MapScreen(
     uiState: MapUiState,
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
-    onMarkerClick: (Long) -> Unit,
-    onMemorySheetDismiss: () -> Unit,
-    onMemoryOpenClick: (Long) -> Unit
+    onMemoryClick: (Long) -> Unit
 ) {
     val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
@@ -118,7 +115,7 @@ fun MapScreen(
                     mapState = mapState,
                     locationEnabled = locationGranted,
                     isDarkTheme = isDarkTheme,
-                    onMarkerClick = onMarkerClick,
+                    onMarkerClick = onMemoryClick,
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -134,14 +131,6 @@ fun MapScreen(
                             end = HereSize.Fab.endMargin,
                             bottom = HereSize.Fab.bottomMargin
                         )
-                )
-            }
-
-            uiState.selected?.let { selected ->
-                MemoryPreviewSheet(
-                    selected = selected,
-                    onDismissRequest = onMemorySheetDismiss,
-                    onOpenClick = { onMemoryOpenClick(selected.memory.id) }
                 )
             }
 
