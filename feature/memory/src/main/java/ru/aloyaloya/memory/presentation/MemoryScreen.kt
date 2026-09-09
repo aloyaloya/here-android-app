@@ -5,6 +5,9 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,12 +41,14 @@ import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.button.HereIconButton
 import ru.aloyaloya.design_system.component.emotion.EmotionPin
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
+import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.extension.sheetShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.memory.R
@@ -65,6 +70,7 @@ private const val HALO_ALPHA = 0.42f
 private const val SCRIM_ALPHA = 0.28f
 private const val SHEET_MAX_HEIGHT_FRACTION = 0.6f
 private const val MAP_ZOOM = 15.5f
+private const val MEDIA_COLUMNS = 3
 
 private const val SEPARATOR = " · "
 private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru"))
@@ -317,6 +323,15 @@ private fun MemoryDetailSheet(
                 .background(colors.outline)
         )
 
+        MediaSection(media = memory.media)
+    }
+}
+
+@Composable
+private fun MediaSection(media: List<MemoryMedia>) {
+    val colors = HereTheme.colors
+
+    if (media.isEmpty()) {
         Column(verticalArrangement = Arrangement.spacedBy(HereSize.Memory.mediaTextSpacing)) {
             Text(
                 text = stringResource(R.string.memory_no_media_title),
@@ -329,6 +344,32 @@ private fun MemoryDetailSheet(
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.textSecondary
             )
+        }
+        return
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(HereSize.Memory.mediaSpacing)) {
+        Text(
+            text = stringResource(R.string.memory_media_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = colors.textPrimary
+        )
+
+        media.chunked(MEDIA_COLUMNS).forEach { row ->
+            Row(horizontalArrangement = Arrangement.spacedBy(HereSize.Memory.mediaSpacing)) {
+                row.forEach { item ->
+                    MediaPhoto(
+                        uri = item.uri,
+                        modifier = Modifier
+                            .weight(1f)
+                            .aspectRatio(1f)
+                    )
+                }
+
+                repeat(MEDIA_COLUMNS - row.size) {
+                    Spacer(modifier = Modifier.weight(1f))
+                }
+            }
         }
     }
 }
