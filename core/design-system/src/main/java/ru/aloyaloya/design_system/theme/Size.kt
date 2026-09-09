@@ -214,7 +214,8 @@ object HereSize {
         val sheetSpacing = 17.dp
         val headerSpacing = 6.dp
         val mediaTextSpacing = 3.dp
-        val mediaSpacing = 8.dp
+        val mediaSpacing = 10.dp
+        val mediaSize = 107.dp
         val dividerThickness = 1.dp
     }
 
