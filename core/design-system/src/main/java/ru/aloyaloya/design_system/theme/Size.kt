@@ -166,6 +166,68 @@ object HereSize {
         val addGap = 5.dp
     }
 
+    /** Компактная кнопка на приглушенном акцентном фоне. */
+    object TonalButton {
+        val height = 52.dp
+        val horizontalPadding = 22.dp
+        val iconSize = 20.dp
+        val iconSpacing = 8.dp
+    }
+
+    /** Круглая кнопка с иконкой поверх карты или фотографии. */
+    object IconButton {
+        val size = 48.dp
+        val iconSize = 22.dp
+        val backgroundAlpha = 0.94f
+    }
+
+    /** Эмоция строкой: эмодзи и название. */
+    object EmotionTag {
+        val spacing = 10.dp
+        val verticalPadding = 7.dp
+        val horizontalPadding = 13.dp
+        val emojiSize = 18.sp
+    }
+
+    /** Квадратная плитка эмоции без выбора: иконка воспоминания. */
+    object EmotionBadge {
+        val size = 62.dp
+        val emojiSize = 30.sp
+    }
+
+    /** Экран воспоминания. */
+    object Memory {
+        val haloSize = 143.dp
+        val pinSize = 94.dp
+        val pinBorder = 5.dp
+        val pinEmojiSize = 44.sp
+        val scrimHeight = 133.dp
+        val sheetCornerOverlap = 30.dp
+        val actionsHorizontalPadding = 22.dp
+        val actionsTopPadding = 12.dp
+        val sheetHorizontalPadding = 27.dp
+        val sheetTopPadding = 22.dp
+        val sheetBottomPadding = 32.dp
+        val sheetSpacing = 17.dp
+        val headerSpacing = 6.dp
+        val mediaTextSpacing = 3.dp
+        val dividerThickness = 1.dp
+    }
+
+    /** Лист подтверждения необратимого действия. */
+    object ConfirmSheet {
+        val iconSize = 68.dp
+        val iconSymbolSize = 31.sp
+        val contentSpacing = 14.dp
+        val actionSpacing = 10.dp
+    }
+
+    /** Пункт меню в листе действий. */
+    object SheetAction {
+        val height = 60.dp
+        val iconSpacing = 14.dp
+    }
+
     /** Основная кнопка. */
     object PrimaryButton {
         val height = 65.dp

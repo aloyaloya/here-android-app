@@ -2,10 +2,10 @@ package ru.aloyaloya.map.presentation
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import ru.aloyaloya.domain.repository.MemoryRepository
 import ru.aloyaloya.map.model.MapUiState
 import ru.aloyaloya.mapkit.model.YandexMapConfig
@@ -16,17 +16,16 @@ class MapViewModel @Inject constructor(
     memoryRepository: MemoryRepository
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow<MapUiState>(MapUiState.Loading)
-    val uiState: StateFlow<MapUiState> = _uiState.asStateFlow()
-
-    init {
-        viewModelScope.launch {
-            memoryRepository.observeAll().collect { memories ->
-                _uiState.value = MapUiState.Content(
-                    mapConfig = mapConfig,
-                    memories = memories
-                )
-            }
+    val uiState: StateFlow<MapUiState> = memoryRepository.observeAll()
+        .map { memories ->
+            MapUiState.Content(
+                mapConfig = mapConfig,
+                memories = memories
+            )
         }
-    }
+        .stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.Eagerly,
+            initialValue = MapUiState.Loading
+        )
 }

@@ -46,8 +46,8 @@ import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.memory.R
-import ru.aloyaloya.memory.model.NewMemorySheet
-import ru.aloyaloya.memory.model.NewMemoryUiState
+import ru.aloyaloya.memory.model.MemoryFormSheet
+import ru.aloyaloya.memory.model.MemoryFormUiState
 import ru.aloyaloya.memory.presentation.component.DateSheet
 import ru.aloyaloya.memory.presentation.component.TimeSheet
 import ru.aloyaloya.ui.emotion.color
@@ -71,11 +71,14 @@ private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLa
 private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"))
 
 /**
- * Экран нового воспоминания.
+ * Форма воспоминания: и нового, и уже записанного.
  *
- * Открывается поверх карты после выбора эмоции, поэтому у него своя панель сверху
- * и нет нижней навигации. Сохранить можно и действием в панели, и кнопкой внизу:
- * так в макете.
+ * Открывается поверх карты после выбора эмоции или с экрана воспоминания, поэтому
+ * у нее своя панель сверху и нет нижней навигации. Сохранить можно и действием
+ * в панели, и кнопкой внизу: так в макете.
+ *
+ * Чем форма занята, она узнает по [MemoryFormUiState.editing]: меняются только
+ * заголовок панели и подпись кнопки, поля везде одни и те же.
  *
  * @param uiState Состояние формы.
  * @param onEmotionSelected Колбэк смены эмоции.
@@ -92,9 +95,8 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
  * @param modifier [Modifier], применяемый к экрану.
  */
 @Composable
-fun NewMemoryScreen(
-    uiState: NewMemoryUiState,
-    point: MapPoint,
+fun MemoryFormScreen(
+    uiState: MemoryFormUiState,
     onEmotionSelected: (Emotion) -> Unit,
     onTitleChanged: (String) -> Unit,
     onDescriptionChanged: (String) -> Unit,
@@ -115,16 +117,19 @@ fun NewMemoryScreen(
             .imePadding()
     ) {
         HereModalTopBar(
-            title = stringResource(R.string.new_memory_title),
+            title = stringResource(
+                if (uiState.editing) R.string.memory_form_title_edit
+                else R.string.memory_form_title_new
+            ),
             navigation = {
                 HereModalTopBarAction(
-                    text = stringResource(R.string.new_memory_cancel),
+                    text = stringResource(R.string.memory_form_cancel),
                     onClick = onCancelClick
                 )
             },
             action = {
                 HereModalTopBarAction(
-                    text = stringResource(R.string.new_memory_done),
+                    text = stringResource(R.string.memory_form_done),
                     onClick = onSaveClick,
                     accent = true,
                     enabled = uiState.saveEnabled
@@ -141,7 +146,7 @@ fun NewMemoryScreen(
                 .padding(vertical = HereSpacing.s)
         ) {
             PlacePreview(
-                point = point,
+                point = uiState.point,
                 emotion = uiState.emotion,
                 address = uiState.address
             )
@@ -161,7 +166,7 @@ fun NewMemoryScreen(
                 HereTextField(
                     value = uiState.title,
                     onValueChange = onTitleChanged,
-                    placeholder = stringResource(R.string.new_memory_title_placeholder),
+                    placeholder = stringResource(R.string.memory_form_title_placeholder),
                     textStyle = MaterialTheme.typography.titleSmall,
                     singleLine = true
                 )
@@ -169,7 +174,7 @@ fun NewMemoryScreen(
                 HereTextField(
                     value = uiState.description,
                     onValueChange = onDescriptionChanged,
-                    placeholder = stringResource(R.string.new_memory_description_placeholder),
+                    placeholder = stringResource(R.string.memory_form_description_placeholder),
                     minHeight = HereSize.TextField.multilineMinHeight
                 )
 
@@ -178,7 +183,10 @@ fun NewMemoryScreen(
         }
 
         HerePrimaryButton(
-            text = stringResource(R.string.new_memory_save),
+            text = stringResource(
+                if (uiState.editing) R.string.memory_form_save_edit
+                else R.string.memory_form_save_new
+            ),
             onClick = onSaveClick,
             enabled = uiState.saveEnabled,
             modifier = Modifier
@@ -189,13 +197,13 @@ fun NewMemoryScreen(
     }
 
     when (uiState.activeSheet) {
-        NewMemorySheet.DATE -> DateSheet(
+        MemoryFormSheet.DATE -> DateSheet(
             initialDate = uiState.happenedAt.toLocalDate(),
             onDismissRequest = onSheetDismiss,
             onDateSelected = onDateSelected
         )
 
-        NewMemorySheet.TIME -> TimeSheet(
+        MemoryFormSheet.TIME -> TimeSheet(
             initialTime = uiState.happenedAt.toLocalTime(),
             onDismissRequest = onSheetDismiss,
             onTimeSelected = onTimeSelected
@@ -208,12 +216,13 @@ fun NewMemoryScreen(
 /**
  * Превью выбранного места: пин эмоции и адрес.
  *
- * Адрес приходит от геокодера позже самого экрана, поэтому плашка не появляется
- * рывком, а вырастает из своего угла.
+ * Точка известна не сразу: при редактировании она приходит из базы вместе с остальными
+ * полями, и до этого карточка остается пустой. Адрес приходит от геокодера еще позже,
+ * поэтому плашка не появляется рывком, а вырастает из своего угла.
  */
 @Composable
 private fun PlacePreview(
-    point: MapPoint,
+    point: MapPoint?,
     emotion: Emotion?,
     address: String?
 ) {
@@ -227,18 +236,20 @@ private fun PlacePreview(
             .clip(HereShape.card)
             .background(colors.surfaceMuted)
     ) {
-        YandexMap(
-            modifier = Modifier.fillMaxSize(),
-            movable = true,
-            interactive = false,
-            locationEnabled = false,
-            isDarkTheme = LocalAppDarkTheme.current,
-            startPosition = point,
-            startZoom = 16f,
-            logoPlacement = MapLogoPlacement.Card
-        )
+        if (point != null) {
+            YandexMap(
+                modifier = Modifier.fillMaxSize(),
+                movable = true,
+                interactive = false,
+                locationEnabled = false,
+                isDarkTheme = LocalAppDarkTheme.current,
+                startPosition = point,
+                startZoom = 16f,
+                logoPlacement = MapLogoPlacement.Card
+            )
+        }
 
-        if (emotion != null) {
+        if (emotion != null && point != null) {
             EmotionPin(
                 emoji = emotion.emoji,
                 color = emotion.color.solid,
@@ -285,7 +296,7 @@ private fun DateTimeSection(
 ) {
     Row(horizontalArrangement = Arrangement.spacedBy(HereSize.DateTimeField.spacing)) {
         HereDateTimeField(
-            label = stringResource(R.string.new_memory_date_label),
+            label = stringResource(R.string.memory_form_date_label),
             value = DateFormat.format(happenedAt),
             icon = DesignSystemR.drawable.ic_calendar_outline,
             onClick = onDateClick,
@@ -293,7 +304,7 @@ private fun DateTimeSection(
         )
 
         HereDateTimeField(
-            label = stringResource(R.string.new_memory_time_label),
+            label = stringResource(R.string.memory_form_time_label),
             value = TimeFormat.format(happenedAt),
             icon = DesignSystemR.drawable.ic_clock_outline,
             onClick = onTimeClick,
@@ -309,7 +320,7 @@ private fun EmotionSection(
     onEmotionSelected: (Emotion) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.m)) {
-        HereSectionLabel(text = stringResource(R.string.new_memory_emotion_label))
+        HereSectionLabel(text = stringResource(R.string.memory_form_emotion_label))
 
         Row(
             horizontalArrangement = Arrangement.spacedBy(HereSize.EmotionChip.spacing),

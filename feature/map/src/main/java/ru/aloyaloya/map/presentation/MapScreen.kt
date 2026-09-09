@@ -66,11 +66,14 @@ private fun Context.hasLocationPermission(): Boolean =
  * @param uiState Состояние экрана.
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: отдает наверх эмоцию
  * и точку, на которой открылся лист.
+ * @param onMemoryClick Колбэк нажатия на метку воспоминания: с карты сразу
+ * открывается экран воспоминания.
  */
 @Composable
 fun MapScreen(
     uiState: MapUiState,
-    onEmotionConfirmed: (Emotion, MapPoint) -> Unit
+    onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
+    onMemoryClick: (Long) -> Unit
 ) {
     val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
@@ -112,6 +115,7 @@ fun MapScreen(
                     mapState = mapState,
                     locationEnabled = locationGranted,
                     isDarkTheme = isDarkTheme,
+                    onMarkerClick = onMemoryClick,
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -155,6 +159,7 @@ private fun MapContent(
     mapState: YandexMapState,
     locationEnabled: Boolean,
     isDarkTheme: Boolean,
+    onMarkerClick: (Long) -> Unit,
     modifier: Modifier
 ) {
     val statusBarInset = WindowInsets.statusBars
@@ -181,6 +186,7 @@ private fun MapContent(
         locationEnabled = locationEnabled,
         isDarkTheme = isDarkTheme,
         markers = markers,
+        onMarkerClick = onMarkerClick,
         logoPlacement = logoPlacement.copy(
             verticalInset = logoPlacement.verticalInset + statusBarInset
         )
