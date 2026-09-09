@@ -133,7 +133,8 @@ private fun MemoryForm(
         onSheetDismiss = viewModel::onSheetDismiss,
         onDateSelected = viewModel::onDateSelected,
         onTimeSelected = viewModel::onTimeSelected,
-        onAddMediaClick = {},
+        onMediaPicked = viewModel::onMediaPicked,
+        onMediaRemove = viewModel::onMediaRemove,
         onSaveClick = viewModel::onSave,
         onCancelClick = onClose
     )

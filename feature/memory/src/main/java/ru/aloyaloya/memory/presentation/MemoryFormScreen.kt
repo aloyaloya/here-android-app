@@ -1,5 +1,9 @@
 package ru.aloyaloya.memory.presentation
 
+import android.net.Uri
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.PickVisualMediaRequest
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
@@ -33,6 +37,7 @@ import ru.aloyaloya.design_system.component.emotion.EmotionPin
 import ru.aloyaloya.design_system.component.field.HereDateTimeField
 import ru.aloyaloya.design_system.component.field.HereTextField
 import ru.aloyaloya.design_system.component.media.MediaAddTile
+import ru.aloyaloya.design_system.component.media.MediaTile
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.component.topbar.HereModalTopBar
 import ru.aloyaloya.design_system.component.topbar.HereModalTopBarAction
@@ -42,6 +47,7 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.ui.YandexMap
@@ -67,6 +73,9 @@ private const val ADDRESS_INITIAL_SCALE = 0.8f
 private const val DATE_WEIGHT = 1.35f
 private const val TIME_WEIGHT = 1f
 
+/** Сколько снимков можно прикрепить к одному воспоминанию. */
+private const val MEDIA_LIMIT = 10
+
 private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru"))
 private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"))
 
@@ -89,7 +98,8 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
  * @param onSheetDismiss Колбэк закрытия листа без выбора.
  * @param onDateSelected Колбэк выбранной даты.
  * @param onTimeSelected Колбэк выбранного времени.
- * @param onAddMediaClick Колбэк добавления фото или видео.
+ * @param onMediaPicked Колбэк выбранных в пикере снимков.
+ * @param onMediaRemove Колбэк удаления снимка по его месту в подборке.
  * @param onSaveClick Колбэк сохранения.
  * @param onCancelClick Колбэк отмены.
  * @param modifier [Modifier], применяемый к экрану.
@@ -105,7 +115,8 @@ fun MemoryFormScreen(
     onSheetDismiss: () -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onTimeSelected: (LocalTime) -> Unit,
-    onAddMediaClick: () -> Unit,
+    onMediaPicked: (List<String>) -> Unit,
+    onMediaRemove: (Int) -> Unit,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier
@@ -178,7 +189,11 @@ fun MemoryFormScreen(
                     minHeight = HereSize.TextField.multilineMinHeight
                 )
 
-                MediaAddTile(onClick = onAddMediaClick)
+                MediaSection(
+                    media = uiState.media,
+                    onMediaPicked = onMediaPicked,
+                    onMediaRemove = onMediaRemove
+                )
             }
         }
 
@@ -214,11 +229,48 @@ fun MemoryFormScreen(
 }
 
 /**
+ * Ряд снимков и плитка добавления.
+ */
+@Composable
+private fun MediaSection(
+    media: List<MemoryMedia>,
+    onMediaPicked: (List<String>) -> Unit,
+    onMediaRemove: (Int) -> Unit
+) {
+    val picker = rememberLauncherForActivityResult(
+        contract = ActivityResultContracts.PickMultipleVisualMedia(MEDIA_LIMIT)
+    ) { uris ->
+        onMediaPicked(uris.map(Uri::toString))
+    }
+
+    Row(
+        horizontalArrangement = Arrangement.spacedBy(HereSize.MediaTile.spacing),
+        modifier = Modifier
+            .fillMaxWidth()
+            .horizontalScroll(rememberScrollState())
+    ) {
+        media.forEachIndexed { index, item ->
+            MediaTile(
+                uri = item.uri,
+                onRemoveClick = { onMediaRemove(index) }
+            )
+        }
+
+        if (media.size < MEDIA_LIMIT) {
+            MediaAddTile(
+                onClick = {
+                    picker.launch(
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                    )
+                }
+            )
+        }
+    }
+}
+
+/**
  * Превью выбранного места: пин эмоции и адрес.
- *
- * Точка известна не сразу: при редактировании она приходит из базы вместе с остальными
- * полями, и до этого карточка остается пустой. Адрес приходит от геокодера еще позже,
- * поэтому плашка не появляется рывком, а вырастает из своего угла.
+
  */
 @Composable
 private fun PlacePreview(
