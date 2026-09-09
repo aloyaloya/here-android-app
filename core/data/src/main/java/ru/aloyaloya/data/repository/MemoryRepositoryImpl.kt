@@ -5,6 +5,7 @@ import kotlinx.coroutines.flow.map
 import ru.aloyaloya.data.mapper.MemoryMapper.toDomain
 import ru.aloyaloya.data.mapper.MemoryMapper.toEntity
 import ru.aloyaloya.data.mapper.MemoryMapper.toMediaEntities
+import ru.aloyaloya.data.storage.MediaStorage
 import ru.aloyaloya.database.dao.MemoryDao
 import ru.aloyaloya.database.dao.MemoryMediaDao
 import ru.aloyaloya.domain.model.Memory
@@ -18,7 +19,8 @@ import javax.inject.Singleton
 @Singleton
 class MemoryRepositoryImpl @Inject constructor(
     private val memoryDao: MemoryDao,
-    private val memoryMediaDao: MemoryMediaDao
+    private val memoryMediaDao: MemoryMediaDao,
+    private val mediaStorage: MediaStorage
 ) : MemoryRepository {
 
     override fun observeAll(): Flow<List<Memory>> =
@@ -36,9 +38,22 @@ class MemoryRepositoryImpl @Inject constructor(
         return memoryId
     }
 
-    override suspend fun update(memory: Memory) =
+    override suspend fun update(memory: Memory) {
+        val stored = memoryMediaDao.getByMemoryId(memory.id)
+        val keptIds = memory.media.mapTo(mutableSetOf()) { it.id }
+        val removed = stored.filterNot { it.id in keptIds }
+        val added = memory.media.filter { it.id == 0L }
+
         memoryDao.update(memory.toEntity())
 
-    override suspend fun delete(memory: Memory) =
+        if (removed.isNotEmpty()) memoryMediaDao.deleteAll(removed)
+        if (added.isNotEmpty()) memoryMediaDao.insertAll(added.map { it.toEntity(memory.id) })
+
+        mediaStorage.delete(removed.map { it.uri })
+    }
+
+    override suspend fun delete(memory: Memory) {
         memoryDao.delete(memory.toEntity())
+        mediaStorage.delete(memory.media.map { it.uri })
+    }
 }
