@@ -22,8 +22,10 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import ru.aloyaloya.design_system.component.button.HereIconButton
 import ru.aloyaloya.design_system.component.media.MediaPhoto
+import ru.aloyaloya.design_system.component.media.MediaPlayBadge
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.memory.R
 import ru.aloyaloya.design_system.R as DesignSystemR
@@ -64,12 +66,21 @@ fun MediaViewer(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
-                MediaPhoto(
-                    uri = media[page].uri,
-                    shape = RectangleShape,
-                    contentScale = ContentScale.Fit,
-                    modifier = Modifier.fillMaxSize()
-                )
+                Box(contentAlignment = Alignment.Center) {
+                    MediaPhoto(
+                        uri = media[page].uri,
+                        shape = RectangleShape,
+                        contentScale = ContentScale.Fit,
+                        modifier = Modifier.fillMaxSize()
+                    )
+
+                    if (media[page].type == MediaType.VIDEO) {
+                        MediaPlayBadge(
+                            size = HereSize.MediaBadge.largeSize,
+                            iconSize = HereSize.MediaBadge.largeIconSize
+                        )
+                    }
+                }
             }
 
             HereIconButton(

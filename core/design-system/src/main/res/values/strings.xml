@@ -4,4 +4,5 @@
     <string name="fab_add_memory_content_description">Добавить воспоминание</string>
     <string name="media_add">+ медиа</string>
     <string name="media_remove">Убрать медиафайл</string>
+    <string name="media_video">Видео</string>
 </resources>

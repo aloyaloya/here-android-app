@@ -1,5 +1,6 @@
 package ru.aloyaloya.memory.presentation
 
+import android.content.ContentResolver
 import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
@@ -30,6 +31,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.emotion.EmotionChip
@@ -47,6 +49,7 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapPoint
@@ -73,8 +76,10 @@ private const val ADDRESS_INITIAL_SCALE = 0.8f
 private const val DATE_WEIGHT = 1.35f
 private const val TIME_WEIGHT = 1f
 
-/** Сколько снимков можно прикрепить к одному воспоминанию. */
+/** Сколько файлов можно прикрепить к одному воспоминанию. */
 private const val MEDIA_LIMIT = 10
+
+private const val VIDEO_MIME_PREFIX = "video/"
 
 private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru"))
 private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"))
@@ -98,8 +103,8 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
  * @param onSheetDismiss Колбэк закрытия листа без выбора.
  * @param onDateSelected Колбэк выбранной даты.
  * @param onTimeSelected Колбэк выбранного времени.
- * @param onMediaPicked Колбэк выбранных в пикере снимков.
- * @param onMediaRemove Колбэк удаления снимка по его месту в подборке.
+ * @param onMediaPicked Колбэк выбранных в пикере файлов.
+ * @param onMediaRemove Колбэк удаления файла по его месту в подборке.
  * @param onSaveClick Колбэк сохранения.
  * @param onCancelClick Колбэк отмены.
  * @param modifier [Modifier], применяемый к экрану.
@@ -115,7 +120,7 @@ fun MemoryFormScreen(
     onSheetDismiss: () -> Unit,
     onDateSelected: (LocalDate) -> Unit,
     onTimeSelected: (LocalTime) -> Unit,
-    onMediaPicked: (List<String>) -> Unit,
+    onMediaPicked: (List<MemoryMedia>) -> Unit,
     onMediaRemove: (Int) -> Unit,
     onSaveClick: () -> Unit,
     onCancelClick: () -> Unit,
@@ -229,18 +234,25 @@ fun MemoryFormScreen(
 }
 
 /**
- * Ряд снимков и плитка добавления.
+ * Ряд выбранных файлов и плитка добавления.
  */
 @Composable
 private fun MediaSection(
     media: List<MemoryMedia>,
-    onMediaPicked: (List<String>) -> Unit,
+    onMediaPicked: (List<MemoryMedia>) -> Unit,
     onMediaRemove: (Int) -> Unit
 ) {
+    val resolver = LocalContext.current.contentResolver
+
     val picker = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.PickMultipleVisualMedia(MEDIA_LIMIT)
     ) { uris ->
-        onMediaPicked(uris.map(Uri::toString))
+        onMediaPicked(uris.map { uri ->
+            MemoryMedia(
+                uri = uri.toString(),
+                type = resolver.mediaType(uri)
+            )
+        })
     }
 
     Row(
@@ -252,7 +264,8 @@ private fun MediaSection(
         media.forEachIndexed { index, item ->
             MediaTile(
                 uri = item.uri,
-                onRemoveClick = { onMediaRemove(index) }
+                onRemoveClick = { onMediaRemove(index) },
+                video = item.type == MediaType.VIDEO
             )
         }
 
@@ -260,13 +273,17 @@ private fun MediaSection(
             MediaAddTile(
                 onClick = {
                     picker.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageOnly)
+                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)
                     )
                 }
             )
         }
     }
 }
+
+/** Что именно выбрали в пикере: адрес о типе файла не говорит, а MIME говорит. */
+private fun ContentResolver.mediaType(uri: Uri): MediaType =
+    if (getType(uri)?.startsWith(VIDEO_MIME_PREFIX) == true) MediaType.VIDEO else MediaType.PHOTO
 
 /**
  * Превью выбранного места: пин эмоции и адрес.

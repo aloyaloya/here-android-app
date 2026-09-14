@@ -26,15 +26,17 @@ private val RemoveButtonBackground = Color.Black.copy(alpha = 0.55f)
 /**
  * Плитка выбранного медиафайла с кнопкой «убрать».
  *
- * @param uri Путь к файлу или content-адрес только что выбранного снимка.
+ * @param uri Путь к файлу или content-адрес только что выбранного файла.
  * @param onRemoveClick Колбэк удаления из подборки.
+ * @param video Файл — видео: поверх кадра появляется значок.
  * @param modifier [Modifier], применяемый к плитке.
  */
 @Composable
 fun MediaTile(
     uri: String,
     onRemoveClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    video: Boolean = false
 ) {
     Box(
         modifier = modifier
@@ -48,6 +50,10 @@ fun MediaTile(
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(HereSize.MediaTile.size)
         )
+
+        if (video) {
+            MediaPlayBadge(modifier = Modifier.align(Alignment.Center))
+        }
 
         Box(
             contentAlignment = Alignment.Center,

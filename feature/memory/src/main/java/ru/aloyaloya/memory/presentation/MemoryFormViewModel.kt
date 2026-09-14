@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.aloyaloya.domain.model.Emotion
-import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.domain.repository.AddressRepository
@@ -59,10 +58,9 @@ class MemoryFormViewModel @Inject constructor(
         _uiState.update { it.copy(description = description) }
     }
 
-    fun onMediaPicked(uris: List<String>) {
-        if (uris.isEmpty()) return
+    fun onMediaPicked(picked: List<MemoryMedia>) {
+        if (picked.isEmpty()) return
 
-        val picked = uris.map { MemoryMedia(uri = it, type = MediaType.PHOTO) }
         _uiState.update { it.copy(media = it.media + picked) }
     }
 

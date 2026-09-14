@@ -198,6 +198,14 @@ object HereSize {
         val emojiSize = 30.sp
     }
 
+    /** Значок видео поверх кадра. */
+    object MediaBadge {
+        val size = 34.dp
+        val iconSize = 15.dp
+        val largeSize = 72.dp
+        val largeIconSize = 32.dp
+    }
+
     /** Полноэкранный просмотр снимков. */
     object MediaViewer {
         val actionsPadding = 16.dp
