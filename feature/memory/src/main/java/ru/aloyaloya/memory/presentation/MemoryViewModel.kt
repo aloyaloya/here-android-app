@@ -50,11 +50,21 @@ class MemoryViewModel @Inject constructor(
 
     fun onSheetDismiss() = showSheet(null)
 
+    fun onMediaClick(index: Int) = showMedia(index)
+
+    fun onViewerDismiss() = showMedia(null)
+
     fun onDeleteConfirm() {
         val memory = (_uiState.value as? MemoryUiState.Content)?.memory ?: return
 
         viewModelScope.launch {
             memoryRepository.delete(memory)
+        }
+    }
+
+    private fun showMedia(index: Int?) {
+        _uiState.update { state ->
+            if (state is MemoryUiState.Content) state.copy(viewedMedia = index) else state
         }
     }
 

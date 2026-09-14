@@ -1,6 +1,7 @@
 package ru.aloyaloya.memory.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -54,6 +55,7 @@ import ru.aloyaloya.memory.R
 import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
 import ru.aloyaloya.memory.presentation.component.DeleteMemorySheet
+import ru.aloyaloya.memory.presentation.component.MediaViewer
 import ru.aloyaloya.memory.presentation.component.MemoryActionsSheet
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
@@ -82,6 +84,8 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
  * @param onMoreClick Колбэк открытия меню действий.
  * @param onEditClick Колбэк выбора редактирования в меню.
  * @param onDeleteClick Колбэк выбора удаления в меню.
+ * @param onMediaClick Колбэк открытия снимка на весь экран.
+ * @param onViewerDismiss Колбэк закрытия просмотра снимка.
  * @param onDeleteConfirm Колбэк подтверждения удаления.
  * @param onSheetDismiss Колбэк закрытия открытого листа.
  * @param modifier [Modifier], применяемый к экрану.
@@ -93,6 +97,8 @@ fun MemoryScreen(
     onMoreClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onMediaClick: (Int) -> Unit,
+    onViewerDismiss: () -> Unit,
     onDeleteConfirm: () -> Unit,
     onSheetDismiss: () -> Unit,
     modifier: Modifier = Modifier
@@ -113,8 +119,17 @@ fun MemoryScreen(
                 address = uiState.address,
                 onBackClick = onBackClick,
                 onMoreClick = onMoreClick,
+                onMediaClick = onMediaClick,
                 modifier = modifier
             )
+
+            uiState.viewedMedia?.let { index ->
+                MediaViewer(
+                    media = uiState.memory.media,
+                    initialIndex = index,
+                    onDismissRequest = onViewerDismiss
+                )
+            }
 
             when (uiState.activeSheet) {
                 MemorySheet.ACTIONS -> MemoryActionsSheet(
@@ -146,6 +161,7 @@ private fun MemoryContent(
     address: String?,
     onBackClick: () -> Unit,
     onMoreClick: () -> Unit,
+    onMediaClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val density = LocalDensity.current
@@ -207,6 +223,7 @@ private fun MemoryContent(
         MemoryDetailSheet(
             memory = memory,
             address = address,
+            onMediaClick = onMediaClick,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .heightIn(max = maxHeight * SHEET_MAX_HEIGHT_FRACTION)
@@ -267,6 +284,7 @@ private fun TopScrim(modifier: Modifier = Modifier) {
 private fun MemoryDetailSheet(
     memory: Memory,
     address: String?,
+    onMediaClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
@@ -321,12 +339,15 @@ private fun MemoryDetailSheet(
                 .background(colors.outline)
         )
 
-        MediaSection(media = memory.media)
+        MediaSection(media = memory.media, onMediaClick = onMediaClick)
     }
 }
 
 @Composable
-private fun MediaSection(media: List<MemoryMedia>) {
+private fun MediaSection(
+    media: List<MemoryMedia>,
+    onMediaClick: (Int) -> Unit
+) {
     val colors = HereTheme.colors
 
     if (media.isEmpty()) {
@@ -359,10 +380,12 @@ private fun MediaSection(media: List<MemoryMedia>) {
                 .fillMaxWidth()
                 .horizontalScroll(rememberScrollState())
         ) {
-            media.forEach { item ->
+            media.forEachIndexed { index, item ->
                 MediaPhoto(
                     uri = item.uri,
-                    modifier = Modifier.size(HereSize.Memory.mediaSize)
+                    modifier = Modifier
+                        .size(HereSize.Memory.mediaSize)
+                        .clickable { onMediaClick(index) }
                 )
             }
         }

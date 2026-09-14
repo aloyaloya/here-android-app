@@ -198,6 +198,14 @@ object HereSize {
         val emojiSize = 30.sp
     }
 
+    /** Полноэкранный просмотр снимков. */
+    object MediaViewer {
+        val actionsPadding = 16.dp
+        val counterBottomPadding = 34.dp
+        val counterVerticalPadding = 7.dp
+        val counterHorizontalPadding = 14.dp
+    }
+
     /** Экран воспоминания. */
     object Memory {
         val haloSize = 143.dp
