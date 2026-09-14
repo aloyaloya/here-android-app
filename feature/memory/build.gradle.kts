@@ -44,6 +44,9 @@ dependencies {
     implementation(project(":core:design-system"))
     implementation(project(":core:mapkit"))
 
+    implementation(libs.media3.exoplayer)
+    implementation(libs.media3.ui)
+
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
 

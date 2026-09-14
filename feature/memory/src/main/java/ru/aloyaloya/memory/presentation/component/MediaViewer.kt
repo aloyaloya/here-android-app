@@ -22,7 +22,6 @@ import androidx.compose.ui.window.Dialog
 import androidx.compose.ui.window.DialogProperties
 import ru.aloyaloya.design_system.component.button.HereIconButton
 import ru.aloyaloya.design_system.component.media.MediaPhoto
-import ru.aloyaloya.design_system.component.media.MediaPlayBadge
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.domain.model.MediaType
@@ -34,10 +33,10 @@ private val ViewerBackground = Color.Black
 private val CounterBackground = Color.White.copy(alpha = 0.18f)
 
 /**
- * Полноэкранный просмотр снимков воспоминания.
+ * Полноэкранный просмотр медиа воспоминания.
  *
- * @param media Снимки воспоминания.
- * @param initialIndex Снимок, с которого открылся просмотр.
+ * @param media Медиа воспоминания.
+ * @param initialIndex Файл, с которого открылся просмотр.
  * @param onDismissRequest Колбэк закрытия просмотра.
  * @param modifier [Modifier], применяемый к просмотру.
  */
@@ -66,20 +65,21 @@ fun MediaViewer(
                 state = pagerState,
                 modifier = Modifier.fillMaxSize()
             ) { page ->
-                Box(contentAlignment = Alignment.Center) {
+                val item = media[page]
+
+                if (item.type == MediaType.VIDEO) {
+                    VideoPage(
+                        uri = item.uri,
+                        playing = pagerState.currentPage == page,
+                        modifier = Modifier.fillMaxSize()
+                    )
+                } else {
                     MediaPhoto(
-                        uri = media[page].uri,
+                        uri = item.uri,
                         shape = RectangleShape,
                         contentScale = ContentScale.Fit,
                         modifier = Modifier.fillMaxSize()
                     )
-
-                    if (media[page].type == MediaType.VIDEO) {
-                        MediaPlayBadge(
-                            size = HereSize.MediaBadge.largeSize,
-                            iconSize = HereSize.MediaBadge.largeIconSize
-                        )
-                    }
                 }
             }
 
