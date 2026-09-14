@@ -3,7 +3,6 @@ package ru.aloyaloya.memory.presentation.component
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
@@ -103,9 +102,9 @@ fun MediaViewer(
                     style = MaterialTheme.typography.bodyMedium,
                     color = Color.White,
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .navigationBarsPadding()
-                        .padding(bottom = HereSize.MediaViewer.counterBottomPadding)
+                        .align(Alignment.TopCenter)
+                        .statusBarsPadding()
+                        .padding(HereSize.MediaViewer.counterMargin)
                         .clip(HereShape.pill)
                         .background(CounterBackground)
                         .padding(

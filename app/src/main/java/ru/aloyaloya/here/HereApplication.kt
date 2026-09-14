@@ -5,7 +5,6 @@ import coil3.ImageLoader
 import coil3.PlatformContext
 import coil3.SingletonImageLoader
 import coil3.request.CachePolicy
-import coil3.video.VideoFrameDecoder
 import ru.aloyaloya.here.di.AppComponent
 import ru.aloyaloya.here.di.DaggerAppComponent
 import ru.aloyaloya.mapkit.MapKitInitializer
@@ -34,10 +33,11 @@ class HereApplication : ComponentProvider, SingletonImageLoader.Factory, Applica
 
     /**
      * Собирает загрузчик изображений для всего приложения.
+     *
+     * Без дискового кэша: снимки и ролики и так лежат во внутреннем хранилище.
      */
     override fun newImageLoader(context: PlatformContext): ImageLoader =
         ImageLoader.Builder(context)
-            .components { add(VideoFrameDecoder.Factory()) }
             .diskCachePolicy(CachePolicy.DISABLED)
             .build()
 

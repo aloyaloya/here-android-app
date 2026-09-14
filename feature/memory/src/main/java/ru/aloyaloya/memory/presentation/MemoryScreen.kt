@@ -386,6 +386,7 @@ private fun MediaSection(
                 Box(contentAlignment = Alignment.Center) {
                     MediaPhoto(
                         uri = item.uri,
+                        video = item.type == MediaType.VIDEO,
                         modifier = Modifier
                             .size(HereSize.Memory.mediaSize)
                             .clickable { onMediaClick(index) }

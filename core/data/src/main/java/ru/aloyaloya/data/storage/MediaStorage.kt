@@ -3,6 +3,7 @@ package ru.aloyaloya.data.storage
 import android.content.ContentResolver
 import android.content.Context
 import android.net.Uri
+import android.webkit.MimeTypeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
@@ -21,11 +22,12 @@ class MediaStorage @Inject constructor(context: Context) {
     private val root = File(context.filesDir, MEDIA_DIRECTORY)
 
     suspend fun save(uri: String): String? = withContext(Dispatchers.IO) {
-        val file = File(root, UUID.randomUUID().toString())
+        val source = Uri.parse(uri)
+        val file = File(root, fileName(source))
 
         runCatching {
             root.mkdirs()
-            resolver.openInputStream(Uri.parse(uri))?.use { input ->
+            resolver.openInputStream(source)?.use { input ->
                 file.outputStream().use(input::copyTo)
             } ?: error("Не удалось открыть $uri")
             file.path
@@ -46,5 +48,13 @@ class MediaStorage @Inject constructor(context: Context) {
                 if (file.canonicalPath.startsWith(rootPath)) file.delete()
             }
         }
+    }
+
+    /** Имя копии с расширением: по нему Coil и плеер понимают, что за файл внутри. */
+    private fun fileName(uri: Uri): String {
+        val name = UUID.randomUUID().toString()
+        val extension = MimeTypeMap.getSingleton().getExtensionFromMimeType(resolver.getType(uri))
+
+        return if (extension == null) name else "$name.$extension"
     }
 }

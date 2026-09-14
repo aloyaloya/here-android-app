@@ -45,7 +45,7 @@ fun MediaTile(
             .background(HereTheme.colors.surfaceMuted)
     ) {
         AsyncImage(
-            model = uri,
+            model = rememberMediaRequest(uri, video),
             contentDescription = null,
             contentScale = ContentScale.Crop,
             modifier = Modifier.size(HereSize.MediaTile.size)
