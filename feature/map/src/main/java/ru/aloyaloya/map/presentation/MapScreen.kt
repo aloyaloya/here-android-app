@@ -6,7 +6,9 @@ import android.content.pm.PackageManager
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
@@ -24,7 +26,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -119,11 +123,8 @@ fun MapScreen(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                HereFab(
-                    onClick = {
-                        pickedPoint = mapState.cameraTarget
-                        emotionPickerVisible = true
-                    },
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(HereSize.Fab.stackSpacing),
                     modifier = Modifier
                         .align(Alignment.BottomEnd)
                         .navigationBarsPadding()
@@ -131,7 +132,30 @@ fun MapScreen(
                             end = HereSize.Fab.endMargin,
                             bottom = HereSize.Fab.bottomMargin
                         )
-                )
+                ) {
+                    HereFab(
+                        onClick = {
+                            if (locationGranted) {
+                                mapState.moveToUserLocation()
+                            } else {
+                                launcher.launch(locationPermissions)
+                            }
+                        },
+                        icon = R.drawable.ic_location,
+                        contentDescription = stringResource(
+                            R.string.fab_location_content_description
+                        ),
+                        container = HereTheme.colors.onAccent,
+                        content = HereTheme.colors.accent
+                    )
+
+                    HereFab(
+                        onClick = {
+                            pickedPoint = mapState.cameraTarget
+                            emotionPickerVisible = true
+                        }
+                    )
+                }
             }
 
             if (emotionPickerVisible) {

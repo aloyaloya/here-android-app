@@ -105,6 +105,11 @@ fun YandexMap(
         }
     }
 
+    DisposableEffect(state, binder) {
+        state.locationBinder = binder
+        onDispose { state.locationBinder = null }
+    }
+
     LaunchedEffect(binder, userLocationStyle) {
         binder.applyStyle()
     }

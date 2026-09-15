@@ -51,6 +51,7 @@ object HereSize {
         val iconSize = 28.dp
         val endMargin = 18.dp
         val bottomMargin = 126.dp
+        val stackSpacing = 14.dp
     }
 
     /** Нижний лист. */

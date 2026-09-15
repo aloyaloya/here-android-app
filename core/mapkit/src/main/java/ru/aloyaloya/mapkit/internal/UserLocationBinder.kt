@@ -2,6 +2,7 @@ package ru.aloyaloya.mapkit.internal
 
 import android.content.Context
 import androidx.compose.ui.graphics.toArgb
+import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.layers.ObjectEvent
@@ -18,6 +19,9 @@ import com.yandex.mapkit.location.Location as MapKitLocation
 
 /**
  * Геолокация: last-known, слой пользователя, один фикс MapKit.
+ *
+ * Камера наводится на пользователя один раз за сессию карты: иначе она сбрасывалась бы
+ * при каждом возврате на экран. Дальше наведение - только по [moveToUserLocation].
  *
  * @param style Текущие цвета маркера или `null`, если маркер не показывается. Читается
  * лямбдой, а не значением: слой с одним ID можно создать только раз, поэтому биндер
@@ -36,34 +40,49 @@ internal class UserLocationBinder(
     private var locationManager: LocationManager? = null
     private var locationListener: LocationListener? = null
     private var active = false
+    private var centered = false
 
     fun attach() {
         if (active) return
         active = true
         mapKit.resetLocationManagerToDefault()
 
-        LastKnownLocationReader.readBestPoint(appContext)?.let { moveCamera(it) }
-
         userLocationLayer = mapKit.createUserLocationLayer(mapView.mapWindow).apply {
             setObjectListener(iconListener)
             isVisible = true
         }
 
-        val manager = mapKit.createLocationManager()
+        if (!centered) {
+            centered = true
+            moveToUserLocation(animated = false)
+        }
+    }
+
+    /**
+     * Наводит камеру на пользователя.
+     */
+    fun moveToUserLocation(animated: Boolean = true) {
+        LastKnownLocationReader.readBestPoint(appContext)?.let { moveCamera(it, animated) }
+
+        val manager = locationManager ?: mapKit.createLocationManager().also {
+            locationManager = it
+        }
+
+        locationListener?.let(manager::unsubscribe)
+
         val listener = object : LocationListener {
             private var done = false
 
             override fun onLocationUpdated(location: MapKitLocation) {
                 if (done) return
                 done = true
-                moveCamera(location.position)
+                moveCamera(location.position, animated)
                 manager.unsubscribe(this)
             }
 
             override fun onLocationStatusUpdated(status: LocationStatus) = Unit
         }
 
-        locationManager = manager
         locationListener = listener
         manager.requestSingleUpdate(listener)
     }
@@ -100,10 +119,14 @@ internal class UserLocationBinder(
         view.accuracyCircle.fillColor = style.accuracy.toArgb()
     }
 
-    private fun moveCamera(point: Point) {
-        mapView.mapWindow.map.move(
-            CameraPosition(point, userLocationZoom, 0f, 0f),
-        )
+    private fun moveCamera(point: Point, animated: Boolean) {
+        val position = CameraPosition(point, userLocationZoom, 0f, 0f)
+
+        if (animated) {
+            mapView.mapWindow.map.move(position, CAMERA_ANIMATION, null)
+        } else {
+            mapView.mapWindow.map.move(position)
+        }
     }
 
     fun detach() {
@@ -115,5 +138,9 @@ internal class UserLocationBinder(
         userLocationLayer?.isVisible = false
         userLocationLayer = null
         userLocationView = null
+    }
+
+    private companion object {
+        val CAMERA_ANIMATION = Animation(Animation.Type.SMOOTH, 0.4f)
     }
 }
