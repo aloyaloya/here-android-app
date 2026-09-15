@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.domain.repository.AddressRepository
 import ru.aloyaloya.domain.repository.MemoryRepository
 import ru.aloyaloya.mapkit.model.MapPoint
@@ -57,6 +58,19 @@ class MemoryFormViewModel @Inject constructor(
         _uiState.update { it.copy(description = description) }
     }
 
+    fun onMediaPicked(picked: List<MemoryMedia>) {
+        if (picked.isEmpty()) return
+
+        _uiState.update { it.copy(media = it.media + picked) }
+    }
+
+    fun onMediaRemove(index: Int) {
+        _uiState.update { state ->
+            if (index !in state.media.indices) state
+            else state.copy(media = state.media.filterIndexed { i, _ -> i != index })
+        }
+    }
+
     fun onDateFieldClick() {
         _uiState.update { it.copy(activeSheet = MemoryFormSheet.DATE) }
     }
@@ -92,7 +106,8 @@ class MemoryFormViewModel @Inject constructor(
                 title = state.title.trim(),
                 description = state.description.trim(),
                 emotion = emotion,
-                happenedAt = state.happenedAt.toEpochMilli()
+                happenedAt = state.happenedAt.toEpochMilli(),
+                media = state.media
             ) ?: Memory(
                 title = state.title.trim(),
                 description = state.description.trim(),
@@ -100,7 +115,8 @@ class MemoryFormViewModel @Inject constructor(
                 longitude = point.longitude,
                 emotion = emotion,
                 createdAt = System.currentTimeMillis(),
-                happenedAt = state.happenedAt.toEpochMilli()
+                happenedAt = state.happenedAt.toEpochMilli(),
+                media = state.media
             )
 
             if (edited == null) memoryRepository.create(memory) else memoryRepository.update(memory)
@@ -130,7 +146,8 @@ class MemoryFormViewModel @Inject constructor(
                     emotion = memory.emotion,
                     title = memory.title,
                     description = memory.description,
-                    point = point
+                    point = point,
+                    media = memory.media
                 )
             }
 

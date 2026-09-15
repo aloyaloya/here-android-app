@@ -1,9 +1,13 @@
 package ru.aloyaloya.here
 
 import android.app.Application
-import ru.aloyaloya.mapkit.MapKitInitializer
+import coil3.ImageLoader
+import coil3.PlatformContext
+import coil3.SingletonImageLoader
+import coil3.request.CachePolicy
 import ru.aloyaloya.here.di.AppComponent
 import ru.aloyaloya.here.di.DaggerAppComponent
+import ru.aloyaloya.mapkit.MapKitInitializer
 import ru.aloyaloya.ui.di.ComponentProvider
 import kotlin.reflect.KClass
 
@@ -13,7 +17,7 @@ import kotlin.reflect.KClass
  * Создает корневой DI-компонент при старте приложения
  * и выполняет инъекцию зависимостей в `Application`.
  */
-class HereApplication : ComponentProvider, Application() {
+class HereApplication : ComponentProvider, SingletonImageLoader.Factory, Application() {
 
     lateinit var appComponent: AppComponent
 
@@ -26,6 +30,16 @@ class HereApplication : ComponentProvider, Application() {
 
         appComponent.inject(this)
     }
+
+    /**
+     * Собирает загрузчик изображений для всего приложения.
+     *
+     * Без дискового кэша: снимки и ролики и так лежат во внутреннем хранилище.
+     */
+    override fun newImageLoader(context: PlatformContext): ImageLoader =
+        ImageLoader.Builder(context)
+            .diskCachePolicy(CachePolicy.DISABLED)
+            .build()
 
     /**
      * Предоставляет feature-компонент по ключу для модулей верхнего уровня.

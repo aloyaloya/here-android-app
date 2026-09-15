@@ -17,6 +17,8 @@ yandexMapsMobile = "4.33.1-full"
 room = "2.7.1"
 coroutines = "1.10.2"
 foundationLayout = "1.11.4"
+coil = "3.3.0"
+media3 = "1.8.0"
 
 [libraries]
 yandex-maps-mobile = { module = "com.yandex.android:maps.mobile", version.ref = "yandexMapsMobile" }
@@ -47,6 +49,11 @@ androidx-compose-material3 = { group = "androidx.compose.material3", name = "mat
 androidx-appcompat = { group = "androidx.appcompat", name = "appcompat", version.ref = "appcompat" }
 material = { group = "com.google.android.material", name = "material", version.ref = "material" }
 androidx-compose-foundation-layout = { group = "androidx.compose.foundation", name = "foundation-layout", version.ref = "foundationLayout" }
+coil-compose = { group = "io.coil-kt.coil3", name = "coil-compose", version.ref = "coil" }
+coil-core = { group = "io.coil-kt.coil3", name = "coil", version.ref = "coil" }
+coil-video = { group = "io.coil-kt.coil3", name = "coil-video", version.ref = "coil" }
+media3-exoplayer = { group = "androidx.media3", name = "media3-exoplayer", version.ref = "media3" }
+media3-ui = { group = "androidx.media3", name = "media3-ui", version.ref = "media3" }
 
 [plugins]
 kotlin-android = { id = "org.jetbrains.kotlin.android", version.ref = "kotlin" }

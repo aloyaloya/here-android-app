@@ -52,6 +52,8 @@ dependencies {
     implementation(project(":feature:calendar"))
     implementation(project(":feature:analytic"))
 
+    implementation(libs.coil.core)
+
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)
 

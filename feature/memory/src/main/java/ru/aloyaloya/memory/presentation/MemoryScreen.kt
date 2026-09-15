@@ -1,10 +1,13 @@
 package ru.aloyaloya.memory.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -38,18 +41,23 @@ import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.button.HereIconButton
 import ru.aloyaloya.design_system.component.emotion.EmotionPin
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
+import ru.aloyaloya.design_system.component.media.MediaPhoto
+import ru.aloyaloya.design_system.component.media.MediaPlayBadge
 import ru.aloyaloya.design_system.extension.sheetShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.domain.model.MediaType
+import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.memory.R
 import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
 import ru.aloyaloya.memory.presentation.component.DeleteMemorySheet
+import ru.aloyaloya.memory.presentation.component.MediaViewer
 import ru.aloyaloya.memory.presentation.component.MemoryActionsSheet
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
@@ -78,6 +86,8 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
  * @param onMoreClick Колбэк открытия меню действий.
  * @param onEditClick Колбэк выбора редактирования в меню.
  * @param onDeleteClick Колбэк выбора удаления в меню.
+ * @param onMediaClick Колбэк открытия снимка на весь экран.
+ * @param onViewerDismiss Колбэк закрытия просмотра снимка.
  * @param onDeleteConfirm Колбэк подтверждения удаления.
  * @param onSheetDismiss Колбэк закрытия открытого листа.
  * @param modifier [Modifier], применяемый к экрану.
@@ -89,6 +99,8 @@ fun MemoryScreen(
     onMoreClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
+    onMediaClick: (Int) -> Unit,
+    onViewerDismiss: () -> Unit,
     onDeleteConfirm: () -> Unit,
     onSheetDismiss: () -> Unit,
     modifier: Modifier = Modifier
@@ -109,8 +121,17 @@ fun MemoryScreen(
                 address = uiState.address,
                 onBackClick = onBackClick,
                 onMoreClick = onMoreClick,
+                onMediaClick = onMediaClick,
                 modifier = modifier
             )
+
+            uiState.viewedMedia?.let { index ->
+                MediaViewer(
+                    media = uiState.memory.media,
+                    initialIndex = index,
+                    onDismissRequest = onViewerDismiss
+                )
+            }
 
             when (uiState.activeSheet) {
                 MemorySheet.ACTIONS -> MemoryActionsSheet(
@@ -142,6 +163,7 @@ private fun MemoryContent(
     address: String?,
     onBackClick: () -> Unit,
     onMoreClick: () -> Unit,
+    onMediaClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val density = LocalDensity.current
@@ -203,6 +225,7 @@ private fun MemoryContent(
         MemoryDetailSheet(
             memory = memory,
             address = address,
+            onMediaClick = onMediaClick,
             modifier = Modifier
                 .align(Alignment.BottomCenter)
                 .heightIn(max = maxHeight * SHEET_MAX_HEIGHT_FRACTION)
@@ -263,6 +286,7 @@ private fun TopScrim(modifier: Modifier = Modifier) {
 private fun MemoryDetailSheet(
     memory: Memory,
     address: String?,
+    onMediaClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
@@ -317,6 +341,18 @@ private fun MemoryDetailSheet(
                 .background(colors.outline)
         )
 
+        MediaSection(media = memory.media, onMediaClick = onMediaClick)
+    }
+}
+
+@Composable
+private fun MediaSection(
+    media: List<MemoryMedia>,
+    onMediaClick: (Int) -> Unit
+) {
+    val colors = HereTheme.colors
+
+    if (media.isEmpty()) {
         Column(verticalArrangement = Arrangement.spacedBy(HereSize.Memory.mediaTextSpacing)) {
             Text(
                 text = stringResource(R.string.memory_no_media_title),
@@ -329,6 +365,38 @@ private fun MemoryDetailSheet(
                 style = MaterialTheme.typography.bodySmall,
                 color = colors.textSecondary
             )
+        }
+        return
+    }
+
+    Column(verticalArrangement = Arrangement.spacedBy(HereSize.Memory.mediaSpacing)) {
+        Text(
+            text = stringResource(R.string.memory_media_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = colors.textPrimary
+        )
+
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(HereSize.Memory.mediaSpacing),
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+        ) {
+            media.forEachIndexed { index, item ->
+                Box(contentAlignment = Alignment.Center) {
+                    MediaPhoto(
+                        uri = item.uri,
+                        video = item.type == MediaType.VIDEO,
+                        modifier = Modifier
+                            .size(HereSize.Memory.mediaSize)
+                            .clickable { onMediaClick(index) }
+                    )
+
+                    if (item.type == MediaType.VIDEO) {
+                        MediaPlayBadge()
+                    }
+                }
+            }
         }
     }
 }

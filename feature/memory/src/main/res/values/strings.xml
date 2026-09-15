@@ -15,7 +15,10 @@
     <string name="memory_form_save_edit">Сохранить изменения</string>
 
     <string name="memory_back">Назад</string>
-    <string name="memory_no_media_title">Фотографий нет</string>
+    <string name="memory_media_title">Фото и видео</string>
+    <string name="memory_media_close">Закрыть просмотр</string>
+    <string name="memory_media_counter">%1$d из %2$d</string>
+    <string name="memory_no_media_title">Фото и видео нет</string>
     <string name="memory_no_media_subtitle">Можно добавить позже</string>
     <string name="memory_more">Действия</string>
     <string name="memory_action_edit">Редактировать</string>

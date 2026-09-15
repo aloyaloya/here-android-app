@@ -164,6 +164,9 @@ object HereSize {
         val addBorder = 2.dp
         val addDash = 6.dp
         val addGap = 5.dp
+        val removeSize = 26.dp
+        val removeIconSize = 11.dp
+        val removeMargin = 6.dp
     }
 
     /** Компактная кнопка на приглушенном акцентном фоне. */
@@ -195,6 +198,23 @@ object HereSize {
         val emojiSize = 30.sp
     }
 
+    /** Значок видео поверх кадра. */
+    object MediaBadge {
+        val size = 34.dp
+        val iconSize = 15.dp
+        val largeSize = 72.dp
+        val largeIconSize = 32.dp
+    }
+
+    /** Полноэкранный просмотр снимков. */
+    object MediaViewer {
+        val actionsPadding = 16.dp
+        val counterMargin = 24.dp
+        val dismissDistance = 120.dp
+        val counterVerticalPadding = 7.dp
+        val counterHorizontalPadding = 14.dp
+    }
+
     /** Экран воспоминания. */
     object Memory {
         val haloSize = 143.dp
@@ -211,6 +231,8 @@ object HereSize {
         val sheetSpacing = 17.dp
         val headerSpacing = 6.dp
         val mediaTextSpacing = 3.dp
+        val mediaSpacing = 10.dp
+        val mediaSize = 107.dp
         val dividerThickness = 1.dp
     }
 

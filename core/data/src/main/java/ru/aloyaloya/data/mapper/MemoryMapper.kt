@@ -38,16 +38,13 @@ internal object MemoryMapper {
         happenedAt = happenedAt
     )
 
-    fun Memory.toMediaEntities(memoryId: Long): List<MemoryMediaEntity> =
-        media.map { it.toEntity(memoryId) }
-
-    private fun MemoryMediaEntity.toDomain(): MemoryMedia = MemoryMedia(
+    fun MemoryMediaEntity.toDomain(): MemoryMedia = MemoryMedia(
         id = id,
         uri = uri,
         type = type.toDomain()
     )
 
-    private fun MemoryMedia.toEntity(memoryId: Long): MemoryMediaEntity = MemoryMediaEntity(
+    fun MemoryMedia.toEntity(memoryId: Long): MemoryMediaEntity = MemoryMediaEntity(
         id = id,
         memoryId = memoryId,
         uri = uri,

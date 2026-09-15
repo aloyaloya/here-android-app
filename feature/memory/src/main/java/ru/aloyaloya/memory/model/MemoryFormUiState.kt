@@ -1,6 +1,7 @@
 package ru.aloyaloya.memory.model
 
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.mapkit.model.MapPoint
 import java.time.LocalDateTime
 
@@ -14,6 +15,7 @@ import java.time.LocalDateTime
  * @property description Описание воспоминания.
  * @property point Точка воспоминания: у нового приходит из маршрута, у существующего
  * читается из базы, поэтому до загрузки ее нет.
+ * @property media Прикрепленные снимки: у новых адрес из пикера, у сохраненных путь к файлу.
  * @property address Адрес выбранной точки или null, пока он не определён или определить не удалось.
  * @property editing Форма открыта на существующем воспоминании.
  * @property saving Идет запись в базу.
@@ -25,6 +27,7 @@ data class MemoryFormUiState(
     val title: String = "",
     val description: String = "",
     val point: MapPoint? = null,
+    val media: List<MemoryMedia> = emptyList(),
     val address: String? = null,
     val editing: Boolean = false,
     val saving: Boolean = false,
