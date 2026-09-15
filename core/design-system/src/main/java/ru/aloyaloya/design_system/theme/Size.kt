@@ -210,6 +210,7 @@ object HereSize {
     object MediaViewer {
         val actionsPadding = 16.dp
         val counterMargin = 24.dp
+        val dismissDistance = 120.dp
         val counterVerticalPadding = 7.dp
         val counterHorizontalPadding = 14.dp
     }
