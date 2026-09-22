@@ -295,8 +295,8 @@ private fun MemoryDetailSheet(
         verticalArrangement = Arrangement.spacedBy(HereSize.Memory.sheetSpacing),
         modifier = modifier
             .fillMaxWidth()
-            .sheetShadow(HereShape.sheetDetail)
-            .clip(HereShape.sheetDetail)
+            .sheetShadow(HereShape.sheet)
+            .clip(HereShape.sheet)
             .background(colors.background)
             .verticalScroll(rememberScrollState())
             .navigationBarsPadding()

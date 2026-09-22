@@ -329,7 +329,7 @@ private fun QuickTimeChip(
         ),
         color = if (selected) colors.accent else colors.textSecondary,
         modifier = Modifier
-            .clip(HereShape.chip)
+            .clip(HereShape.tile)
             .background(if (selected) colors.accentContainer else colors.surfaceMuted)
             .clickable(onClick = onClick)
             .padding(

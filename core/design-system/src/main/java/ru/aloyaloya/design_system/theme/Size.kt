@@ -247,7 +247,7 @@ object HereSize {
         val pinBorder = 5.dp
         val pinEmojiSize = 44.sp
         val scrimHeight = 133.dp
-        val sheetCornerOverlap = 30.dp
+        val sheetCornerOverlap = 28.dp
         val actionsHorizontalPadding = 22.dp
         val actionsTopPadding = 12.dp
         val sheetHorizontalPadding = 27.dp
@@ -277,6 +277,6 @@ object HereSize {
 
     /** Основная кнопка. */
     object PrimaryButton {
-        val height = 65.dp
+        val height = 56.dp
     }
 }

@@ -45,8 +45,8 @@ fun PlacePickerPanel(
         verticalArrangement = Arrangement.spacedBy(sizes.panelSpacing),
         modifier = modifier
             .fillMaxWidth()
-            .sheetShadow(HereShape.cardLarge)
-            .clip(HereShape.cardLarge)
+            .sheetShadow(HereShape.card)
+            .clip(HereShape.card)
             .background(colors.surface)
             .padding(sizes.panelPadding)
     ) {

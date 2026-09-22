@@ -33,7 +33,7 @@ fun EmotionTag(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(HereSize.EmotionTag.spacing),
         modifier = modifier
-            .background(color = color, shape = HereShape.chip)
+            .background(color = color, shape = HereShape.tile)
             .padding(
                 vertical = HereSize.EmotionTag.verticalPadding,
                 horizontal = HereSize.EmotionTag.horizontalPadding

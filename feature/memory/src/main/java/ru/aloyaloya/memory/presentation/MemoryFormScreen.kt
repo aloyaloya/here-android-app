@@ -345,7 +345,7 @@ private fun PlacePreview(
                 style = MaterialTheme.typography.titleMedium,
                 color = colors.textPrimary,
                 modifier = Modifier
-                    .clip(HereShape.chip)
+                    .clip(HereShape.tile)
                     .background(colors.surface)
                     .padding(
                         vertical = HereSize.PlacePreview.addressVerticalPadding,

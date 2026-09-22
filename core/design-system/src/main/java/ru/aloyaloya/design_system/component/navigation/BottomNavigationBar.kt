@@ -34,8 +34,8 @@ fun BottomNavigationBar(
         modifier = modifier
             .fillMaxWidth()
             .height(HereSize.NavBar.height)
-            .navBarShadow(HereShape.navBar)
-            .clip(HereShape.navBar)
+            .navBarShadow(HereShape.pill)
+            .clip(HereShape.pill)
             .background(HereTheme.colors.surface),
         verticalAlignment = Alignment.CenterVertically,
         content = content
