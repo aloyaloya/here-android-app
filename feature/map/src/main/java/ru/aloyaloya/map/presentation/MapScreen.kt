@@ -10,19 +10,13 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Easing
-import androidx.compose.animation.core.FiniteAnimationSpec
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.animateFloat
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -46,9 +40,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.TransformOrigin
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
@@ -77,15 +69,15 @@ import ru.aloyaloya.design_system.R as DesignSystemR
 /** Прозрачность круга точности вокруг маркера. */
 private const val USER_LOCATION_ACCURACY_ALPHA = 0.10f
 
-/** Кнопка внизу сначала уезжает, и только следом приезжает то, что ее сменяет. */
+/** Кнопка внизу сначала сжимается, и только следом вырастает то, что ее сменяет. */
 private const val ACTIONS_EXIT_MILLIS = 180
 private const val ACTIONS_ENTER_MILLIS = 280
 
-/** Прицел растет и сжимается так же, как метки на карте. */
-private const val PIN_RESIZE_MILLIS = 260
-private val PinGrowEasing = Easing(OvershootInterpolator()::getInterpolation)
-private val PinShrinkEasing = Easing(AccelerateInterpolator()::getInterpolation)
-private val PinOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1f)
+/** Кнопки, плашка и прицел растут и сжимаются так же, как метки на карте. */
+private const val RESIZE_MILLIS = 260
+private val GrowEasing = Easing(OvershootInterpolator()::getInterpolation)
+private val ShrinkEasing = Easing(AccelerateInterpolator()::getInterpolation)
+private val BottomOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1f)
 
 private val locationPermissions = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -192,12 +184,12 @@ fun MapScreen(
                 AnimatedVisibility(
                     visible = picking,
                     enter = scaleIn(
-                        tween(PIN_RESIZE_MILLIS, easing = PinGrowEasing),
-                        transformOrigin = PinOrigin
+                        tween(RESIZE_MILLIS, easing = GrowEasing),
+                        transformOrigin = BottomOrigin
                     ),
                     exit = scaleOut(
-                        tween(PIN_RESIZE_MILLIS, easing = PinShrinkEasing),
-                        transformOrigin = PinOrigin
+                        tween(RESIZE_MILLIS, easing = ShrinkEasing),
+                        transformOrigin = BottomOrigin
                     ),
                     modifier = Modifier
                         .align(Alignment.Center)
@@ -218,39 +210,39 @@ fun MapScreen(
                 ) {
                     AnimatedVisibility(
                         visible = locationGranted && mapState.awayFromUser,
-                        enter = slideInVertically { height -> height / 2 },
-                        exit = slideOutVertically { height -> height / 2 }
+                        enter = scaleIn(tween(RESIZE_MILLIS, easing = GrowEasing)),
+                        exit = scaleOut(tween(RESIZE_MILLIS, easing = ShrinkEasing))
                     ) {
-                        Box(modifier = shadowSafeFade()) {
-                            LocationFab(onClick = onLocationClick)
-                        }
+                        LocationFab(onClick = onLocationClick)
                     }
 
                     AnimatedContent(
                         targetState = uiState.picking,
                         transitionSpec = {
-                            val enter = slideInVertically(
-                                tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS)
-                            ) { height -> height }
-                            val exit =
-                                slideOutVertically(tween(ACTIONS_EXIT_MILLIS)) { height -> height }
-
-                            enter togetherWith exit using SizeTransform(clip = false)
+                            EnterTransition.None togetherWith ExitTransition.None using
+                                SizeTransform(clip = false)
                         },
                         contentAlignment = Alignment.BottomEnd,
                         contentKey = { state -> state != null },
                         label = "map-actions"
                     ) { pickingState ->
-                        val fade = shadowSafeFade(
-                            enterSpec = tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS),
-                            exitSpec = tween(ACTIONS_EXIT_MILLIS)
+                        val origin = if (pickingState == null) TransformOrigin.Center else BottomOrigin
+                        val resize = Modifier.animateEnterExit(
+                            enter = scaleIn(
+                                tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS, GrowEasing),
+                                transformOrigin = origin
+                            ),
+                            exit = scaleOut(
+                                tween(ACTIONS_EXIT_MILLIS, easing = ShrinkEasing),
+                                transformOrigin = origin
+                            )
                         )
 
                         if (pickingState == null) {
-                            HereFab(onClick = onPickStart, modifier = fade)
+                            HereFab(onClick = onPickStart, modifier = resize)
                         } else {
                             PlacePickerPanel(
-                                modifier = fade,
+                                modifier = resize,
                                 address = pickingState.address,
                                 resolving = pickingState.resolving,
                                 onCancel = onPickCancel,
@@ -288,29 +280,6 @@ fun MapScreen(
                 )
             }
         }
-    }
-}
-
-/**
- * Проявление и растворение, которое не обрезает тень.
- *
- * Обычный fadeIn рисует полупрозрачное содержимое в отдельный буфер размером с сам
- * элемент, и тень за его краями пропадает до конца анимации. Здесь прозрачность
- * применяется к каждой отрисовке напрямую, без буфера.
- */
-@Composable
-private fun AnimatedVisibilityScope.shadowSafeFade(
-    enterSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow),
-    exitSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow)
-): Modifier {
-    val alpha by transition.animateFloat(
-        transitionSpec = { if (targetState == EnterExitState.Visible) enterSpec else exitSpec },
-        label = "shadow-safe-fade"
-    ) { state -> if (state == EnterExitState.Visible) 1f else 0f }
-
-    return Modifier.graphicsLayer {
-        this.alpha = alpha
-        compositingStrategy = CompositingStrategy.ModulateAlpha
     }
 }
 
