@@ -2,6 +2,7 @@
 <resources>
     <string name="theme_toggle_content_description">Сменить тему</string>
     <string name="fab_add_memory_content_description">Добавить воспоминание</string>
+    <string name="fab_location_content_description">Показать мое место</string>
     <string name="media_add">+ медиа</string>
     <string name="media_remove">Убрать медиафайл</string>
     <string name="media_video">Видео</string>

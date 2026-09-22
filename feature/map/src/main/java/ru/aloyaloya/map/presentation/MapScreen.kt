@@ -3,14 +3,31 @@ package ru.aloyaloya.map.presentation
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.OvershootInterpolator
+import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.material3.CircularProgressIndicator
@@ -23,7 +40,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.theme.HereSize
@@ -31,6 +50,9 @@ import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.map.model.MapUiState
+import ru.aloyaloya.map.presentation.component.PlaceMemoriesSheet
+import ru.aloyaloya.map.presentation.component.PlacePickerPanel
+import ru.aloyaloya.map.presentation.component.PlacePin
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapMarker
 import ru.aloyaloya.mapkit.model.MapMarkerIcon
@@ -42,9 +64,20 @@ import ru.aloyaloya.mapkit.ui.rememberYandexMapState
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
+import ru.aloyaloya.design_system.R as DesignSystemR
 
 /** Прозрачность круга точности вокруг маркера. */
 private const val USER_LOCATION_ACCURACY_ALPHA = 0.10f
+
+/** Кнопка внизу сначала сжимается, и только следом вырастает то, что ее сменяет. */
+private const val ACTIONS_EXIT_MILLIS = 180
+private const val ACTIONS_ENTER_MILLIS = 280
+
+/** Кнопки, плашка и прицел растут и сжимаются так же, как метки на карте. */
+private const val RESIZE_MILLIS = 260
+private val GrowEasing = Easing(OvershootInterpolator()::getInterpolation)
+private val ShrinkEasing = Easing(AccelerateInterpolator()::getInterpolation)
+private val BottomOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1f)
 
 private val locationPermissions = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -59,21 +92,28 @@ private fun Context.hasLocationPermission(): Boolean =
 /**
  * Экран карты.
  *
- * Точка воспоминания — центр камеры в момент нажатия на FAB, а не в момент
- * подтверждения эмоции: пользователь выбирает место на той карте, которую видит
- * до открытия листа.
+ * Воспоминание ставится в два шага: сначала режим выбора места, где карта ездит под
+ * неподвижным прицелом, и только потом лист эмоций. Точка берется в момент «Дальше» —
+ * это то место, которое пользователь видел под прицелом.
  *
  * @param uiState Состояние экрана.
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: отдает наверх эмоцию
- * и точку, на которой открылся лист.
+ * и выбранную точку.
  * @param onMemoryClick Колбэк нажатия на метку воспоминания: с карты сразу
- * открывается экран воспоминания.
+ * открывается экран воспоминания. Воспоминания в одной точке сперва показываются списком.
+ * @param onPickStart Колбэк входа в режим выбора места.
+ * @param onPickCancel Колбэк выхода из режима выбора места.
+ * @param onPickPointChanged Колбэк остановки камеры в режиме выбора: по точке
+ * определяется адрес.
  */
 @Composable
 fun MapScreen(
     uiState: MapUiState,
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
-    onMemoryClick: (Long) -> Unit
+    onMemoryClick: (Long) -> Unit,
+    onPickStart: () -> Unit,
+    onPickCancel: () -> Unit,
+    onPickPointChanged: (MapPoint) -> Unit
 ) {
     val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
@@ -107,30 +147,125 @@ fun MapScreen(
         is MapUiState.Content -> {
             var emotionPickerVisible by rememberSaveable { mutableStateOf(false) }
             var pickedPoint by remember { mutableStateOf<MapPoint?>(null) }
+            var cameraMoving by remember { mutableStateOf(false) }
+            var placeMemoryIds by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
             val mapState = rememberYandexMapState()
+            val picking = uiState.picking != null
+
+            BackHandler(enabled = picking, onBack = onPickCancel)
+
+            val onLocationClick = {
+                if (locationGranted) {
+                    mapState.moveToUserLocation()
+                } else {
+                    launcher.launch(locationPermissions)
+                }
+            }
+
+            LaunchedEffect(picking) {
+                if (picking) mapState.cameraTarget?.let(onPickPointChanged)
+            }
 
             Box(modifier = Modifier.fillMaxSize()) {
                 MapContent(
                     uiState = uiState,
                     mapState = mapState,
-                    locationEnabled = locationGranted,
+                    locationEnabled = locationGranted && !picking,
                     isDarkTheme = isDarkTheme,
                     onMarkerClick = onMemoryClick,
+                    onClusterClick = { ids -> placeMemoryIds = ids },
+                    onCameraMove = { point, settled ->
+                        cameraMoving = !settled
+                        if (settled && picking) onPickPointChanged(point)
+                    },
                     modifier = Modifier.fillMaxSize()
                 )
 
-                HereFab(
-                    onClick = {
-                        pickedPoint = mapState.cameraTarget
-                        emotionPickerVisible = true
-                    },
+                AnimatedVisibility(
+                    visible = picking,
+                    enter = scaleIn(
+                        tween(RESIZE_MILLIS, easing = GrowEasing),
+                        transformOrigin = BottomOrigin
+                    ),
+                    exit = scaleOut(
+                        tween(RESIZE_MILLIS, easing = ShrinkEasing),
+                        transformOrigin = BottomOrigin
+                    ),
                     modifier = Modifier
-                        .align(Alignment.BottomEnd)
+                        .align(Alignment.Center)
+                        .offset(y = -HereSize.PlacePicker.pinHeight / 2)
+                ) {
+                    PlacePin(moving = cameraMoving)
+                }
+
+                Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(HereSize.Fab.stackSpacing),
+                    modifier = Modifier
+                        .align(Alignment.BottomCenter)
+                        .fillMaxWidth()
                         .navigationBarsPadding()
-                        .padding(
-                            end = HereSize.Fab.endMargin,
-                            bottom = HereSize.Fab.bottomMargin
+                        .padding(horizontal = HereSize.Fab.endMargin)
+                        .padding(bottom = HereSize.Fab.bottomMargin)
+                ) {
+                    AnimatedVisibility(
+                        visible = locationGranted && mapState.awayFromUser,
+                        enter = scaleIn(tween(RESIZE_MILLIS, easing = GrowEasing)),
+                        exit = scaleOut(tween(RESIZE_MILLIS, easing = ShrinkEasing))
+                    ) {
+                        LocationFab(onClick = onLocationClick)
+                    }
+
+                    AnimatedContent(
+                        targetState = uiState.picking,
+                        transitionSpec = {
+                            EnterTransition.None togetherWith ExitTransition.None using
+                                SizeTransform(clip = false)
+                        },
+                        contentAlignment = Alignment.BottomEnd,
+                        contentKey = { state -> state != null },
+                        label = "map-actions"
+                    ) { pickingState ->
+                        val origin = if (pickingState == null) TransformOrigin.Center else BottomOrigin
+                        val resize = Modifier.animateEnterExit(
+                            enter = scaleIn(
+                                tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS, GrowEasing),
+                                transformOrigin = origin
+                            ),
+                            exit = scaleOut(
+                                tween(ACTIONS_EXIT_MILLIS, easing = ShrinkEasing),
+                                transformOrigin = origin
+                            )
                         )
+
+                        if (pickingState == null) {
+                            HereFab(onClick = onPickStart, modifier = resize)
+                        } else {
+                            PlacePickerPanel(
+                                modifier = resize,
+                                address = pickingState.address,
+                                resolving = pickingState.resolving,
+                                onCancel = onPickCancel,
+                                onConfirm = {
+                                    pickedPoint = mapState.cameraTarget
+                                    emotionPickerVisible = true
+                                }
+                            )
+                        }
+                    }
+                }
+            }
+
+            if (placeMemoryIds.isNotEmpty()) {
+                PlaceMemoriesSheet(
+                    memories = uiState.memories
+                        .filter { it.id in placeMemoryIds }
+                        .sortedByDescending { it.happenedAt },
+                    onMemoryClick = { id ->
+                        placeMemoryIds = emptyList()
+                        onMemoryClick(id)
+                    },
+                    onDismissRequest = { placeMemoryIds = emptyList() }
                 )
             }
 
@@ -139,6 +274,7 @@ fun MapScreen(
                     onDismissRequest = { emotionPickerVisible = false },
                     onEmotionConfirmed = { emotion ->
                         emotionPickerVisible = false
+                        onPickCancel()
                         pickedPoint?.let { point -> onEmotionConfirmed(emotion, point) }
                     }
                 )
@@ -147,11 +283,27 @@ fun MapScreen(
     }
 }
 
+@Composable
+private fun LocationFab(onClick: () -> Unit) {
+    HereFab(
+        onClick = onClick,
+        icon = DesignSystemR.drawable.ic_location,
+        contentDescription = stringResource(
+            DesignSystemR.string.fab_location_content_description
+        ),
+        container = HereTheme.colors.onAccent,
+        content = HereTheme.colors.accent
+    )
+}
+
 /**
  * Карта на весь экран.
  *
  * Логотип Яндекса должен оставаться под верхней панелью, а карта рисуется под
  * системными панелями, поэтому к отступу логотипа добавляется высота статус-бара.
+ *
+ * В режиме выбора места чужие метки прячутся: под прицелом должно быть
+ * видно само место, а не соседние воспоминания.
  */
 @Composable
 private fun MapContent(
@@ -160,6 +312,8 @@ private fun MapContent(
     locationEnabled: Boolean,
     isDarkTheme: Boolean,
     onMarkerClick: (Long) -> Unit,
+    onClusterClick: (List<Long>) -> Unit,
+    onCameraMove: (MapPoint, Boolean) -> Unit,
     modifier: Modifier
 ) {
     val statusBarInset = WindowInsets.statusBars
@@ -186,7 +340,10 @@ private fun MapContent(
         locationEnabled = locationEnabled,
         isDarkTheme = isDarkTheme,
         markers = markers,
+        markersVisible = uiState.picking == null,
         onMarkerClick = onMarkerClick,
+        onClusterClick = onClusterClick,
+        onCameraMove = onCameraMove,
         logoPlacement = logoPlacement.copy(
             verticalInset = logoPlacement.verticalInset + statusBarInset
         )

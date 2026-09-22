@@ -18,7 +18,9 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.mapview.MapView
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
@@ -46,7 +48,12 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
  * @param userLocationStyle Цвета маркера текущего положения: модуль берет их снаружи,
  * чтобы маркер следовал за темой приложения. При `null` маркер не показывается.
  * @param markers Метки, которые карта показывает поверх тайлов.
+ * @param markersVisible Видны ли метки. Прячутся и появляются плавно, не пропадая из карты.
  * @param onMarkerClick Колбэк нажатия на метку, отдает идентификатор объекта.
+ * @param onClusterClick Колбэк нажатия на стопку меток в одной точке: приближением ее
+ * не разобрать, поэтому отдаются идентификаторы всех объектов.
+ * @param onCameraMove Колбэк движения камеры: точка под центром и признак того,
+ * что камера уже встала. Пока камера едет, приходит с `settled = false`.
  * @param movable Карта рисуется во вьюху, которая подчиняется скруглению и другим
  * преобразованиям родителя, а до первого кадра остается прозрачной. Нужна там, где карта
  * лежит в карточке. Стоит дороже обычной, поэтому на весь экран берется обычная.
@@ -64,7 +71,10 @@ fun YandexMap(
     locationEnabled: Boolean = false,
     isDarkTheme: Boolean = false,
     markers: List<MapMarker> = emptyList(),
+    markersVisible: Boolean = true,
     onMarkerClick: (Long) -> Unit = {},
+    onClusterClick: (List<Long>) -> Unit = {},
+    onCameraMove: (point: MapPoint, settled: Boolean) -> Unit = { _, _ -> },
     logoPlacement: MapLogoPlacement = MapLogoPlacement.UnderTopBar
 ) {
     val context = LocalContext.current
@@ -105,18 +115,49 @@ fun YandexMap(
         }
     }
 
+    DisposableEffect(state, binder) {
+        state.locationBinder = binder
+        onDispose { state.locationBinder = null }
+    }
+
     LaunchedEffect(binder, userLocationStyle) {
         binder.applyStyle()
     }
 
     val onMarkerClickState = rememberUpdatedState(onMarkerClick)
+    val onClusterClickState = rememberUpdatedState(onClusterClick)
 
-    val markersBinder = remember(mapView, appContext) {
-        MarkersBinder(mapView, appContext) { id -> onMarkerClickState.value(id) }
+    val markersBinder = remember(mapView, appContext, config.maxZoom) {
+        MarkersBinder(
+            mapView = mapView,
+            context = appContext,
+            maxZoom = config.maxZoom,
+            onMarkerClick = { id -> onMarkerClickState.value(id) },
+            onClusterClick = { ids -> onClusterClickState.value(ids) }
+        )
     }
 
     LaunchedEffect(markersBinder, markers) {
         markersBinder.apply(markers)
+    }
+
+    LaunchedEffect(markersBinder, markersVisible) {
+        markersBinder.setVisible(markersVisible)
+    }
+
+    val onCameraMoveState = rememberUpdatedState(onCameraMove)
+
+    DisposableEffect(mapView, binder, state) {
+        val listener = CameraListener { _, position, reason, settled ->
+            if (reason == CameraUpdateReason.GESTURES) binder.cancelPendingMove()
+
+            val target = position.target
+            state.awayFromUser = binder.isAwayFromUser(target)
+            onCameraMoveState.value(MapPoint(target.latitude, target.longitude), settled)
+        }
+
+        mapView.mapWindow.map.addCameraListener(listener)
+        onDispose { mapView.mapWindow.map.removeCameraListener(listener) }
     }
 
     val locationEnabledState = rememberUpdatedState(locationEnabled)
@@ -161,7 +202,7 @@ fun YandexMap(
                     }
                 }
             } finally {
-                binder.detach()
+                binder.detach(animated = false)
                 mapView.onStop()
                 mapKit.onStop()
             }

@@ -51,6 +51,7 @@ object HereSize {
         val iconSize = 28.dp
         val endMargin = 18.dp
         val bottomMargin = 126.dp
+        val stackSpacing = 14.dp
     }
 
     /** Нижний лист. */
@@ -129,6 +130,30 @@ object HereSize {
         val addressMargin = 14.dp
         val addressVerticalPadding = 8.dp
         val addressHorizontalPadding = 14.dp
+    }
+
+    /** Список воспоминаний в одной точке карты. */
+    object PlaceMemories {
+        val rowPadding = 14.dp
+        val rowSpacing = 10.dp
+        val badgeSpacing = 14.dp
+        val textSpacing = 3.dp
+    }
+
+    /** Режим выбора места на карте: прицел по центру и панель с адресом. */
+    object PlacePicker {
+        val pinHeight = 52.dp
+        val pinSize = 30.dp
+        val pinBorder = 4.dp
+        val pinStemWidth = 3.dp
+        val pinStemHeight = 14.dp
+        val pinAnchor = 8.dp
+        val pinLift = 10.dp
+        val panelPadding = 20.dp
+        val panelSpacing = 16.dp
+        val actionSpacing = 10.dp
+        val actionHeight = 52.dp
+        val addressSpacing = 3.dp
     }
 
     /** Панель модального экрана. */

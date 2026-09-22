@@ -61,7 +61,10 @@ fun NavGraphBuilder.mapScreen(
         MapScreen(
             uiState = uiState,
             onEmotionConfirmed = onEmotionConfirmed,
-            onMemoryClick = onMemoryClick
+            onMemoryClick = onMemoryClick,
+            onPickStart = viewModel::startPicking,
+            onPickCancel = viewModel::cancelPicking,
+            onPickPointChanged = viewModel::onPickPointChanged
         )
     }
 }
