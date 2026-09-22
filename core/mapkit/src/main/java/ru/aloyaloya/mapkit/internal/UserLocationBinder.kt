@@ -64,8 +64,17 @@ internal class UserLocationBinder(
 
     /**
      * Наводит камеру на пользователя.
+     *
+     * Если слой уже знает положение, камера едет туда одним движением. Иначе сначала
+     * берется последняя известная точка, следом запрашивается свежая.
      */
     fun moveToUserLocation(animated: Boolean = true) {
+        userLocationLayer?.cameraPosition()?.target?.let { point ->
+            cancelPendingMove()
+            moveCamera(point, animated)
+            return
+        }
+
         LastKnownLocationReader.readBestPoint(appContext)?.let { moveCamera(it, animated) }
 
         val manager = locationManager ?: mapKit.createLocationManager().also {
@@ -89,6 +98,12 @@ internal class UserLocationBinder(
 
         locationListener = listener
         manager.requestSingleUpdate(listener)
+    }
+
+    /** Отменяет ожидание свежего фикса: камеру уже ведет пользователь. */
+    fun cancelPendingMove() {
+        locationListener?.let { locationManager?.unsubscribe(it) }
+        locationListener = null
     }
 
     /**
@@ -154,8 +169,7 @@ internal class UserLocationBinder(
     fun detach() {
         if (!active) return
         active = false
-        locationListener?.let { locationManager?.unsubscribe(it) }
-        locationListener = null
+        cancelPendingMove()
         locationManager = null
         userLocationLayer?.isVisible = false
     }

@@ -209,6 +209,7 @@ fun MapScreen(
                             enter togetherWith exit using SizeTransform(clip = false)
                         },
                         contentAlignment = Alignment.BottomEnd,
+                        contentKey = { state -> state != null },
                         label = "map-actions"
                     ) { pickingState ->
                         if (pickingState == null) {

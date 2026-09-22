@@ -20,6 +20,7 @@ import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.CameraUpdateReason
 import com.yandex.mapkit.mapview.MapView
 import kotlinx.coroutines.awaitCancellation
 import kotlinx.coroutines.coroutineScope
@@ -131,7 +132,9 @@ fun YandexMap(
     val onCameraMoveState = rememberUpdatedState(onCameraMove)
 
     DisposableEffect(mapView, binder, state) {
-        val listener = CameraListener { _, position, _, settled ->
+        val listener = CameraListener { _, position, reason, settled ->
+            if (reason == CameraUpdateReason.GESTURES) binder.cancelPendingMove()
+
             val target = position.target
             state.awayFromUser = binder.isAwayFromUser(target)
             onCameraMoveState.value(MapPoint(target.latitude, target.longitude), settled)
