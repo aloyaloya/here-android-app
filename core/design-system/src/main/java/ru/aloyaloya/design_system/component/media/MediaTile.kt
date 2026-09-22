@@ -3,7 +3,6 @@ package ru.aloyaloya.design_system.component.media
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
@@ -59,18 +58,24 @@ fun MediaTile(
             contentAlignment = Alignment.Center,
             modifier = Modifier
                 .align(Alignment.TopEnd)
-                .padding(HereSize.MediaTile.removeMargin)
-                .size(HereSize.MediaTile.removeSize)
+                .size(HereSize.MediaTile.removeTouchSize)
                 .clip(CircleShape)
-                .background(RemoveButtonBackground)
                 .clickable(onClick = onRemoveClick)
         ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_close),
-                contentDescription = stringResource(R.string.media_remove),
-                tint = Color.White,
-                modifier = Modifier.size(HereSize.MediaTile.removeIconSize)
-            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(HereSize.MediaTile.removeSize)
+                    .clip(CircleShape)
+                    .background(RemoveButtonBackground)
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_close),
+                    contentDescription = stringResource(R.string.media_remove),
+                    tint = Color.White,
+                    modifier = Modifier.size(HereSize.MediaTile.removeIconSize)
+                )
+            }
         }
     }
 }

@@ -191,7 +191,7 @@ object HereSize {
         val addGap = 5.dp
         val removeSize = 26.dp
         val removeIconSize = 11.dp
-        val removeMargin = 6.dp
+        val removeTouchSize = 38.dp
     }
 
     /** Компактная кнопка на приглушенном акцентном фоне. */
