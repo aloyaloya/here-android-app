@@ -202,7 +202,7 @@ fun YandexMap(
                     }
                 }
             } finally {
-                binder.detach()
+                binder.detach(animated = false)
                 mapView.onStop()
                 mapKit.onStop()
             }

@@ -11,6 +11,8 @@ import com.yandex.mapkit.location.LocationListener
 import com.yandex.mapkit.location.LocationManager
 import com.yandex.mapkit.location.LocationStatus
 import com.yandex.mapkit.map.CameraPosition
+import com.yandex.mapkit.map.IconStyle
+import com.yandex.mapkit.map.RotationType
 import com.yandex.mapkit.mapview.MapView
 import com.yandex.mapkit.user_location.UserLocationLayer
 import com.yandex.mapkit.user_location.UserLocationObjectListener
@@ -41,6 +43,7 @@ internal class UserLocationBinder(
     private var locationManager: LocationManager? = null
     private var locationListener: LocationListener? = null
     private var active = false
+    private val resize = IconResize { userLocationView?.let(::applyScale) }
     private var centered = false
 
     fun attach() {
@@ -55,6 +58,7 @@ internal class UserLocationBinder(
             }
 
         layer.isVisible = true
+        resize.animateTo(visible = true)
 
         if (!centered) {
             centered = true
@@ -153,7 +157,18 @@ internal class UserLocationBinder(
         val style = style() ?: return
         view.arrow.setIcon(UserLocationIcons.arrow(appContext, style))
         view.pin.setIcon(UserLocationIcons.pin(appContext, style))
-        view.accuracyCircle.fillColor = style.accuracy.toArgb()
+        applyScale(view)
+    }
+
+    /** Масштаб маркера. Круг точности не сжимается, а тает: его размер ведет MapKit. */
+    private fun applyScale(view: UserLocationView) {
+        val scale = resize.scale
+        view.arrow.setIconStyle(IconStyle().setRotationType(RotationType.ROTATE).setScale(scale))
+        view.pin.setIconStyle(IconStyle().setScale(scale))
+        style()?.let { style ->
+            val alpha = style.accuracy.alpha * scale.coerceAtMost(1f)
+            view.accuracyCircle.fillColor = style.accuracy.copy(alpha = alpha).toArgb()
+        }
     }
 
     private fun moveCamera(point: Point, animated: Boolean) {
@@ -166,12 +181,23 @@ internal class UserLocationBinder(
         }
     }
 
-    fun detach() {
+    /**
+     * Прячет маркер и перестает следить за положением.
+     *
+     * @param animated Сжать маркер перед тем, как спрятать. При уходе с экрана не нужно.
+     */
+    fun detach(animated: Boolean = true) {
         if (!active) return
         active = false
         cancelPendingMove()
         locationManager = null
-        userLocationLayer?.isVisible = false
+
+        if (animated && userLocationView != null) {
+            resize.animateTo(visible = false) { userLocationLayer?.isVisible = false }
+        } else {
+            resize.snapTo(visible = false)
+            userLocationLayer?.isVisible = false
+        }
     }
 
     private companion object {

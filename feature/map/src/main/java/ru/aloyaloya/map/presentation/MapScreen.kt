@@ -3,15 +3,20 @@ package ru.aloyaloya.map.presentation
 import android.Manifest
 import android.content.Context
 import android.content.pm.PackageManager
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.OvershootInterpolator
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
@@ -37,6 +42,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
@@ -45,7 +51,6 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
-import ru.aloyaloya.map.R
 import ru.aloyaloya.map.model.MapUiState
 import ru.aloyaloya.map.presentation.component.PlaceMemoriesSheet
 import ru.aloyaloya.map.presentation.component.PlacePickerPanel
@@ -69,6 +74,12 @@ private const val USER_LOCATION_ACCURACY_ALPHA = 0.10f
 /** Кнопка внизу сначала уезжает, и только следом приезжает то, что ее сменяет. */
 private const val ACTIONS_EXIT_MILLIS = 180
 private const val ACTIONS_ENTER_MILLIS = 280
+
+/** Прицел растет и сжимается так же, как метки на карте. */
+private const val PIN_RESIZE_MILLIS = 260
+private val PinGrowEasing = Easing(OvershootInterpolator()::getInterpolation)
+private val PinShrinkEasing = Easing(AccelerateInterpolator()::getInterpolation)
+private val PinOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1f)
 
 private val locationPermissions = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -172,13 +183,21 @@ fun MapScreen(
                     modifier = Modifier.fillMaxSize()
                 )
 
-                if (picking) {
-                    PlacePin(
-                        moving = cameraMoving,
-                        modifier = Modifier
-                            .align(Alignment.Center)
-                            .offset(y = -HereSize.PlacePicker.pinHeight / 2)
-                    )
+                AnimatedVisibility(
+                    visible = picking,
+                    enter = scaleIn(
+                        tween(PIN_RESIZE_MILLIS, easing = PinGrowEasing),
+                        transformOrigin = PinOrigin
+                    ),
+                    exit = scaleOut(
+                        tween(PIN_RESIZE_MILLIS, easing = PinShrinkEasing),
+                        transformOrigin = PinOrigin
+                    ),
+                    modifier = Modifier
+                        .align(Alignment.Center)
+                        .offset(y = -HereSize.PlacePicker.pinHeight / 2)
+                ) {
+                    PlacePin(moving = cameraMoving)
                 }
 
                 Column(
@@ -203,11 +222,11 @@ fun MapScreen(
                         targetState = uiState.picking,
                         transitionSpec = {
                             val enter = fadeIn(tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS)) +
-                                slideInVertically(
-                                    tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS)
-                                ) { height -> height }
+                                    slideInVertically(
+                                        tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS)
+                                    ) { height -> height }
                             val exit = fadeOut(tween(ACTIONS_EXIT_MILLIS)) +
-                                slideOutVertically(tween(ACTIONS_EXIT_MILLIS)) { height -> height }
+                                    slideOutVertically(tween(ACTIONS_EXIT_MILLIS)) { height -> height }
 
                             enter togetherWith exit using SizeTransform(clip = false)
                         },

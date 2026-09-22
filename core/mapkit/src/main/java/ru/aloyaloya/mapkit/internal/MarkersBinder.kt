@@ -1,12 +1,8 @@
 package ru.aloyaloya.mapkit.internal
 
-import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.PointF
 import android.location.Location
-import android.view.animation.AccelerateInterpolator
-import android.view.animation.OvershootInterpolator
-import androidx.core.animation.doOnEnd
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.geometry.BoundingBox
 import com.yandex.mapkit.geometry.Geometry
@@ -46,8 +42,7 @@ internal class MarkersBinder(
 
     private val placemarks = mutableListOf<PlacemarkMapObject>()
     private val clusters = mutableMapOf<Cluster, PointF>()
-    private var scale = 1f
-    private var resize: ValueAnimator? = null
+    private val resize = IconResize { applyScale() }
 
     private val tapListener = MapObjectTapListener { mapObject, _ ->
         val marker = mapObject.userData as? MapMarker
@@ -102,34 +97,21 @@ internal class MarkersBinder(
         current = markers
     }
 
-    /**
-     * Прячет метки, сжимая их в точку, и показывает, раздувая обратно.
-     */
+    /** Прячет метки, сжимая их в точку, и показывает, раздувая обратно. */
     fun setVisible(visible: Boolean) {
-        val target = if (visible) 1f else 0f
-        resize?.cancel()
-        if (scale == target) return
-
         collection.isVisible = true
-        resize = ValueAnimator.ofFloat(scale, target).apply {
-            duration = RESIZE_MILLIS
-            interpolator = if (visible) OvershootInterpolator() else AccelerateInterpolator()
-            addUpdateListener { animator -> applyScale(animator.animatedValue as Float) }
-            doOnEnd { collection.isVisible = visible }
-            start()
-        }
+        resize.animateTo(visible) { collection.isVisible = visible }
     }
 
-    private fun applyScale(value: Float) {
-        scale = value
+    private fun applyScale() {
         placemarks.forEach { it.setIconStyle(scaled()) }
         clusters.keys.removeAll { !it.isValid }
         clusters.forEach { (cluster, anchor) -> cluster.appearance.setIconStyle(scaled(anchor)) }
     }
 
-    /** Стиль иконки с текущим масштабом. Совсем в ноль MapKit не сжимается, поэтому есть минимум. */
+    /** Стиль иконки с текущим масштабом. */
     private fun scaled(anchor: PointF = CENTER) =
-        IconStyle().setAnchor(anchor).setScale(scale.coerceAtLeast(MIN_SCALE))
+        IconStyle().setAnchor(anchor).setScale(resize.scale)
 
     /** Подводит камеру так, чтобы метки стопки поместились на экран с запасом по краям. */
     private fun zoomTo(markers: List<MapMarker>) {
@@ -195,8 +177,6 @@ internal class MarkersBinder(
         const val FIT_ZOOM_MARGIN = 0.8f
 
         val CAMERA_ANIMATION = Animation(Animation.Type.SMOOTH, 0.4f)
-        const val RESIZE_MILLIS = 260L
-        const val MIN_SCALE = 0.01f
         val CENTER = PointF(0.5f, 0.5f)
     }
 }
