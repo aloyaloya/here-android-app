@@ -18,6 +18,7 @@ import androidx.lifecycle.compose.LocalLifecycleOwner
 import androidx.lifecycle.repeatOnLifecycle
 import com.yandex.mapkit.MapKitFactory
 import com.yandex.mapkit.geometry.Point
+import com.yandex.mapkit.map.CameraListener
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.mapview.MapView
 import kotlinx.coroutines.awaitCancellation
@@ -47,6 +48,8 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
  * чтобы маркер следовал за темой приложения. При `null` маркер не показывается.
  * @param markers Метки, которые карта показывает поверх тайлов.
  * @param onMarkerClick Колбэк нажатия на метку, отдает идентификатор объекта.
+ * @param onCameraMove Колбэк движения камеры: точка под центром и признак того,
+ * что камера уже встала. Пока камера едет, приходит с `settled = false`.
  * @param movable Карта рисуется во вьюху, которая подчиняется скруглению и другим
  * преобразованиям родителя, а до первого кадра остается прозрачной. Нужна там, где карта
  * лежит в карточке. Стоит дороже обычной, поэтому на весь экран берется обычная.
@@ -65,6 +68,7 @@ fun YandexMap(
     isDarkTheme: Boolean = false,
     markers: List<MapMarker> = emptyList(),
     onMarkerClick: (Long) -> Unit = {},
+    onCameraMove: (point: MapPoint, settled: Boolean) -> Unit = { _, _ -> },
     logoPlacement: MapLogoPlacement = MapLogoPlacement.UnderTopBar
 ) {
     val context = LocalContext.current
@@ -122,6 +126,19 @@ fun YandexMap(
 
     LaunchedEffect(markersBinder, markers) {
         markersBinder.apply(markers)
+    }
+
+    val onCameraMoveState = rememberUpdatedState(onCameraMove)
+
+    DisposableEffect(mapView, binder, state) {
+        val listener = CameraListener { _, position, _, settled ->
+            val target = position.target
+            state.awayFromUser = binder.isAwayFromUser(target)
+            onCameraMoveState.value(MapPoint(target.latitude, target.longitude), settled)
+        }
+
+        mapView.mapWindow.map.addCameraListener(listener)
+        onDispose { mapView.mapWindow.map.removeCameraListener(listener) }
     }
 
     val locationEnabledState = rememberUpdatedState(locationEnabled)

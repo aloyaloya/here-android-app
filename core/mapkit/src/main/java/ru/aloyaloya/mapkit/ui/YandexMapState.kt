@@ -2,7 +2,10 @@ package ru.aloyaloya.mapkit.ui
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Stable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import com.yandex.mapkit.mapview.MapView
 import ru.aloyaloya.mapkit.internal.UserLocationBinder
 import ru.aloyaloya.mapkit.model.MapPoint
@@ -12,6 +15,10 @@ class YandexMapState {
 
     internal var mapView: MapView? = null
     internal var locationBinder: UserLocationBinder? = null
+
+    /** Отъехала ли камера от пользователя. Без фикса геолокации всегда `false`. */
+    var awayFromUser: Boolean by mutableStateOf(false)
+        internal set
 
     /** Центр камеры или `null`, пока карта не показана. */
     val cameraTarget: MapPoint?

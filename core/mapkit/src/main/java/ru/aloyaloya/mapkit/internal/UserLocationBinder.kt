@@ -1,6 +1,7 @@
 package ru.aloyaloya.mapkit.internal
 
 import android.content.Context
+import android.location.Location
 import androidx.compose.ui.graphics.toArgb
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.MapKitFactory
@@ -47,10 +48,13 @@ internal class UserLocationBinder(
         active = true
         mapKit.resetLocationManagerToDefault()
 
-        userLocationLayer = mapKit.createUserLocationLayer(mapView.mapWindow).apply {
-            setObjectListener(iconListener)
-            isVisible = true
-        }
+        val layer = userLocationLayer ?: mapKit.createUserLocationLayer(mapView.mapWindow)
+            .also { created ->
+                created.setObjectListener(iconListener)
+                userLocationLayer = created
+            }
+
+        layer.isVisible = true
 
         if (!centered) {
             centered = true
@@ -85,6 +89,24 @@ internal class UserLocationBinder(
 
         locationListener = listener
         manager.requestSingleUpdate(listener)
+    }
+
+    /**
+     * Отъехала ли камера от пользователя.
+     */
+    fun isAwayFromUser(target: Point): Boolean {
+        val user = userLocationLayer?.cameraPosition()?.target ?: return false
+        val distance = FloatArray(1)
+
+        Location.distanceBetween(
+            user.latitude,
+            user.longitude,
+            target.latitude,
+            target.longitude,
+            distance
+        )
+
+        return distance.first() > AWAY_DISTANCE_METERS
     }
 
     /** Перекрашивает маркер под текущую тему. Без маркера на карте не делает ничего. */
@@ -136,11 +158,12 @@ internal class UserLocationBinder(
         locationListener = null
         locationManager = null
         userLocationLayer?.isVisible = false
-        userLocationLayer = null
-        userLocationView = null
     }
 
     private companion object {
         val CAMERA_ANIMATION = Animation(Animation.Type.SMOOTH, 0.4f)
+
+        /** С такого расстояния до пользователя кнопка возврата уже нужна. */
+        const val AWAY_DISTANCE_METERS = 150f
     }
 }
