@@ -47,6 +47,7 @@ import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.map.R
 import ru.aloyaloya.map.model.MapUiState
+import ru.aloyaloya.map.presentation.component.PlaceMemoriesSheet
 import ru.aloyaloya.map.presentation.component.PlacePickerPanel
 import ru.aloyaloya.map.presentation.component.PlacePin
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
@@ -90,7 +91,7 @@ private fun Context.hasLocationPermission(): Boolean =
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: отдает наверх эмоцию
  * и выбранную точку.
  * @param onMemoryClick Колбэк нажатия на метку воспоминания: с карты сразу
- * открывается экран воспоминания.
+ * открывается экран воспоминания. Воспоминания в одной точке сперва показываются списком.
  * @param onPickStart Колбэк входа в режим выбора места.
  * @param onPickCancel Колбэк выхода из режима выбора места.
  * @param onPickPointChanged Колбэк остановки камеры в режиме выбора: по точке
@@ -138,6 +139,7 @@ fun MapScreen(
             var emotionPickerVisible by rememberSaveable { mutableStateOf(false) }
             var pickedPoint by remember { mutableStateOf<MapPoint?>(null) }
             var cameraMoving by remember { mutableStateOf(false) }
+            var placeMemoryIds by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
             val mapState = rememberYandexMapState()
             val picking = uiState.picking != null
 
@@ -162,6 +164,7 @@ fun MapScreen(
                     locationEnabled = locationGranted && !picking,
                     isDarkTheme = isDarkTheme,
                     onMarkerClick = onMemoryClick,
+                    onClusterClick = { ids -> placeMemoryIds = ids },
                     onCameraMove = { point, settled ->
                         cameraMoving = !settled
                         if (settled && picking) onPickPointChanged(point)
@@ -229,6 +232,19 @@ fun MapScreen(
                 }
             }
 
+            if (placeMemoryIds.isNotEmpty()) {
+                PlaceMemoriesSheet(
+                    memories = uiState.memories
+                        .filter { it.id in placeMemoryIds }
+                        .sortedByDescending { it.happenedAt },
+                    onMemoryClick = { id ->
+                        placeMemoryIds = emptyList()
+                        onMemoryClick(id)
+                    },
+                    onDismissRequest = { placeMemoryIds = emptyList() }
+                )
+            }
+
             if (emotionPickerVisible) {
                 EmotionPickerSheet(
                     onDismissRequest = { emotionPickerVisible = false },
@@ -278,6 +294,7 @@ private fun MapContent(
     locationEnabled: Boolean,
     isDarkTheme: Boolean,
     onMarkerClick: (Long) -> Unit,
+    onClusterClick: (List<Long>) -> Unit,
     onCameraMove: (MapPoint, Boolean) -> Unit,
     modifier: Modifier
 ) {
@@ -306,6 +323,7 @@ private fun MapContent(
         isDarkTheme = isDarkTheme,
         markers = markers,
         onMarkerClick = onMarkerClick,
+        onClusterClick = onClusterClick,
         onCameraMove = onCameraMove,
         logoPlacement = logoPlacement.copy(
             verticalInset = logoPlacement.verticalInset + statusBarInset

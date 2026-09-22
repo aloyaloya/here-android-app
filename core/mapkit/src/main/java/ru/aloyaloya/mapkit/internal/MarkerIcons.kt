@@ -4,7 +4,9 @@ import android.content.Context
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.Paint
+import android.graphics.PointF
 import androidx.compose.ui.graphics.toArgb
+import com.yandex.mapkit.map.IconStyle
 import com.yandex.runtime.image.ImageProvider
 import ru.aloyaloya.mapkit.model.MapMarkerIcon
 
@@ -19,6 +21,10 @@ private const val SHADOW_RADIUS_DP = 4f
 private const val SHADOW_OFFSET_DP = 2f
 private const val SHADOW_COLOR = 0x40000000
 
+/** Сдвиг каждой следующей метки в стопке: вправо и вверх. */
+private const val STACK_SHIFT_X_DP = 12f
+private const val STACK_SHIFT_Y_DP = 5f
+
 /**
  * Иконки меток.
  *
@@ -31,17 +37,52 @@ private const val SHADOW_COLOR = 0x40000000
 internal object MarkerIcons {
 
     private val cache = mutableMapOf<MapMarkerIcon, ImageProvider>()
+    private val stackCache = mutableMapOf<List<MapMarkerIcon>, StackIcon>()
 
     fun get(context: Context, icon: MapMarkerIcon): ImageProvider =
-        cache.getOrPut(icon) { ImageProvider.fromBitmap(draw(context, icon)) }
+        cache.getOrPut(icon) { ImageProvider.fromBitmap(draw(context, listOf(icon))) }
 
-    private fun draw(context: Context, icon: MapMarkerIcon): Bitmap {
+    /**
+     * Стопка меток для нескольких воспоминаний рядом.
+     *
+     * @param icons Метки от передней к задней.
+     */
+    fun stack(context: Context, icons: List<MapMarkerIcon>): StackIcon =
+        stackCache.getOrPut(icons) {
+            val back = icons.size - 1
+            val width = ICON_SIZE_DP + back * STACK_SHIFT_X_DP
+            val height = ICON_SIZE_DP + back * STACK_SHIFT_Y_DP
+            val anchor = PointF(ICON_SIZE_DP / 2 / width, 1 - ICON_SIZE_DP / 2 / height)
+
+            StackIcon(
+                image = ImageProvider.fromBitmap(draw(context, icons)),
+                style = IconStyle().setAnchor(anchor)
+            )
+        }
+
+    private fun draw(context: Context, icons: List<MapMarkerIcon>): Bitmap {
         val density = context.resources.displayMetrics.density
-        val size = (ICON_SIZE_DP * density).toInt()
-        val center = ICON_SIZE_DP / 2 * density
-        val bitmap = Bitmap.createBitmap(size, size, Bitmap.Config.ARGB_8888)
+        val back = icons.size - 1
+        val width = ((ICON_SIZE_DP + back * STACK_SHIFT_X_DP) * density).toInt()
+        val height = ((ICON_SIZE_DP + back * STACK_SHIFT_Y_DP) * density).toInt()
+        val bitmap = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888)
         val canvas = Canvas(bitmap)
+        val half = ICON_SIZE_DP / 2 * density
 
+        icons.asReversed().forEachIndexed { index, icon ->
+            val layer = back - index
+            canvas.drawMarker(
+                icon = icon,
+                x = half + layer * STACK_SHIFT_X_DP * density,
+                y = height - half - layer * STACK_SHIFT_Y_DP * density,
+                density = density
+            )
+        }
+
+        return bitmap
+    }
+
+    private fun Canvas.drawMarker(icon: MapMarkerIcon, x: Float, y: Float, density: Float) {
         val outline = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             color = icon.outline.toArgb()
             setShadowLayer(
@@ -55,11 +96,9 @@ internal object MarkerIcons {
             color = icon.fill.toArgb()
         }
 
-        canvas.drawCircle(center, center, CIRCLE_RADIUS_DP * density, outline)
-        canvas.drawCircle(center, center, (CIRCLE_RADIUS_DP - OUTLINE_WIDTH_DP) * density, fill)
-        canvas.drawEmoji(icon.emoji, center, density)
-
-        return bitmap
+        drawCircle(x, y, CIRCLE_RADIUS_DP * density, outline)
+        drawCircle(x, y, (CIRCLE_RADIUS_DP - OUTLINE_WIDTH_DP) * density, fill)
+        drawEmoji(icon.emoji, x, y, density)
     }
 
     /**
@@ -68,14 +107,20 @@ internal object MarkerIcons {
      * Текст рисуется от базовой линии, поэтому центр строки приходится считать
      * по метрикам шрифта.
      */
-    private fun Canvas.drawEmoji(emoji: String, center: Float, density: Float) {
+    private fun Canvas.drawEmoji(emoji: String, x: Float, y: Float, density: Float) {
         val paint = Paint(Paint.ANTI_ALIAS_FLAG).apply {
             textSize = EMOJI_SIZE_DP * density
             textAlign = Paint.Align.CENTER
         }
         val metrics = paint.fontMetrics
-        val baseline = center - (metrics.ascent + metrics.descent) / 2
+        val baseline = y - (metrics.ascent + metrics.descent) / 2
 
-        drawText(emoji, center, baseline, paint)
+        drawText(emoji, x, baseline, paint)
     }
 }
+
+/** Картинка стопки и якорь: точка карты приходится на центр передней метки. */
+internal class StackIcon(
+    val image: ImageProvider,
+    val style: IconStyle
+)

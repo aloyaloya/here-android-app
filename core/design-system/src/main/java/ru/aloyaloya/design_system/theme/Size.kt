@@ -132,6 +132,14 @@ object HereSize {
         val addressHorizontalPadding = 14.dp
     }
 
+    /** Список воспоминаний в одной точке карты. */
+    object PlaceMemories {
+        val rowPadding = 14.dp
+        val rowSpacing = 10.dp
+        val badgeSpacing = 14.dp
+        val textSpacing = 3.dp
+    }
+
     /** Режим выбора места на карте: прицел по центру и панель с адресом. */
     object PlacePicker {
         val pinHeight = 52.dp

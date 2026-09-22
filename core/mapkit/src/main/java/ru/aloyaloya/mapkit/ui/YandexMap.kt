@@ -49,6 +49,8 @@ import ru.aloyaloya.mapkit.model.YandexMapConfig
  * чтобы маркер следовал за темой приложения. При `null` маркер не показывается.
  * @param markers Метки, которые карта показывает поверх тайлов.
  * @param onMarkerClick Колбэк нажатия на метку, отдает идентификатор объекта.
+ * @param onClusterClick Колбэк нажатия на стопку меток в одной точке: приближением ее
+ * не разобрать, поэтому отдаются идентификаторы всех объектов.
  * @param onCameraMove Колбэк движения камеры: точка под центром и признак того,
  * что камера уже встала. Пока камера едет, приходит с `settled = false`.
  * @param movable Карта рисуется во вьюху, которая подчиняется скруглению и другим
@@ -69,6 +71,7 @@ fun YandexMap(
     isDarkTheme: Boolean = false,
     markers: List<MapMarker> = emptyList(),
     onMarkerClick: (Long) -> Unit = {},
+    onClusterClick: (List<Long>) -> Unit = {},
     onCameraMove: (point: MapPoint, settled: Boolean) -> Unit = { _, _ -> },
     logoPlacement: MapLogoPlacement = MapLogoPlacement.UnderTopBar
 ) {
@@ -120,9 +123,16 @@ fun YandexMap(
     }
 
     val onMarkerClickState = rememberUpdatedState(onMarkerClick)
+    val onClusterClickState = rememberUpdatedState(onClusterClick)
 
-    val markersBinder = remember(mapView, appContext) {
-        MarkersBinder(mapView, appContext) { id -> onMarkerClickState.value(id) }
+    val markersBinder = remember(mapView, appContext, config.maxZoom) {
+        MarkersBinder(
+            mapView = mapView,
+            context = appContext,
+            maxZoom = config.maxZoom,
+            onMarkerClick = { id -> onMarkerClickState.value(id) },
+            onClusterClick = { ids -> onClusterClickState.value(ids) }
+        )
     }
 
     LaunchedEffect(markersBinder, markers) {
