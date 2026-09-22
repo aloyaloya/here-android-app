@@ -10,11 +10,15 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.AnimatedVisibilityScope
+import androidx.compose.animation.EnterExitState
 import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Easing
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.Spring
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.slideInVertically
@@ -42,7 +46,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
@@ -212,21 +218,22 @@ fun MapScreen(
                 ) {
                     AnimatedVisibility(
                         visible = locationGranted && mapState.awayFromUser,
-                        enter = fadeIn() + slideInVertically { height -> height / 2 },
-                        exit = fadeOut() + slideOutVertically { height -> height / 2 }
+                        enter = slideInVertically { height -> height / 2 },
+                        exit = slideOutVertically { height -> height / 2 }
                     ) {
-                        LocationFab(onClick = onLocationClick)
+                        Box(modifier = shadowSafeFade()) {
+                            LocationFab(onClick = onLocationClick)
+                        }
                     }
 
                     AnimatedContent(
                         targetState = uiState.picking,
                         transitionSpec = {
-                            val enter = fadeIn(tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS)) +
-                                    slideInVertically(
-                                        tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS)
-                                    ) { height -> height }
-                            val exit = fadeOut(tween(ACTIONS_EXIT_MILLIS)) +
-                                    slideOutVertically(tween(ACTIONS_EXIT_MILLIS)) { height -> height }
+                            val enter = slideInVertically(
+                                tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS)
+                            ) { height -> height }
+                            val exit =
+                                slideOutVertically(tween(ACTIONS_EXIT_MILLIS)) { height -> height }
 
                             enter togetherWith exit using SizeTransform(clip = false)
                         },
@@ -234,10 +241,16 @@ fun MapScreen(
                         contentKey = { state -> state != null },
                         label = "map-actions"
                     ) { pickingState ->
+                        val fade = shadowSafeFade(
+                            enterSpec = tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS),
+                            exitSpec = tween(ACTIONS_EXIT_MILLIS)
+                        )
+
                         if (pickingState == null) {
-                            HereFab(onClick = onPickStart)
+                            HereFab(onClick = onPickStart, modifier = fade)
                         } else {
                             PlacePickerPanel(
+                                modifier = fade,
                                 address = pickingState.address,
                                 resolving = pickingState.resolving,
                                 onCancel = onPickCancel,
@@ -279,11 +292,28 @@ fun MapScreen(
 }
 
 /**
- * Кнопка наведения камеры на пользователя: та же FAB, но цвета наоборот.
+ * Проявление и растворение, которое не обрезает тень.
  *
- * Показывается, только когда камера отъехала: пока пользователь в центре,
- * возвращать нечего и место внизу занимать незачем.
+ * Обычный fadeIn рисует полупрозрачное содержимое в отдельный буфер размером с сам
+ * элемент, и тень за его краями пропадает до конца анимации. Здесь прозрачность
+ * применяется к каждой отрисовке напрямую, без буфера.
  */
+@Composable
+private fun AnimatedVisibilityScope.shadowSafeFade(
+    enterSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow),
+    exitSpec: FiniteAnimationSpec<Float> = spring(stiffness = Spring.StiffnessMediumLow)
+): Modifier {
+    val alpha by transition.animateFloat(
+        transitionSpec = { if (targetState == EnterExitState.Visible) enterSpec else exitSpec },
+        label = "shadow-safe-fade"
+    ) { state -> if (state == EnterExitState.Visible) 1f else 0f }
+
+    return Modifier.graphicsLayer {
+        this.alpha = alpha
+        compositingStrategy = CompositingStrategy.ModulateAlpha
+    }
+}
+
 @Composable
 private fun LocationFab(onClick: () -> Unit) {
     HereFab(
