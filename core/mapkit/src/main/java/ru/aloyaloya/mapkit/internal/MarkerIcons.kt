@@ -6,7 +6,6 @@ import android.graphics.Canvas
 import android.graphics.Paint
 import android.graphics.PointF
 import androidx.compose.ui.graphics.toArgb
-import com.yandex.mapkit.map.IconStyle
 import com.yandex.runtime.image.ImageProvider
 import ru.aloyaloya.mapkit.model.MapMarkerIcon
 
@@ -52,11 +51,9 @@ internal object MarkerIcons {
             val back = icons.size - 1
             val width = ICON_SIZE_DP + back * STACK_SHIFT_X_DP
             val height = ICON_SIZE_DP + back * STACK_SHIFT_Y_DP
-            val anchor = PointF(ICON_SIZE_DP / 2 / width, 1 - ICON_SIZE_DP / 2 / height)
-
             StackIcon(
                 image = ImageProvider.fromBitmap(draw(context, icons)),
-                style = IconStyle().setAnchor(anchor)
+                anchor = PointF(ICON_SIZE_DP / 2 / width, 1 - ICON_SIZE_DP / 2 / height)
             )
         }
 
@@ -122,5 +119,5 @@ internal object MarkerIcons {
 /** Картинка стопки и якорь: точка карты приходится на центр передней метки. */
 internal class StackIcon(
     val image: ImageProvider,
-    val style: IconStyle
+    val anchor: PointF
 )

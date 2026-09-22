@@ -284,7 +284,7 @@ private fun LocationFab(onClick: () -> Unit) {
  * Логотип Яндекса должен оставаться под верхней панелью, а карта рисуется под
  * системными панелями, поэтому к отступу логотипа добавляется высота статус-бара.
  *
- * В режиме выбора места чужие метки убираются с карты: под прицелом должно быть
+ * В режиме выбора места чужие метки прячутся: под прицелом должно быть
  * видно само место, а не соседние воспоминания.
  */
 @Composable
@@ -305,7 +305,7 @@ private fun MapContent(
     val logoPlacement = MapLogoPlacement.UnderTopBar
 
     val colors = HereTheme.colors
-    val markers = if (uiState.picking == null) uiState.memories.toMarkers() else emptyList()
+    val markers = uiState.memories.toMarkers()
     val userLocationStyle = remember(colors) {
         UserLocationStyle(
             fill = colors.accent,
@@ -322,6 +322,7 @@ private fun MapContent(
         locationEnabled = locationEnabled,
         isDarkTheme = isDarkTheme,
         markers = markers,
+        markersVisible = uiState.picking == null,
         onMarkerClick = onMarkerClick,
         onClusterClick = onClusterClick,
         onCameraMove = onCameraMove,

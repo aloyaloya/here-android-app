@@ -1,7 +1,12 @@
 package ru.aloyaloya.mapkit.internal
 
+import android.animation.ValueAnimator
 import android.content.Context
+import android.graphics.PointF
 import android.location.Location
+import android.view.animation.AccelerateInterpolator
+import android.view.animation.OvershootInterpolator
+import androidx.core.animation.doOnEnd
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.geometry.BoundingBox
 import com.yandex.mapkit.geometry.Geometry
@@ -10,7 +15,9 @@ import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.map.Cluster
 import com.yandex.mapkit.map.ClusterListener
 import com.yandex.mapkit.map.ClusterTapListener
+import com.yandex.mapkit.map.IconStyle
 import com.yandex.mapkit.map.MapObjectTapListener
+import com.yandex.mapkit.map.PlacemarkMapObject
 import com.yandex.mapkit.mapview.MapView
 import ru.aloyaloya.mapkit.model.MapMarker
 
@@ -37,6 +44,11 @@ internal class MarkersBinder(
 
     private var current: List<MapMarker> = emptyList()
 
+    private val placemarks = mutableListOf<PlacemarkMapObject>()
+    private val clusters = mutableMapOf<Cluster, PointF>()
+    private var scale = 1f
+    private var resize: ValueAnimator? = null
+
     private val tapListener = MapObjectTapListener { mapObject, _ ->
         val marker = mapObject.userData as? MapMarker
         if (marker == null) {
@@ -60,7 +72,9 @@ internal class MarkersBinder(
 
     private val clusterListener = ClusterListener { cluster ->
         val stack = MarkerIcons.stack(context, cluster.markers().stackIcons())
-        cluster.appearance.setIcon(stack.image, stack.style)
+        cluster.appearance.setIcon(stack.image, scaled(stack.anchor))
+        clusters.keys.removeAll { !it.isValid }
+        clusters[cluster] = stack.anchor
         cluster.addClusterTapListener(clusterTapListener)
     }
 
@@ -74,16 +88,48 @@ internal class MarkersBinder(
         if (markers == current) return
 
         collection.clear()
+        placemarks.clear()
+        clusters.clear()
         markers.forEach { marker ->
-            collection.addPlacemark().apply {
+            placemarks += collection.addPlacemark().apply {
                 geometry = Point(marker.point.latitude, marker.point.longitude)
                 setIcon(MarkerIcons.get(context, marker.icon))
                 userData = marker
+                setIconStyle(scaled())
             }
         }
         collection.clusterPlacemarks(CLUSTER_RADIUS, maxZoom.toInt())
         current = markers
     }
+
+    /**
+     * Прячет метки, сжимая их в точку, и показывает, раздувая обратно.
+     */
+    fun setVisible(visible: Boolean) {
+        val target = if (visible) 1f else 0f
+        resize?.cancel()
+        if (scale == target) return
+
+        collection.isVisible = true
+        resize = ValueAnimator.ofFloat(scale, target).apply {
+            duration = RESIZE_MILLIS
+            interpolator = if (visible) OvershootInterpolator() else AccelerateInterpolator()
+            addUpdateListener { animator -> applyScale(animator.animatedValue as Float) }
+            doOnEnd { collection.isVisible = visible }
+            start()
+        }
+    }
+
+    private fun applyScale(value: Float) {
+        scale = value
+        placemarks.forEach { it.setIconStyle(scaled()) }
+        clusters.keys.removeAll { !it.isValid }
+        clusters.forEach { (cluster, anchor) -> cluster.appearance.setIconStyle(scaled(anchor)) }
+    }
+
+    /** Стиль иконки с текущим масштабом. Совсем в ноль MapKit не сжимается, поэтому есть минимум. */
+    private fun scaled(anchor: PointF = CENTER) =
+        IconStyle().setAnchor(anchor).setScale(scale.coerceAtLeast(MIN_SCALE))
 
     /** Подводит камеру так, чтобы метки стопки поместились на экран с запасом по краям. */
     private fun zoomTo(markers: List<MapMarker>) {
@@ -149,5 +195,8 @@ internal class MarkersBinder(
         const val FIT_ZOOM_MARGIN = 0.8f
 
         val CAMERA_ANIMATION = Animation(Animation.Type.SMOOTH, 0.4f)
+        const val RESIZE_MILLIS = 260L
+        const val MIN_SCALE = 0.01f
+        val CENTER = PointF(0.5f, 0.5f)
     }
 }
