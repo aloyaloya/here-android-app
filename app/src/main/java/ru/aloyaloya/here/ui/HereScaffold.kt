@@ -3,8 +3,6 @@ package ru.aloyaloya.here.ui
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.navigationBarsPadding
-import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -13,7 +11,6 @@ import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBar
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBarItem
 import ru.aloyaloya.design_system.component.topbar.TopAppBar
-import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.here.navigation.TopLevelDestination
 
@@ -21,9 +18,9 @@ import ru.aloyaloya.here.navigation.TopLevelDestination
  * Каркас приложения Here.
  *
  * В отличие от [androidx.compose.material3.Scaffold] контент занимает весь экран,
- * а верхняя панель и нижняя навигация лежат поверх него: на экране карты под ними
- * должна оставаться видна сама карта. Отступы под плавающими элементами экраны
- * задают себе сами. Свои кнопки поверх контента экраны тоже размещают сами.
+ * а панели лежат поверх него по краям: на карте это позволяет держать ее под ними
+ * во всю высоту. Отступы, чтобы не уехать под панели, экраны задают себе сами.
+ * Свои кнопки поверх контента экраны тоже размещают сами.
  *
  * Панель и навигация принадлежат разделам приложения, поэтому на экранах поверх
  * них — например на новом воспоминании — каркас рисует только контент.
@@ -63,11 +60,7 @@ fun HereScaffold(
             )
 
             BottomNavigationBar(
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .navigationBarsPadding()
-                    .padding(horizontal = HereSize.NavBar.horizontalMargin)
-                    .padding(bottom = HereSize.NavBar.bottomMargin)
+                modifier = Modifier.align(Alignment.BottomCenter)
             ) {
                 destinations.forEach { destination ->
                     BottomNavigationBarItem(

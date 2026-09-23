@@ -10,20 +10,14 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import ru.aloyaloya.design_system.extension.headerShadow
-import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
-
-/** Прозрачность панели: контент под ней слегка просвечивает. */
-private const val SURFACE_ALPHA = 0.94f
 
 /**
  * Верхняя панель приложения с заголовком текущего раздела и action-кнопкой темы.
  *
- * Панель не встроена в поток экрана, а лежит поверх контента, поэтому у неё
- * скругление по краям, полупрозрачный фон и тень.
+ * Панель во всю ширину и без скруглений: это край экрана, а не плашка поверх него.
+ * Фон непрозрачный и уходит под статус-бар, поэтому контент под панель не просвечивает.
  *
  * @param title Заголовок текущего раздела.
  * @param darkTheme Текущее состояние темы для анимированного switcher'а.
@@ -39,16 +33,10 @@ fun TopAppBar(
 ) {
     Row(
         modifier = modifier
-            .statusBarsPadding()
-            .padding(
-                horizontal = HereSize.TopAppBar.horizontalMargin,
-                vertical = HereSize.TopAppBar.topMargin
-            )
             .fillMaxWidth()
+            .background(HereTheme.colors.surface)
+            .statusBarsPadding()
             .height(HereSize.TopAppBar.height)
-            .headerShadow(HereShape.pill)
-            .clip(HereShape.pill)
-            .background(HereTheme.colors.surface.copy(alpha = SURFACE_ALPHA))
             .padding(
                 start = HereSize.TopAppBar.titlePadding,
                 end = HereSize.TopAppBar.contentPadding

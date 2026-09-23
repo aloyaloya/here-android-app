@@ -7,7 +7,6 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -50,10 +49,7 @@ fun TopAppBarActions(
 }
 
 /**
- * Круглая кнопка переключения темы.
- *
- * Показывает солнце или луну в зависимости от [darkTheme], смена иконки анимирована.
- * Кнопка обрезана по кругу, поэтому ripple при нажатии тоже круглый.
+ * Кнопка переключения темы.
  *
  * @param darkTheme Если `true`, отображается иконка солнца (переход к светлой теме).
  * @param onThemeChange Вызывается при нажатии на кнопку.
@@ -75,7 +71,6 @@ private fun TopAppBarThemeToggle(
         modifier = modifier
             .size(HereSize.TopAppBar.actionSize)
             .clip(CircleShape)
-            .background(HereTheme.colors.surfaceMuted)
             .clickable(onClick = onThemeChange),
         contentAlignment = Alignment.Center
     ) {

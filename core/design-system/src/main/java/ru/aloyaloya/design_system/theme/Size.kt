@@ -27,22 +27,20 @@ object HereSize {
 
     /** Верхняя панель. */
     object TopAppBar {
-        val height = 74.dp
-        val horizontalMargin = 18.dp
-        val topMargin = 4.dp
-        val contentPadding = 11.dp
-        val titlePadding = 24.dp
-        val actionSize = 52.dp
+        val height = 64.dp
+        val contentPadding = 4.dp
+        val titlePadding = 16.dp
+        val actionSize = 48.dp
         val actionIconSize = 24.dp
     }
 
     /** Нижняя панель навигации. */
     object NavBar {
-        val height = 82.dp
-        val horizontalMargin = 22.dp
-        val bottomMargin = 20.dp
-        val itemIconSize = 28.dp
-        val itemIconLabelSpacing = 5.dp
+        val height = 80.dp
+        val itemIconSize = 24.dp
+        val itemIconLabelSpacing = 4.dp
+        val indicatorWidth = 64.dp
+        val indicatorHeight = 32.dp
     }
 
     /** FAB-кнопка. */
@@ -50,7 +48,7 @@ object HereSize {
         val size = 72.dp
         val iconSize = 28.dp
         val endMargin = 18.dp
-        val bottomMargin = 126.dp
+        val bottomMargin = 104.dp
         val stackSpacing = 14.dp
     }
 
