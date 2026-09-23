@@ -6,4 +6,5 @@
     <string name="media_add">+ медиа</string>
     <string name="media_remove">Убрать медиафайл</string>
     <string name="media_video">Видео</string>
+    <string name="modal_close_content_description">Закрыть</string>
 </resources>

@@ -158,9 +158,12 @@ object HereSize {
 
     /** Панель модального экрана. */
     object ModalTopBar {
-        val horizontalPadding = 27.dp
-        val topPadding = 19.dp
-        val bottomPadding = 12.dp
+        val horizontalPadding = 8.dp
+        val topPadding = 8.dp
+        val bottomPadding = 8.dp
+        val closeSize = 48.dp
+        val closeIconSize = 24.dp
+        val titleSpacing = 16.dp
     }
 
     /** Поле ввода. */
@@ -192,14 +195,6 @@ object HereSize {
         val removeSize = 26.dp
         val removeIconSize = 11.dp
         val removeTouchSize = 38.dp
-    }
-
-    /** Компактная кнопка на приглушенном акцентном фоне. */
-    object TonalButton {
-        val height = 52.dp
-        val horizontalPadding = 22.dp
-        val iconSize = 20.dp
-        val iconSpacing = 8.dp
     }
 
     /** Круглая кнопка с иконкой поверх карты или фотографии. */
@@ -259,14 +254,6 @@ object HereSize {
         val mediaSpacing = 10.dp
         val mediaSize = 107.dp
         val dividerThickness = 1.dp
-    }
-
-    /** Лист подтверждения необратимого действия. */
-    object ConfirmSheet {
-        val iconSize = 68.dp
-        val iconSymbolSize = 31.sp
-        val contentSpacing = 14.dp
-        val actionSpacing = 10.dp
     }
 
     /** Пункт меню в листе действий. */

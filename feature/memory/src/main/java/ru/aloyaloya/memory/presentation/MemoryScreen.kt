@@ -56,7 +56,7 @@ import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.memory.R
 import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
-import ru.aloyaloya.memory.presentation.component.DeleteMemorySheet
+import ru.aloyaloya.memory.presentation.component.DeleteMemoryDialog
 import ru.aloyaloya.memory.presentation.component.MediaViewer
 import ru.aloyaloya.memory.presentation.component.MemoryActionsSheet
 import ru.aloyaloya.ui.emotion.color
@@ -140,7 +140,7 @@ fun MemoryScreen(
                     onDismissRequest = onSheetDismiss
                 )
 
-                MemorySheet.DELETE -> DeleteMemorySheet(
+                MemorySheet.DELETE -> DeleteMemoryDialog(
                     title = uiState.memory.title,
                     onConfirmClick = onDeleteConfirm,
                     onDismissRequest = onSheetDismiss

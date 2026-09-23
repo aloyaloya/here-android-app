@@ -2,8 +2,6 @@
 <resources>
     <string name="memory_form_title_new">Новое место</string>
     <string name="memory_form_title_edit">Изменить</string>
-    <string name="memory_form_cancel">Отмена</string>
-    <string name="memory_form_done">Готово</string>
 
     <string name="memory_form_date_label">Дата</string>
     <string name="memory_form_time_label">Время</string>
@@ -25,7 +23,7 @@
     <string name="memory_action_delete">Удалить</string>
     <string name="memory_delete_title">Удалить «%1$s»?</string>
     <string name="memory_delete_message">Воспоминание и его фотографии исчезнут с карты навсегда.</string>
-    <string name="memory_delete_confirm">Удалить навсегда</string>
+    <string name="memory_delete_confirm">Удалить</string>
 
     <string name="sheet_cancel">Отмена</string>
     <string name="sheet_confirm">Выбрать</string>

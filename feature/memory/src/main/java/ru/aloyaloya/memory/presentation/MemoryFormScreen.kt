@@ -42,7 +42,6 @@ import ru.aloyaloya.design_system.component.media.MediaAddTile
 import ru.aloyaloya.design_system.component.media.MediaTile
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.component.topbar.HereModalTopBar
-import ru.aloyaloya.design_system.component.topbar.HereModalTopBarAction
 import ru.aloyaloya.design_system.extension.cardShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
@@ -88,8 +87,8 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
  * Форма воспоминания: и нового, и уже записанного.
  *
  * Открывается поверх карты после выбора эмоции или с экрана воспоминания, поэтому
- * у нее своя панель сверху и нет нижней навигации. Сохранить можно и действием
- * в панели, и кнопкой внизу: так в макете.
+ * у нее своя панель сверху и нет нижней навигации. Панель только закрывает форму,
+ * сохранение живет в кнопке внизу — одно действие, один орган управления.
  *
  * Чем форма занята, она узнает по [MemoryFormUiState.editing]: меняются только
  * заголовок панели и подпись кнопки, поля везде одни и те же.
@@ -137,20 +136,7 @@ fun MemoryFormScreen(
                 if (uiState.editing) R.string.memory_form_title_edit
                 else R.string.memory_form_title_new
             ),
-            navigation = {
-                HereModalTopBarAction(
-                    text = stringResource(R.string.memory_form_cancel),
-                    onClick = onCancelClick
-                )
-            },
-            action = {
-                HereModalTopBarAction(
-                    text = stringResource(R.string.memory_form_done),
-                    onClick = onSaveClick,
-                    accent = true,
-                    enabled = uiState.saveEnabled
-                )
-            }
+            onCloseClick = onCancelClick
         )
 
         Column(
