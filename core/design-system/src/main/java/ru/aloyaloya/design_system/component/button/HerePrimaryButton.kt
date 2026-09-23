@@ -14,7 +14,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.Dp
-import ru.aloyaloya.design_system.extension.buttonShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -22,7 +21,7 @@ import ru.aloyaloya.design_system.theme.HereTheme
 /**
  * Основная кнопка приложения Here — широкая пилюля акцентного цвета.
  *
- * Пока кнопка неактивна, она гасится до приглушенного фона и остается без тени.
+ * Пока кнопка неактивна, она гасится до приглушенного фона.
  *
  * @param text Подпись кнопки.
  * @param onClick Колбэк нажатия.
@@ -55,7 +54,6 @@ fun HerePrimaryButton(
         modifier = modifier
             .fillMaxWidth()
             .height(height)
-            .then(if (enabled) Modifier.buttonShadow(HereShape.pill) else Modifier)
             .clip(HereShape.pill)
             .background(background)
             .clickable(enabled = enabled, onClick = onClick)

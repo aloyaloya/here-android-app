@@ -19,24 +19,6 @@ fun Modifier.cardShadow(shape: Shape): Modifier =
     themedShadow(shape = shape, blur = 12.dp, offsetY = 2.dp, alpha = 0.04f)
 
 /**
- * Тень верхней панели приложения.
- *
- * @param shape Форма элемента, к которому применяется тень.
- */
-@Composable
-fun Modifier.headerShadow(shape: Shape): Modifier =
-    themedShadow(shape = shape, blur = 18.dp, offsetY = 4.dp, alpha = 0.08f)
-
-/**
- * Тень нижней панели навигации.
- *
- * @param shape Форма элемента, к которому применяется тень.
- */
-@Composable
-fun Modifier.navBarShadow(shape: Shape): Modifier =
-    themedShadow(shape = shape, blur = 30.dp, offsetY = 10.dp, alpha = 0.14f)
-
-/**
  * Тень нижнего листа: падает вверх, на затемнённый экран.
  *
  * @param shape Форма элемента, к которому применяется тень.
@@ -70,22 +52,6 @@ fun Modifier.fabShadow(shape: Shape): Modifier =
         color = HereTheme.colors.accent.copy(alpha = 0.42f),
         blur = 24.dp,
         offsetY = 10.dp
-    )
-
-/**
- * Тень основной кнопки, окрашенная в акцентный цвет.
- *
- * Как и у FAB, она видна в обеих темах, поэтому обводкой не заменяется.
- *
- * @param shape Форма элемента, к которому применяется тень.
- */
-@Composable
-fun Modifier.buttonShadow(shape: Shape): Modifier =
-    dropShadow(
-        shape = shape,
-        color = HereTheme.colors.accent.copy(alpha = 0.35f),
-        blur = 20.dp,
-        offsetY = 8.dp
     )
 
 /** Тень выбранного дня в календаре, окрашенная в акцентный цвет. */
