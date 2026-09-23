@@ -42,7 +42,6 @@ import ru.aloyaloya.design_system.component.media.MediaAddTile
 import ru.aloyaloya.design_system.component.media.MediaTile
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.component.topbar.HereModalTopBar
-import ru.aloyaloya.design_system.extension.cardShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
@@ -287,7 +286,6 @@ private fun PlacePreview(
         modifier = Modifier
             .fillMaxWidth()
             .height(HereSize.PlacePreview.height)
-            .cardShadow(HereShape.card)
             .clip(HereShape.card)
             .background(colors.surfaceMuted)
     ) {

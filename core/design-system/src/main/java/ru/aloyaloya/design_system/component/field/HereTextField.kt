@@ -14,13 +14,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
-import ru.aloyaloya.design_system.extension.cardShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
- * Поле ввода приложения Here — карточка на поверхности, без рамки и подчеркивания.
+ * Поле ввода приложения Here — заливка приглушенным фоном, без рамки и подчеркивания.
  *
  * Высоту поле берет по содержимому, но не меньше [minHeight]: так однострочный
  * заголовок и многострочное описание собираются из одного компонента.
@@ -53,9 +52,8 @@ fun HereTextField(
         singleLine = singleLine,
         modifier = modifier
             .fillMaxWidth()
-            .cardShadow(HereShape.tile)
             .clip(HereShape.tile)
-            .background(colors.surface)
+            .background(colors.surfaceMuted)
             .padding(
                 vertical = HereSize.TextField.verticalPadding,
                 horizontal = HereSize.TextField.horizontalPadding

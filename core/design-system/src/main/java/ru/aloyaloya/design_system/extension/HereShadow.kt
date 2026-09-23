@@ -10,7 +10,7 @@ import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
- * Тень карточки.
+ * Тень элемента поверх карты: пина воспоминания и прицела выбора места.
  *
  * @param shape Форма элемента, к которому применяется тень.
  */

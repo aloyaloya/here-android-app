@@ -38,7 +38,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
-import ru.aloyaloya.design_system.extension.cardShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -135,9 +134,8 @@ private fun TimeWheels(
         modifier = Modifier
             .fillMaxWidth()
             .height(HereSize.TimeWheel.cardHeight)
-            .cardShadow(HereShape.card)
             .clip(HereShape.card)
-            .background(colors.surface)
+            .background(colors.surfaceMuted)
     ) {
         Box(
             modifier = Modifier

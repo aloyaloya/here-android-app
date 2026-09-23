@@ -27,7 +27,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
 import ru.aloyaloya.design_system.extension.calendarDayShadow
-import ru.aloyaloya.design_system.extension.cardShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -139,9 +138,8 @@ private fun MonthNavButton(
         contentAlignment = Alignment.Center,
         modifier = Modifier
             .size(HereSize.Calendar.navButtonSize)
-            .cardShadow(HereShape.pill)
             .clip(HereShape.pill)
-            .background(colors.surface)
+            .background(colors.surfaceMuted)
             .clickable(onClick = onClick)
     ) {
         Text(
