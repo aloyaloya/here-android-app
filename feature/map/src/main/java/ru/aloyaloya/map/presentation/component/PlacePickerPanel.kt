@@ -15,20 +15,19 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.button.HereSecondaryButton
-import ru.aloyaloya.design_system.extension.sheetShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.map.R
 
 /**
- * Окошко режима выбора места: адрес точки под прицелом и выход из режима.
+ * Панель режима выбора места: адрес точки под прицелом и выход из режима.
  *
  * @param address Адрес точки или `null`, если определить его не вышло.
  * @param resolving Идет ли сейчас запрос адреса.
  * @param onCancel Колбэк отмены выбора.
  * @param onConfirm Колбэк подтверждения выбранной точки.
- * @param modifier [Modifier], применяемый к окошку.
+ * @param modifier [Modifier], применяемый к панели.
  */
 @Composable
 fun PlacePickerPanel(
@@ -45,8 +44,7 @@ fun PlacePickerPanel(
         verticalArrangement = Arrangement.spacedBy(sizes.panelSpacing),
         modifier = modifier
             .fillMaxWidth()
-            .sheetShadow(HereShape.card)
-            .clip(HereShape.card)
+            .clip(HereShape.sheet)
             .background(colors.surface)
             .padding(sizes.panelPadding)
     ) {

@@ -19,15 +19,6 @@ fun Modifier.cardShadow(shape: Shape): Modifier =
     themedShadow(shape = shape, blur = 12.dp, offsetY = 2.dp, alpha = 0.04f)
 
 /**
- * Тень нижнего листа: падает вверх, на затемнённый экран.
- *
- * @param shape Форма элемента, к которому применяется тень.
- */
-@Composable
-fun Modifier.sheetShadow(shape: Shape): Modifier =
-    themedShadow(shape = shape, blur = 40.dp, offsetY = (-12).dp, alpha = 0.14f)
-
-/**
  * Тень круглой кнопки поверх карты или фотографии.
  * Заметнее тени карточки
  *

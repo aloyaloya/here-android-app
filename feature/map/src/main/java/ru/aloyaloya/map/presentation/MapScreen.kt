@@ -8,16 +8,13 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -198,60 +195,59 @@ fun MapScreen(
                     PlacePin(moving = cameraMoving)
                 }
 
+                var shownPicking by remember { mutableStateOf(uiState.picking) }
+                uiState.picking?.let { shownPicking = it }
+
                 Column(
-                    horizontalAlignment = Alignment.End,
-                    verticalArrangement = Arrangement.spacedBy(HereSize.Fab.stackSpacing),
                     modifier = Modifier
                         .align(Alignment.BottomCenter)
                         .fillMaxWidth()
                         .navigationBarsPadding()
-                        .padding(horizontal = HereSize.Fab.endMargin)
-                        .padding(bottom = HereSize.Fab.bottomMargin)
+                        .padding(bottom = HereSize.NavBar.height)
                 ) {
-                    AnimatedVisibility(
-                        visible = locationGranted && mapState.awayFromUser,
-                        enter = scaleIn(tween(RESIZE_MILLIS, easing = GrowEasing)),
-                        exit = scaleOut(tween(RESIZE_MILLIS, easing = ShrinkEasing))
+                    Column(
+                        horizontalAlignment = Alignment.End,
+                        verticalArrangement = Arrangement.spacedBy(HereSize.Fab.stackSpacing),
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(horizontal = HereSize.Fab.endMargin)
+                            .padding(bottom = HereSize.Fab.barSpacing)
                     ) {
-                        LocationFab(onClick = onLocationClick)
+                        AnimatedVisibility(
+                            visible = locationGranted && mapState.awayFromUser,
+                            enter = scaleIn(tween(RESIZE_MILLIS, easing = GrowEasing)),
+                            exit = scaleOut(tween(RESIZE_MILLIS, easing = ShrinkEasing))
+                        ) {
+                            LocationFab(onClick = onLocationClick)
+                        }
+
+                        AnimatedVisibility(
+                            visible = !picking,
+                            enter = scaleIn(tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS, GrowEasing)),
+                            exit = scaleOut(tween(ACTIONS_EXIT_MILLIS, easing = ShrinkEasing))
+                        ) {
+                            HereFab(onClick = onPickStart)
+                        }
                     }
 
-                    AnimatedContent(
-                        targetState = uiState.picking,
-                        transitionSpec = {
-                            EnterTransition.None togetherWith ExitTransition.None using
-                                SizeTransform(clip = false)
-                        },
-                        contentAlignment = Alignment.BottomEnd,
-                        contentKey = { state -> state != null },
-                        label = "map-actions"
-                    ) { pickingState ->
-                        val origin = if (pickingState == null) TransformOrigin.Center else BottomOrigin
-                        val resize = Modifier.animateEnterExit(
-                            enter = scaleIn(
-                                tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS, GrowEasing),
-                                transformOrigin = origin
-                            ),
-                            exit = scaleOut(
-                                tween(ACTIONS_EXIT_MILLIS, easing = ShrinkEasing),
-                                transformOrigin = origin
-                            )
+                    AnimatedVisibility(
+                        visible = picking,
+                        enter = slideInVertically(
+                            tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS)
+                        ) { height -> height },
+                        exit = slideOutVertically(
+                            tween(ACTIONS_EXIT_MILLIS)
+                        ) { height -> height }
+                    ) {
+                        PlacePickerPanel(
+                            address = shownPicking?.address,
+                            resolving = shownPicking?.resolving != false,
+                            onCancel = onPickCancel,
+                            onConfirm = {
+                                pickedPoint = mapState.cameraTarget
+                                emotionPickerVisible = true
+                            }
                         )
-
-                        if (pickingState == null) {
-                            HereFab(onClick = onPickStart, modifier = resize)
-                        } else {
-                            PlacePickerPanel(
-                                modifier = resize,
-                                address = pickingState.address,
-                                resolving = pickingState.resolving,
-                                onCancel = onPickCancel,
-                                onConfirm = {
-                                    pickedPoint = mapState.cameraTarget
-                                    emotionPickerVisible = true
-                                }
-                            )
-                        }
                     }
                 }
             }

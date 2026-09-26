@@ -43,7 +43,6 @@ import ru.aloyaloya.design_system.component.emotion.EmotionPin
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
 import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
-import ru.aloyaloya.design_system.extension.sheetShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -295,7 +294,6 @@ private fun MemoryDetailSheet(
         verticalArrangement = Arrangement.spacedBy(HereSize.Memory.sheetSpacing),
         modifier = modifier
             .fillMaxWidth()
-            .sheetShadow(HereShape.sheet)
             .clip(HereShape.sheet)
             .background(colors.background)
             .verticalScroll(rememberScrollState())

@@ -15,7 +15,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
-import ru.aloyaloya.design_system.extension.sheetShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -58,7 +57,6 @@ fun HereBottomSheet(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .sheetShadow(HereShape.sheet)
                 .clip(HereShape.sheet)
                 .background(HereTheme.colors.background)
         ) {
