@@ -7,8 +7,8 @@
     <string name="memory_form_time_label">Время</string>
 
     <string name="memory_form_emotion_label">Что чувствуешь</string>
-    <string name="memory_form_title_placeholder">Как назовем место?</string>
-    <string name="memory_form_description_placeholder">Что запомнилось?</string>
+    <string name="memory_form_title_label">Как назовем место?</string>
+    <string name="memory_form_description_label">Что запомнилось?</string>
     <string name="memory_form_save_new">Сохранить воспоминание</string>
     <string name="memory_form_save_edit">Сохранить изменения</string>
 

@@ -30,7 +30,7 @@ import ru.aloyaloya.design_system.theme.HereTheme
  *
  * Ширину задает вызывающая сторона: в ряду дата обычно шире времени.
  *
- * @param label Подпись над значением. Регистр приводит сам компонент.
+ * @param label Подпись над значением.
  * @param value Значение — дата или время в готовом для показа виде.
  * @param icon Иконка справа от значения.
  * @param onClick Колбэк нажатия.
@@ -61,10 +61,9 @@ fun HereDateTimeField(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(HereSize.DateTimeField.labelSpacing)) {
             Text(
-                text = label.uppercase(),
+                text = label,
                 style = MaterialTheme.typography.labelSmall.copy(
-                    fontSize = HereSize.DateTimeField.labelSize,
-                    letterSpacing = HereSize.DateTimeField.labelLetterSpacing
+                    fontSize = HereSize.DateTimeField.labelSize
                 ),
                 color = colors.textSecondary
             )

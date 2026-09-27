@@ -71,7 +71,7 @@ import ru.aloyaloya.design_system.R as DesignSystemR
 private const val ADDRESS_INITIAL_SCALE = 0.8f
 
 /** Дата занимает больше места, чем время: «15 июля 2026» против «19:30». */
-private const val DATE_WEIGHT = 1.35f
+private const val DATE_WEIGHT = 1.8f
 private const val TIME_WEIGHT = 1f
 
 /** Сколько файлов можно прикрепить к одному воспоминанию. */
@@ -128,7 +128,6 @@ fun MemoryFormScreen(
         modifier = modifier
             .fillMaxSize()
             .background(HereTheme.colors.background)
-            .imePadding()
     ) {
         HereModalTopBar(
             title = stringResource(
@@ -143,6 +142,7 @@ fun MemoryFormScreen(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
+                .imePadding()
                 .padding(horizontal = HereSpacing.screenHorizontal)
                 .padding(vertical = HereSpacing.s)
         ) {
@@ -167,7 +167,7 @@ fun MemoryFormScreen(
                 HereTextField(
                     value = uiState.title,
                     onValueChange = onTitleChanged,
-                    placeholder = stringResource(R.string.memory_form_title_placeholder),
+                    label = stringResource(R.string.memory_form_title_label),
                     textStyle = MaterialTheme.typography.titleSmall,
                     singleLine = true
                 )
@@ -175,7 +175,7 @@ fun MemoryFormScreen(
                 HereTextField(
                     value = uiState.description,
                     onValueChange = onDescriptionChanged,
-                    placeholder = stringResource(R.string.memory_form_description_placeholder),
+                    label = stringResource(R.string.memory_form_description_label),
                     minHeight = HereSize.TextField.multilineMinHeight
                 )
 

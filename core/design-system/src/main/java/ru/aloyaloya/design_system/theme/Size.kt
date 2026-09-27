@@ -64,8 +64,6 @@ object HereSize {
         val actionHeight = 52.dp
         val actionSpacing = 10.dp
         val titleSpacing = 3.dp
-        val titleLabelSize = 12f.sp
-        val titleLabelLetterSpacing = 1.2f.sp
         val titleValueSize = 28.sp
     }
 
@@ -170,9 +168,12 @@ object HereSize {
 
     /** Поле ввода. */
     object TextField {
-        val verticalPadding = 16.dp
+        val verticalPadding = 12.dp
         val horizontalPadding = 20.dp
         val multilineMinHeight = 111.dp
+        val labelSlot = 16.dp
+        val labelSize = 12.sp
+        val focusBorder = 2.dp
     }
 
     /** Плашка даты или времени события. */
@@ -183,8 +184,9 @@ object HereSize {
         val labelSpacing = 1.dp
         val iconSize = 28.dp
         val spacing = 8.dp
-        val labelSize = 10.sp
-        val labelLetterSpacing = 0.8.sp
+
+        /** Кегль подписи общий с полем ввода: это одна и та же подпись над значением. */
+        val labelSize = 12.sp
     }
 
     /** Плитка медиа: превью снимка и кнопка добавления. */
