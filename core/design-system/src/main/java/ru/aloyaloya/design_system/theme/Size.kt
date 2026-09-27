@@ -85,13 +85,12 @@ object HereSize {
         val daySize = 17.sp
     }
 
-    /** Барабаны в листе выбора времени. */
+    /** Барабан выбора времени и чипы частого времени над ним. */
     object TimeWheel {
-        val cardHeight = 172.dp
+        val cardHeight = 132.dp
         val itemHeight = 36.dp
-        val bandHeight = 48.dp
+        val bandHeight = 44.dp
         val bandHorizontalMargin = 14.dp
-        val fadeHeight = 44.dp
         val colonWidth = 22.dp
         val chipSpacing = 6.dp
         val chipVerticalPadding = 10.dp

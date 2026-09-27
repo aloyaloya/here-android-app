@@ -32,8 +32,6 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
@@ -142,7 +140,7 @@ private fun TimeWheels(
                 .fillMaxWidth()
                 .padding(horizontal = HereSize.TimeWheel.bandHorizontalMargin)
                 .height(HereSize.TimeWheel.bandHeight)
-                .clip(MaterialTheme.shapes.medium)
+                .clip(HereShape.pill)
                 .background(colors.accentContainer)
         )
 
@@ -172,8 +170,6 @@ private fun TimeWheels(
                 modifier = Modifier.weight(1f)
             )
         }
-
-        WheelFades()
     }
 }
 
@@ -207,6 +203,7 @@ private fun Wheel(
 
     val currentOnSelect by rememberUpdatedState(onSelect)
 
+    // TODO: добавить хаптики
     LaunchedEffect(listState) {
         snapshotFlow { centerIndex }.collect { index ->
             values.getOrNull(index)?.let(currentOnSelect)
@@ -253,30 +250,6 @@ private fun Wheel(
                 )
             }
         }
-    }
-}
-
-/** Растворение значений у верхнего и нижнего края карточки. */
-@Composable
-private fun WheelFades() {
-    val surface = HereTheme.colors.surface
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(HereSize.TimeWheel.fadeHeight)
-                .background(Brush.verticalGradient(listOf(surface, Color.Transparent)))
-        )
-
-        Box(modifier = Modifier.weight(1f))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(HereSize.TimeWheel.fadeHeight)
-                .background(Brush.verticalGradient(listOf(Color.Transparent, surface)))
-        )
     }
 }
 
