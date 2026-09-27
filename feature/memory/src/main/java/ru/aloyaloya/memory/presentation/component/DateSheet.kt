@@ -1,5 +1,9 @@
 package ru.aloyaloya.memory.presentation.component
 
+import androidx.annotation.DrawableRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
@@ -11,6 +15,7 @@ import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,21 +27,28 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import ru.aloyaloya.design_system.component.emotion.EmotionPin
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
+import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.memory.R
 import ru.aloyaloya.memory.model.DAYS_IN_WEEK
 import ru.aloyaloya.memory.model.monthGrid
+import ru.aloyaloya.ui.emotion.color
+import ru.aloyaloya.ui.emotion.emoji
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import java.util.Locale
+import ru.aloyaloya.design_system.R as DesignSystemR
 
 private val RussianLocale = Locale.forLanguageTag("ru")
 private val FullDateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", RussianLocale)
@@ -50,12 +62,14 @@ private val MonthFormat = DateTimeFormatter.ofPattern("LLLL yyyy", RussianLocale
  * способом ничего не меняет.
  *
  * @param initialDate Дата, с которой лист открывается.
+ * @param emotionByDate Эмоция последнего воспоминания каждого дня.
  * @param onDismissRequest Колбэк закрытия листа без выбора.
  * @param onDateSelected Колбэк подтвержденной даты.
  */
 @Composable
 fun DateSheet(
     initialDate: LocalDate,
+    emotionByDate: Map<LocalDate, Emotion>,
     onDismissRequest: () -> Unit,
     onDateSelected: (LocalDate) -> Unit
 ) {
@@ -85,6 +99,7 @@ fun DateSheet(
             MonthGrid(
                 month = shownMonth,
                 selectedDate = selectedDate,
+                emotionByDate = emotionByDate,
                 onDayClick = { selectedDate = it }
             )
 
@@ -119,8 +134,16 @@ private fun MonthHeader(
         )
 
         Row(horizontalArrangement = Arrangement.spacedBy(HereSize.Calendar.navButtonSpacing)) {
-            MonthNavButton(text = "‹", onClick = onPreviousClick)
-            MonthNavButton(text = "›", onClick = onNextClick)
+            MonthNavButton(
+                icon = DesignSystemR.drawable.ic_chevron_left,
+                contentDescription = stringResource(R.string.date_sheet_previous_month),
+                onClick = onPreviousClick
+            )
+            MonthNavButton(
+                icon = DesignSystemR.drawable.ic_chevron_right,
+                contentDescription = stringResource(R.string.date_sheet_next_month),
+                onClick = onNextClick
+            )
         }
     }
 }
@@ -128,7 +151,8 @@ private fun MonthHeader(
 /** Круглая кнопка перелистывания месяца. */
 @Composable
 private fun MonthNavButton(
-    text: String,
+    @DrawableRes icon: Int,
+    contentDescription: String,
     onClick: () -> Unit
 ) {
     val colors = HereTheme.colors
@@ -141,10 +165,11 @@ private fun MonthNavButton(
             .background(colors.surfaceMuted)
             .clickable(onClick = onClick)
     ) {
-        Text(
-            text = text,
-            style = MaterialTheme.typography.titleLarge,
-            color = colors.textPrimary
+        Icon(
+            painter = painterResource(icon),
+            tint = colors.textPrimary,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(HereSize.Calendar.navIconSize)
         )
     }
 }
@@ -154,6 +179,7 @@ private fun MonthNavButton(
 private fun MonthGrid(
     month: YearMonth,
     selectedDate: LocalDate,
+    emotionByDate: Map<LocalDate, Emotion>,
     onDayClick: (LocalDate) -> Unit
 ) {
     val days = remember(month) { monthGrid(month) }
@@ -165,9 +191,13 @@ private fun MonthGrid(
         days.chunked(DAYS_IN_WEEK).forEach { week ->
             Row(horizontalArrangement = Arrangement.spacedBy(HereSize.Calendar.gridSpacing)) {
                 week.forEach { day ->
+                    val inShownMonth = YearMonth.from(day) == month
+
                     DayCell(
                         day = day,
-                        inShownMonth = YearMonth.from(day) == month,
+                        /** Дни соседних месяцев по краям сетки — заполнение, а не содержание. */
+                        emotion = if (inShownMonth) emotionByDate[day] else null,
+                        inShownMonth = inShownMonth,
                         selected = day == selectedDate,
                         today = day == today,
                         onClick = { onDayClick(day) },
@@ -203,10 +233,11 @@ private fun WeekdayRow() {
     }
 }
 
-/** Ячейка календаря — круг с числом. */
+/** Ячейка календаря — круг с числом дня или с пином эмоции его последнего воспоминания. */
 @Composable
 private fun DayCell(
     day: LocalDate,
+    emotion: Emotion?,
     inShownMonth: Boolean,
     selected: Boolean,
     today: Boolean,
@@ -241,13 +272,38 @@ private fun DayCell(
             )
             .clickable(onClick = onClick)
     ) {
-        Text(
-            text = day.dayOfMonth.toString(),
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = HereSize.Calendar.daySize,
-                fontWeight = if (selected || today) FontWeight.Bold else FontWeight.SemiBold
-            ),
-            color = textColor
-        )
+        /**
+         * В дне с воспоминаниями пин говорит больше числа, поэтому число уступает ему
+         * место. Обратно оно возвращается, когда день выбирают: на залитой акцентом
+         * плитке пин все равно потерялся бы.
+         */
+        AnimatedVisibility(
+            visible = !selected && emotion != null,
+            enter = scaleIn(),
+            exit = scaleOut()
+        ) {
+            EmotionPin(
+                emoji = emotion?.emoji.orEmpty(),
+                color = emotion?.color?.solid ?: Color.Transparent,
+                size = HereSize.Calendar.pinSize,
+                border = HereSize.Calendar.pinBorder,
+                emojiSize = HereSize.Calendar.pinEmojiSize
+            )
+        }
+
+        AnimatedVisibility(
+            visible = selected || emotion == null,
+            enter = scaleIn(),
+            exit = scaleOut()
+        ) {
+            Text(
+                text = day.dayOfMonth.toString(),
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = HereSize.Calendar.daySize,
+                    fontWeight = if (selected || today) FontWeight.Bold else FontWeight.SemiBold
+                ),
+                color = textColor
+            )
+        }
     }
 }

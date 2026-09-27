@@ -25,6 +25,9 @@
     <string name="memory_delete_message">Воспоминание и его фотографии исчезнут с карты навсегда.</string>
     <string name="memory_delete_confirm">Удалить</string>
 
+    <string name="date_sheet_previous_month">Предыдущий месяц</string>
+    <string name="date_sheet_next_month">Следующий месяц</string>
+
     <string name="sheet_cancel">Отмена</string>
     <string name="sheet_confirm">Выбрать</string>
 

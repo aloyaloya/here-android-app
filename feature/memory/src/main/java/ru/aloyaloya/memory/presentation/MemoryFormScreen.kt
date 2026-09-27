@@ -204,6 +204,7 @@ fun MemoryFormScreen(
     when (uiState.activeSheet) {
         MemoryFormSheet.DATE -> DateSheet(
             initialDate = uiState.happenedAt.toLocalDate(),
+            emotionByDate = uiState.emotionByDate,
             onDismissRequest = onSheetDismiss,
             onDateSelected = onDateSelected
         )

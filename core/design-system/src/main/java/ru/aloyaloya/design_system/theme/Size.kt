@@ -74,8 +74,12 @@ object HereSize {
     object Calendar {
         val gridSpacing = 6.dp
         val navButtonSize = 40.dp
+        val navIconSize = 20.dp
         val navButtonSpacing = 8.dp
         val selectedBorder = 1.5.dp
+        val pinSize = 33.dp
+        val pinBorder = 1.dp
+        val pinEmojiSize = 18f.sp
         val monthSize = 18.sp
         val weekdaySize = 10.5f.sp
         val daySize = 17.sp
