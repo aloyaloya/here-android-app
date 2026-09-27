@@ -11,7 +11,7 @@
     <string name="place_picker_searching">Определяем место…</string>
     <string name="place_picker_unknown">Точка на карте</string>
     <string name="place_picker_cancel">Отмена</string>
-    <string name="place_picker_next">Дальше</string>
+    <string name="place_picker_here">Здесь</string>
     <plurals name="place_memories_title">
         <item quantity="one">Здесь %d воспоминание</item>
         <item quantity="few">Здесь %d воспоминания</item>

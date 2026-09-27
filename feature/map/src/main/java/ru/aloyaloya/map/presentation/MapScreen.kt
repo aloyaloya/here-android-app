@@ -8,14 +8,11 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -42,7 +39,6 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
-import ru.aloyaloya.design_system.component.button.HereExtendedFab
 import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -69,8 +65,6 @@ import ru.aloyaloya.design_system.R as DesignSystemR
 private const val USER_LOCATION_ACCURACY_ALPHA = 0.10f
 
 /** Кнопка внизу сначала сжимается, и только следом вырастает то, что ее сменяет. */
-private const val ACTIONS_EXIT_MILLIS = 180
-private const val ACTIONS_ENTER_MILLIS = 280
 
 /** Кнопки, плашка и прицел растут и сжимаются так же, как метки на карте. */
 private const val RESIZE_MILLIS = 260
@@ -218,27 +212,21 @@ fun MapScreen(
                         LocationFab(onClick = onLocationClick)
                     }
 
-                    AnimatedContent(
-                        targetState = picking,
-                        transitionSpec = {
-                            scaleIn(tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS, GrowEasing)) togetherWith
-                                scaleOut(tween(ACTIONS_EXIT_MILLIS, easing = ShrinkEasing)) using
-                                SizeTransform(clip = false)
-                        },
-                        label = "map-action"
-                    ) { isPicking ->
-                        if (isPicking) {
-                            HereExtendedFab(
-                                text = stringResource(R.string.place_picker_next),
-                                onClick = {
-                                    pickedPoint = mapState.cameraTarget
-                                    emotionPickerVisible = true
-                                }
-                            )
-                        } else {
-                            HereFab(onClick = onPickStart)
+                    /**
+                     * Одна кнопка на оба состояния: в режиме выбора места она не
+                     * сменяется другой, а растягивается в подпись.
+                     */
+                    HereFab(
+                        text = stringResource(R.string.place_picker_here).takeIf { picking },
+                        onClick = {
+                            if (picking) {
+                                pickedPoint = mapState.cameraTarget
+                                emotionPickerVisible = true
+                            } else {
+                                onPickStart()
+                            }
                         }
-                    }
+                    )
                 }
             }
 
