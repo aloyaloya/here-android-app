@@ -45,11 +45,10 @@ object HereSize {
 
     /** FAB-кнопка. */
     object Fab {
-        val size = 72.dp
-        val iconSize = 28.dp
+        val size = 56.dp
+        val iconSize = 24.dp
         val endMargin = 18.dp
         val barSpacing = 24.dp
-        val extendedHeight = 56.dp
         val extendedPadding = 22.dp
         val stackSpacing = 14.dp
     }
@@ -182,7 +181,7 @@ object HereSize {
         val verticalPadding = 12.dp
         val horizontalPadding = 14.dp
         val labelSpacing = 1.dp
-        val iconSize = 24.dp
+        val iconSize = 28.dp
         val spacing = 8.dp
         val labelSize = 10.sp
         val labelLetterSpacing = 0.8.sp

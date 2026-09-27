@@ -31,7 +31,7 @@ fun DeleteMemoryDialog(
     AlertDialog(
         onDismissRequest = onDismissRequest,
         modifier = modifier,
-        shape = HereShape.card,
+        shape = HereShape.dialog,
         containerColor = colors.surface,
         titleContentColor = colors.textPrimary,
         textContentColor = colors.textSecondary,
