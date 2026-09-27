@@ -20,9 +20,6 @@ import ru.aloyaloya.design_system.theme.HereTheme
 /**
  * FAB-кнопка с подписью вместо иконки.
  *
- * Стоит там же, где [HereFab], но называет действие словом: у режима выбора места
- * нет иконки, которая читалась бы однозначно.
- *
  * @param text Подпись кнопки.
  * @param onClick Колбэк нажатия.
  * @param modifier [Modifier], применяемый к кнопке.
