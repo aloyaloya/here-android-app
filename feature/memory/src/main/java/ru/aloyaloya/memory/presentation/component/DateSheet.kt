@@ -26,7 +26,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
-import ru.aloyaloya.design_system.extension.calendarDayShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -227,7 +226,6 @@ private fun DayCell(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .aspectRatio(1f)
-            .then(if (selected) Modifier.calendarDayShadow(HereShape.pill) else Modifier)
             .clip(HereShape.pill)
             .then(if (selected) Modifier.background(colors.accent) else Modifier)
             .then(

@@ -10,9 +10,11 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBar
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBarItem
+import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.component.topbar.TopAppBar
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.here.navigation.TopLevelDestination
+import ru.aloyaloya.design_system.R as DesignSystemR
 
 /**
  * Каркас приложения Here.
@@ -25,8 +27,13 @@ import ru.aloyaloya.here.navigation.TopLevelDestination
  * Панель и навигация принадлежат разделам приложения, поэтому на экранах поверх
  * них — например на новом воспоминании — каркас рисует только контент.
  *
+ * Пока приложение в режиме ([contextMode]), верхнюю панель раздела подменяет шапка режима:
+ * заголовок называет происходящее, а стрелка выходит. Нижняя навигация остается на месте —
+ * уход в другой раздел выключает режим сам.
+ *
  * @param currentTopLevelDestination Текущий верхнеуровневый destination навигации
  * или `null`, если открыт экран вне разделов.
+ * @param contextMode Текущий режим приложения или `null`, если приложение не в режиме.
  * @param destinations Список объектов [TopLevelDestination].
  * @param onNavigate Колбэк, вызываемый при нажатии на элемент навигации.
  * @param darkTheme Текущее состояние темы для кнопки в верхней панели.
@@ -37,6 +44,7 @@ import ru.aloyaloya.here.navigation.TopLevelDestination
 @Composable
 fun HereScaffold(
     currentTopLevelDestination: TopLevelDestination?,
+    contextMode: HereContextMode?,
     destinations: List<TopLevelDestination>,
     onNavigate: (TopLevelDestination) -> Unit,
     darkTheme: Boolean,
@@ -52,12 +60,23 @@ fun HereScaffold(
         content()
 
         if (currentTopLevelDestination != null) {
-            TopAppBar(
-                title = stringResource(currentTopLevelDestination.titleResId),
-                darkTheme = darkTheme,
-                onThemeChange = onThemeChange,
-                modifier = Modifier.align(Alignment.TopCenter)
-            )
+            if (contextMode != null) {
+                HereContextTopAppBar(
+                    title = stringResource(contextMode.titleResId),
+                    navigationContentDescription = stringResource(
+                        DesignSystemR.string.context_bar_back_content_description
+                    ),
+                    onNavigateBack = contextMode.onExit,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            } else {
+                TopAppBar(
+                    title = stringResource(currentTopLevelDestination.titleResId),
+                    darkTheme = darkTheme,
+                    onThemeChange = onThemeChange,
+                    modifier = Modifier.align(Alignment.TopCenter)
+                )
+            }
 
             BottomNavigationBar(
                 modifier = Modifier.align(Alignment.BottomCenter)

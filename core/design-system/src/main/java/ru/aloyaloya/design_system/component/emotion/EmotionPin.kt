@@ -10,7 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import ru.aloyaloya.design_system.extension.cardShadow
+import ru.aloyaloya.design_system.extension.overlayShadow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import ru.aloyaloya.design_system.theme.HereSize
@@ -41,7 +41,7 @@ fun EmotionPin(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(size)
-            .cardShadow(CircleShape)
+            .overlayShadow(CircleShape)
             .background(color = color, shape = CircleShape)
             .border(
                 width = border,

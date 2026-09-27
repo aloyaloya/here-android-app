@@ -12,7 +12,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
-import ru.aloyaloya.design_system.extension.iconButtonShadow
+import ru.aloyaloya.design_system.extension.overlayShadow
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 
@@ -37,7 +37,7 @@ fun HereIconButton(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(HereSize.IconButton.size)
-            .iconButtonShadow(CircleShape)
+            .overlayShadow(CircleShape)
             .clip(CircleShape)
             .background(colors.surface.copy(alpha = HereSize.IconButton.backgroundAlpha))
             .clickable(onClick = onClick)

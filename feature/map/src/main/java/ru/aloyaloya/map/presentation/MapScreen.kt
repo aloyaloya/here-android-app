@@ -8,13 +8,14 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
-import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.slideOutVertically
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -41,14 +42,15 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import ru.aloyaloya.design_system.component.button.HereExtendedFab
 import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.map.R
 import ru.aloyaloya.map.model.MapUiState
 import ru.aloyaloya.map.presentation.component.PlaceMemoriesSheet
-import ru.aloyaloya.map.presentation.component.PlacePickerPanel
 import ru.aloyaloya.map.presentation.component.PlacePin
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapMarker
@@ -94,6 +96,8 @@ private fun Context.hasLocationPermission(): Boolean =
  * это то место, которое пользователь видел под прицелом.
  *
  * @param uiState Состояние экрана.
+ * @param picking Включен ли режим выбора места. Режимом владеет приложение: он подменяет
+ * панели, поэтому экран о нем сообщает, но не хранит.
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: отдает наверх эмоцию
  * и выбранную точку.
  * @param onMemoryClick Колбэк нажатия на метку воспоминания: с карты сразу
@@ -106,6 +110,7 @@ private fun Context.hasLocationPermission(): Boolean =
 @Composable
 fun MapScreen(
     uiState: MapUiState,
+    picking: Boolean,
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
     onMemoryClick: (Long) -> Unit,
     onPickStart: () -> Unit,
@@ -147,7 +152,6 @@ fun MapScreen(
             var cameraMoving by remember { mutableStateOf(false) }
             var placeMemoryIds by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
             val mapState = rememberYandexMapState()
-            val picking = uiState.picking != null
 
             BackHandler(enabled = picking, onBack = onPickCancel)
 
@@ -167,6 +171,7 @@ fun MapScreen(
                 MapContent(
                     uiState = uiState,
                     mapState = mapState,
+                    picking = picking,
                     locationEnabled = locationGranted && !picking,
                     isDarkTheme = isDarkTheme,
                     onMarkerClick = onMemoryClick,
@@ -195,59 +200,44 @@ fun MapScreen(
                     PlacePin(moving = cameraMoving)
                 }
 
-                var shownPicking by remember { mutableStateOf(uiState.picking) }
-                uiState.picking?.let { shownPicking = it }
-
                 Column(
+                    horizontalAlignment = Alignment.End,
+                    verticalArrangement = Arrangement.spacedBy(HereSize.Fab.stackSpacing),
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
+                        .align(Alignment.BottomEnd)
                         .navigationBarsPadding()
                         .padding(bottom = HereSize.NavBar.height)
+                        .padding(horizontal = HereSize.Fab.endMargin)
+                        .padding(bottom = HereSize.Fab.barSpacing)
                 ) {
-                    Column(
-                        horizontalAlignment = Alignment.End,
-                        verticalArrangement = Arrangement.spacedBy(HereSize.Fab.stackSpacing),
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(horizontal = HereSize.Fab.endMargin)
-                            .padding(bottom = HereSize.Fab.barSpacing)
+                    AnimatedVisibility(
+                        visible = locationGranted && mapState.awayFromUser,
+                        enter = scaleIn(tween(RESIZE_MILLIS, easing = GrowEasing)),
+                        exit = scaleOut(tween(RESIZE_MILLIS, easing = ShrinkEasing))
                     ) {
-                        AnimatedVisibility(
-                            visible = locationGranted && mapState.awayFromUser,
-                            enter = scaleIn(tween(RESIZE_MILLIS, easing = GrowEasing)),
-                            exit = scaleOut(tween(RESIZE_MILLIS, easing = ShrinkEasing))
-                        ) {
-                            LocationFab(onClick = onLocationClick)
-                        }
-
-                        AnimatedVisibility(
-                            visible = !picking,
-                            enter = scaleIn(tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS, GrowEasing)),
-                            exit = scaleOut(tween(ACTIONS_EXIT_MILLIS, easing = ShrinkEasing))
-                        ) {
-                            HereFab(onClick = onPickStart)
-                        }
+                        LocationFab(onClick = onLocationClick)
                     }
 
-                    AnimatedVisibility(
-                        visible = picking,
-                        enter = slideInVertically(
-                            tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS)
-                        ) { height -> height },
-                        exit = slideOutVertically(
-                            tween(ACTIONS_EXIT_MILLIS)
-                        ) { height -> height }
-                    ) {
-                        PlacePickerPanel(
-                            address = shownPicking?.address,
-                            resolving = shownPicking?.resolving != false,
-                            onCancel = onPickCancel,
-                            onConfirm = {
-                                pickedPoint = mapState.cameraTarget
-                                emotionPickerVisible = true
-                            }
-                        )
+                    AnimatedContent(
+                        targetState = picking,
+                        transitionSpec = {
+                            scaleIn(tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS, GrowEasing)) togetherWith
+                                scaleOut(tween(ACTIONS_EXIT_MILLIS, easing = ShrinkEasing)) using
+                                SizeTransform(clip = false)
+                        },
+                        label = "map-action"
+                    ) { isPicking ->
+                        if (isPicking) {
+                            HereExtendedFab(
+                                text = stringResource(R.string.place_picker_next),
+                                onClick = {
+                                    pickedPoint = mapState.cameraTarget
+                                    emotionPickerVisible = true
+                                }
+                            )
+                        } else {
+                            HereFab(onClick = onPickStart)
+                        }
                     }
                 }
             }
@@ -305,6 +295,7 @@ private fun LocationFab(onClick: () -> Unit) {
 private fun MapContent(
     uiState: MapUiState.Content,
     mapState: YandexMapState,
+    picking: Boolean,
     locationEnabled: Boolean,
     isDarkTheme: Boolean,
     onMarkerClick: (Long) -> Unit,
@@ -336,7 +327,7 @@ private fun MapContent(
         locationEnabled = locationEnabled,
         isDarkTheme = isDarkTheme,
         markers = markers,
-        markersVisible = uiState.picking == null,
+        markersVisible = !picking,
         onMarkerClick = onMarkerClick,
         onClusterClick = onClusterClick,
         onCameraMove = onCameraMove,

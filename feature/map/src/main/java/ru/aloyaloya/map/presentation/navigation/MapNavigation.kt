@@ -1,5 +1,6 @@
 package ru.aloyaloya.map.presentation.navigation
 
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -35,11 +36,19 @@ fun NavController.navigateToMap(navOptions: NavOptions) =
  * Внутри функции добавляется composable-маршрут [MapRoute] и
  * размещается UI-контент экрана карты.
  *
+ * Режимом выбора места владеет приложение, а не этот экран: режим подменяет панели,
+ * а они принадлежат каркасу. Вьюмодель на него подписывается, чтобы знать,
+ * определять ли адрес под прицелом.
+ *
+ * @param picking Включен ли режим выбора места.
+ * @param onPickingChange Колбэк входа в режим выбора места и выхода из него.
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: вместе с эмоцией отдает
  * точку на карте, дальше идет экран нового места.
  * @param onMemoryClick Колбэк перехода к воспоминанию по нажатию на его метку.
  */
 fun NavGraphBuilder.mapScreen(
+    picking: Boolean,
+    onPickingChange: (Boolean) -> Unit,
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
     onMemoryClick: (Long) -> Unit
 ) {
@@ -58,12 +67,17 @@ fun NavGraphBuilder.mapScreen(
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
+        LaunchedEffect(viewModel, picking) {
+            if (picking) viewModel.startPicking() else viewModel.cancelPicking()
+        }
+
         MapScreen(
             uiState = uiState,
+            picking = picking,
             onEmotionConfirmed = onEmotionConfirmed,
             onMemoryClick = onMemoryClick,
-            onPickStart = viewModel::startPicking,
-            onPickCancel = viewModel::cancelPicking,
+            onPickStart = { onPickingChange(true) },
+            onPickCancel = { onPickingChange(false) },
             onPickPointChanged = viewModel::onPickPointChanged
         )
     }

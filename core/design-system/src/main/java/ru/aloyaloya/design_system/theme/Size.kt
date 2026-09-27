@@ -49,6 +49,8 @@ object HereSize {
         val iconSize = 28.dp
         val endMargin = 18.dp
         val barSpacing = 24.dp
+        val extendedHeight = 56.dp
+        val extendedPadding = 22.dp
         val stackSpacing = 14.dp
     }
 
