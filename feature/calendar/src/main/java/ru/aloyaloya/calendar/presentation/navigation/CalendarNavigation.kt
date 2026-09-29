@@ -1,10 +1,18 @@
 package ru.aloyaloya.calendar.presentation.navigation
 
+import androidx.compose.runtime.getValue
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
+import ru.aloyaloya.calendar.di.CalendarComponent
+import ru.aloyaloya.calendar.presentation.CalendarScreen
+import ru.aloyaloya.calendar.presentation.CalendarViewModel
+import ru.aloyaloya.ui.di.ComponentProvider
 
 @Serializable
 /** Маршрут экрана календаря в графе навигации. */
@@ -26,7 +34,21 @@ fun NavController.navigateToCalendar(navOptions: NavOptions) =
  * размещается UI-контент экрана календаря.
  */
 fun NavGraphBuilder.calendarScreen() {
-    composable<CalendarRoute> {
+    composable<CalendarRoute> { navBackStackEntry ->
 
+        val context = LocalContext.current.applicationContext
+
+        val factory = (context as ComponentProvider)
+            .provideComponent("calendar", CalendarComponent::class)
+            .viewModelFactory
+
+        val viewModel = viewModel<CalendarViewModel>(
+            viewModelStoreOwner = navBackStackEntry,
+            factory = factory
+        )
+
+        val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+
+        CalendarScreen(uiState = uiState)
     }
 }
