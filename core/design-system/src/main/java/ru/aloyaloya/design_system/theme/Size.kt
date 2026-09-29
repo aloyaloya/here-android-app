@@ -61,7 +61,6 @@ object HereSize {
         val handleWidth = 48.dp
         val handleHeight = 5.dp
         val handleVerticalPadding = 17.dp
-        val actionHeight = 52.dp
         val actionSpacing = 10.dp
         val titleSpacing = 3.dp
         val titleValueSize = 28.sp
@@ -201,8 +200,8 @@ object HereSize {
 
     /** Круглая кнопка с иконкой поверх карты или фотографии. */
     object IconButton {
-        val size = 48.dp
-        val iconSize = 22.dp
+        val size = 40.dp
+        val iconSize = 24.dp
         val backgroundAlpha = 0.94f
     }
 
@@ -261,6 +260,7 @@ object HereSize {
     /** Пункт меню в листе действий. */
     object SheetAction {
         val height = 60.dp
+        val iconSize = 24.dp
         val iconSpacing = 14.dp
     }
 

@@ -87,7 +87,7 @@ private fun MemoryAction(
             painter = painterResource(icon),
             contentDescription = null,
             tint = color,
-            modifier = Modifier.size(HereSize.IconButton.iconSize)
+            modifier = Modifier.size(HereSize.SheetAction.iconSize)
         )
 
         Text(

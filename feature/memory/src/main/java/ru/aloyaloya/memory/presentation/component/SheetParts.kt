@@ -71,14 +71,12 @@ fun SheetActions(
         HereSecondaryButton(
             text = stringResource(R.string.sheet_cancel),
             onClick = onCancelClick,
-            height = HereSize.Sheet.actionHeight,
             modifier = Modifier.weight(CANCEL_WEIGHT)
         )
 
         HerePrimaryButton(
             text = stringResource(R.string.sheet_confirm),
             onClick = onConfirmClick,
-            height = HereSize.Sheet.actionHeight,
             modifier = Modifier.weight(CONFIRM_WEIGHT)
         )
     }

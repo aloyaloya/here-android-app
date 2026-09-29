@@ -13,7 +13,6 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.Dp
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -27,15 +26,13 @@ import ru.aloyaloya.design_system.theme.HereTheme
  * @param onClick Колбэк нажатия.
  * @param modifier [Modifier], применяемый к кнопке.
  * @param enabled Активна ли кнопка.
- * @param height Высота кнопки: в листах она ниже, чем на экране.
  */
 @Composable
 fun HerePrimaryButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    height: Dp = HereSize.PrimaryButton.height
+    enabled: Boolean = true
 ) {
     val colors = HereTheme.colors
 
@@ -53,7 +50,7 @@ fun HerePrimaryButton(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxWidth()
-            .height(height)
+            .height(HereSize.PrimaryButton.height)
             .clip(HereShape.pill)
             .background(background)
             .clickable(enabled = enabled, onClick = onClick)
