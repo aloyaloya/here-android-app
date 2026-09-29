@@ -137,7 +137,7 @@ object HereSize {
         val textSpacing = 3.dp
     }
 
-    /** Режим выбора места на карте: прицел по центру и панель с адресом. */
+    /** Режим выбора места на карте: прицел по центру. */
     object PlacePicker {
         val pinHeight = 52.dp
         val pinSize = 30.dp
@@ -146,11 +146,6 @@ object HereSize {
         val pinStemHeight = 14.dp
         val pinAnchor = 8.dp
         val pinLift = 10.dp
-        val panelPadding = 20.dp
-        val panelSpacing = 16.dp
-        val actionSpacing = 10.dp
-        val actionHeight = 52.dp
-        val addressSpacing = 3.dp
     }
 
     /** Панель модального экрана. */

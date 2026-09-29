@@ -98,8 +98,6 @@ private fun Context.hasLocationPermission(): Boolean =
  * открывается экран воспоминания. Воспоминания в одной точке сперва показываются списком.
  * @param onPickStart Колбэк входа в режим выбора места.
  * @param onPickCancel Колбэк выхода из режима выбора места.
- * @param onPickPointChanged Колбэк остановки камеры в режиме выбора: по точке
- * определяется адрес.
  */
 @Composable
 fun MapScreen(
@@ -108,8 +106,7 @@ fun MapScreen(
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
     onMemoryClick: (Long) -> Unit,
     onPickStart: () -> Unit,
-    onPickCancel: () -> Unit,
-    onPickPointChanged: (MapPoint) -> Unit
+    onPickCancel: () -> Unit
 ) {
     val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
@@ -157,10 +154,6 @@ fun MapScreen(
                 }
             }
 
-            LaunchedEffect(picking) {
-                if (picking) mapState.cameraTarget?.let(onPickPointChanged)
-            }
-
             Box(modifier = Modifier.fillMaxSize()) {
                 MapContent(
                     uiState = uiState,
@@ -170,10 +163,7 @@ fun MapScreen(
                     isDarkTheme = isDarkTheme,
                     onMarkerClick = onMemoryClick,
                     onClusterClick = { ids -> placeMemoryIds = ids },
-                    onCameraMove = { point, settled ->
-                        cameraMoving = !settled
-                        if (settled && picking) onPickPointChanged(point)
-                    },
+                    onCameraMove = { _, settled -> cameraMoving = !settled },
                     modifier = Modifier.fillMaxSize()
                 )
 

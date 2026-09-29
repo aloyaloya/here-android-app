@@ -1,6 +1,5 @@
 package ru.aloyaloya.map.presentation.navigation
 
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -10,11 +9,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
+import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.map.di.MapComponent
-import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.map.presentation.MapScreen
 import ru.aloyaloya.map.presentation.MapViewModel
-import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.ui.di.ComponentProvider
 
 @Serializable
@@ -34,11 +33,7 @@ fun NavController.navigateToMap(navOptions: NavOptions) =
  * Регистрирует экран карты как destination в [NavGraphBuilder].
  *
  * Внутри функции добавляется composable-маршрут [MapRoute] и
- * размещается UI-контент экрана карты.
- *
- * Режимом выбора места владеет приложение, а не этот экран: режим подменяет панели,
- * а они принадлежат каркасу. Вьюмодель на него подписывается, чтобы знать,
- * определять ли адрес под прицелом.
+ * размещается UI-контент экрана карты. *
  *
  * @param picking Включен ли режим выбора места.
  * @param onPickingChange Колбэк входа в режим выбора места и выхода из него.
@@ -67,18 +62,13 @@ fun NavGraphBuilder.mapScreen(
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        LaunchedEffect(viewModel, picking) {
-            if (picking) viewModel.startPicking() else viewModel.cancelPicking()
-        }
-
         MapScreen(
             uiState = uiState,
             picking = picking,
             onEmotionConfirmed = onEmotionConfirmed,
             onMemoryClick = onMemoryClick,
             onPickStart = { onPickingChange(true) },
-            onPickCancel = { onPickingChange(false) },
-            onPickPointChanged = viewModel::onPickPointChanged
+            onPickCancel = { onPickingChange(false) }
         )
     }
 }

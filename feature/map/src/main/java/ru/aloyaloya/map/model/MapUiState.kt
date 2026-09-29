@@ -13,18 +13,7 @@ sealed class MapUiState {
     data object Loading : MapUiState()
     data class Content(
         val mapConfig: YandexMapConfig,
-        val memories: List<Memory>,
-        val picking: PlacePicking? = null
+        val memories: List<Memory>
     ) : MapUiState()
 }
 
-/**
- * Режим выбора места: карта ездит под неподвижным прицелом.
- *
- * @param address Адрес точки под прицелом или `null`, если определить его не вышло.
- * @param resolving Идет ли сейчас запрос адреса.
- */
-data class PlacePicking(
-    val address: String? = null,
-    val resolving: Boolean = true
-)
