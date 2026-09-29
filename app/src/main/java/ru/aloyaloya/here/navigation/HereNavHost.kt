@@ -56,7 +56,9 @@ fun HereNavHost(
             onBackClick = { navController.popBackStack() },
             onEditClick = { memoryId -> navController.navigateToEditMemory(memoryId) }
         )
-        calendarScreen()
+        calendarScreen(
+            onMemoryClick = { memoryId -> navController.navigateToMemory(memoryId) }
+        )
         analyticScreen()
     }
 }

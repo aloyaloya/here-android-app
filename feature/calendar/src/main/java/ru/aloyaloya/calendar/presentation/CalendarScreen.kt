@@ -8,7 +8,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -22,29 +26,42 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.res.stringResource
+import ru.aloyaloya.calendar.R
 import ru.aloyaloya.calendar.model.CalendarUiState
 import ru.aloyaloya.design_system.component.calendar.CalendarDayMark
 import ru.aloyaloya.design_system.component.calendar.HereMonthGrid
 import ru.aloyaloya.design_system.component.calendar.HereMonthHeader
+import ru.aloyaloya.design_system.component.memory.HereMemoryRow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
+import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
+import java.util.Locale
+
+private val DayFormat = DateTimeFormatter.ofPattern("d MMMM", Locale.forLanguageTag("ru"))
+private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"))
 
 /**
  * Экран календаря: воспоминания по дням месяца.
  *
  * @param uiState Состояние экрана.
+ * @param onMemoryClick Колбэк нажатия на воспоминание дня, получает его id.
  * @param modifier Внешний [Modifier] экрана.
  */
 @Composable
 fun CalendarScreen(
     uiState: CalendarUiState,
+    onMemoryClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -60,15 +77,27 @@ fun CalendarScreen(
                 )
             }
 
-            is CalendarUiState.Content -> CalendarContent(uiState)
+            is CalendarUiState.Content -> CalendarContent(
+                uiState = uiState,
+                onMemoryClick = onMemoryClick
+            )
         }
     }
 }
 
-/** Месяц с эмоциями в днях на карточке и фон в цвет его настроения. */
+/**
+ * Месяц с эмоциями в днях на карточке, под ним воспоминания выбранного дня,
+ * а за всем этим фон в цвет настроения месяца.
+ *
+ * Сразу выбран сегодняшний день: экран открывается с тем, что было сегодня.
+ */
 @Composable
-private fun CalendarContent(uiState: CalendarUiState.Content) {
+private fun CalendarContent(
+    uiState: CalendarUiState.Content,
+    onMemoryClick: (Long) -> Unit
+) {
     var shownMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
+    var selectedDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
 
     val markByDate = uiState.emotionByDate.mapValues { (_, emotion) ->
         CalendarDayMark(emoji = emotion.emoji, color = emotion.color.solid)
@@ -81,6 +110,7 @@ private fun CalendarContent(uiState: CalendarUiState.Content) {
     MoodGlow(color = monthEmotion?.color?.solid)
 
     Column(
+        verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
         modifier = Modifier
             .statusBarsPadding()
             .navigationBarsPadding()
@@ -88,6 +118,7 @@ private fun CalendarContent(uiState: CalendarUiState.Content) {
                 top = HereSize.TopAppBar.height,
                 bottom = HereSize.NavBar.height
             )
+            .verticalScroll(rememberScrollState())
             .padding(
                 horizontal = HereSpacing.l,
                 vertical = HereSpacing.s
@@ -108,9 +139,55 @@ private fun CalendarContent(uiState: CalendarUiState.Content) {
 
             HereMonthGrid(
                 month = shownMonth,
-                selectedDate = null,
+                selectedDate = selectedDate,
                 markByDate = markByDate,
-                onDayClick = {}
+                onDayClick = { day ->
+                    selectedDate = day
+                    // День соседнего месяца в сетке ведет в его месяц
+                    shownMonth = YearMonth.from(day)
+                }
+            )
+        }
+
+        DayMemories(
+            date = selectedDate,
+            memories = uiState.memoriesByDate[selectedDate].orEmpty(),
+            onMemoryClick = onMemoryClick
+        )
+    }
+}
+
+/** Заголовок выбранного дня и его воспоминания, или подсказка, что их нет. */
+@Composable
+private fun DayMemories(
+    date: LocalDate,
+    memories: List<Memory>,
+    onMemoryClick: (Long) -> Unit
+) {
+    Column(verticalArrangement = Arrangement.spacedBy(HereSize.MemoryRow.spacing)) {
+        Text(
+            text = DayFormat.format(date),
+            style = MaterialTheme.typography.titleMedium,
+            color = HereTheme.colors.textPrimary
+        )
+
+        if (memories.isEmpty()) {
+            Text(
+                text = stringResource(R.string.calendar_day_empty),
+                style = MaterialTheme.typography.bodyMedium,
+                color = HereTheme.colors.textTertiary
+            )
+        }
+
+        memories.forEach { memory ->
+            HereMemoryRow(
+                emoji = memory.emotion.emoji,
+                color = memory.emotion.color.soft,
+                title = memory.title,
+                subtitle = TimeFormat.format(
+                    Instant.ofEpochMilli(memory.happenedAt).atZone(ZoneId.systemDefault())
+                ),
+                onClick = { onMemoryClick(memory.id) }
             )
         }
     }

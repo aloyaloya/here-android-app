@@ -32,8 +32,10 @@ fun NavController.navigateToCalendar(navOptions: NavOptions) =
  *
  * Внутри функции добавляется composable-маршрут [CalendarRoute] и
  * размещается UI-контент экрана календаря.
+ *
+ * @param onMemoryClick Колбэк нажатия на воспоминание дня, получает его id.
  */
-fun NavGraphBuilder.calendarScreen() {
+fun NavGraphBuilder.calendarScreen(onMemoryClick: (Long) -> Unit) {
     composable<CalendarRoute> { navBackStackEntry ->
 
         val context = LocalContext.current.applicationContext
@@ -49,6 +51,9 @@ fun NavGraphBuilder.calendarScreen() {
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        CalendarScreen(uiState = uiState)
+        CalendarScreen(
+            uiState = uiState,
+            onMemoryClick = onMemoryClick
+        )
     }
 }

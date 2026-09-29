@@ -1,6 +1,7 @@
 package ru.aloyaloya.calendar.model
 
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.domain.model.Memory
 import java.time.LocalDate
 
 /**
@@ -8,5 +9,8 @@ import java.time.LocalDate
  */
 sealed class CalendarUiState {
     data object Loading : CalendarUiState()
-    data class Content(val emotionByDate: Map<LocalDate, Emotion>) : CalendarUiState()
+    data class Content(
+        val emotionByDate: Map<LocalDate, Emotion>,
+        val memoriesByDate: Map<LocalDate, List<Memory>>
+    ) : CalendarUiState()
 }

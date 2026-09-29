@@ -21,13 +21,16 @@ class CalendarViewModel @Inject constructor(
     val uiState: StateFlow<CalendarUiState> =
         memoryRepository.observeAll()
             .map { memories ->
-                val emotionByDate = memories
+                val memoriesByDate = memories
+                    .sortedBy(Memory::happenedAt)
                     .groupBy { memory -> memory.happenedAt.toLocalDate() }
-                    .mapValues { (_, dayMemories) ->
-                        dayMemories.maxBy(Memory::happenedAt).emotion
-                    }
 
-                CalendarUiState.Content(emotionByDate)
+                CalendarUiState.Content(
+                    emotionByDate = memoriesByDate.mapValues { (_, dayMemories) ->
+                        dayMemories.last().emotion
+                    },
+                    memoriesByDate = memoriesByDate
+                )
             }
             .stateIn(
                 scope = viewModelScope,
