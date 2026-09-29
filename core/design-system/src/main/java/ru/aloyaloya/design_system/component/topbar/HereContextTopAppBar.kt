@@ -1,69 +1,58 @@
 package ru.aloyaloya.design_system.component.topbar
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.res.painterResource
 import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
- * Верхняя панель режима: стрелка выхода и название экрана.
+ * Верхняя панель режима: стрелка выхода, название экрана и действия справа.
  *
  * @param title Название режима.
  * @param navigationContentDescription Описание выхода для программ чтения с экрана.
  * @param onNavigateBack Колбэк выхода из режима.
  * @param modifier Внешний [Modifier] панели.
+ * @param actions Кнопки справа.
  */
 @Composable
 fun HereContextTopAppBar(
     title: String,
     navigationContentDescription: String?,
     onNavigateBack: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    actions: @Composable RowScope.() -> Unit = {}
 ) {
-    val colors = HereTheme.colors
-
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(colors.surface)
+            .background(HereTheme.colors.surface)
             .statusBarsPadding()
             .height(HereSize.TopAppBar.height)
             .padding(horizontal = HereSize.TopAppBar.contentPadding),
         verticalAlignment = Alignment.CenterVertically
     ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(HereSize.TopAppBar.actionSize)
-                .clip(CircleShape)
-                .clickable(onClick = onNavigateBack)
-        ) {
-            Icon(
-                painter = painterResource(R.drawable.ic_arrow_back),
-                tint = colors.textPrimary,
-                contentDescription = navigationContentDescription,
-                modifier = Modifier.size(HereSize.TopAppBar.actionIconSize)
-            )
-        }
+        TopAppBarAction(
+            icon = R.drawable.ic_arrow_back,
+            contentDescription = navigationContentDescription,
+            onClick = onNavigateBack
+        )
 
         TopAppBarTitleSection(
             title = title,
-            modifier = Modifier.padding(start = HereSize.TopAppBar.contentPadding)
+            modifier = Modifier
+                .weight(1f)
+                .padding(start = HereSize.TopAppBar.contentPadding)
         )
+
+        actions()
     }
 }

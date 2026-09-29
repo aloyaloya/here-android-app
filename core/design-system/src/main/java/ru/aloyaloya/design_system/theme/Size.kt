@@ -237,16 +237,12 @@ object HereSize {
         val pinSize = 94.dp
         val pinBorder = 5.dp
         val pinEmojiSize = 44.sp
-        val scrimHeight = 133.dp
         val sheetCornerOverlap = 28.dp
-        val actionsHorizontalPadding = 22.dp
-        val actionsTopPadding = 12.dp
         val sheetHorizontalPadding = 27.dp
         val sheetTopPadding = 22.dp
         val sheetBottomPadding = 32.dp
         val sheetSpacing = 17.dp
         val headerSpacing = 6.dp
-        val mediaTextSpacing = 3.dp
         val mediaSpacing = 10.dp
         val mediaSize = 107.dp
         val dividerThickness = 1.dp

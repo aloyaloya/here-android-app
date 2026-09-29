@@ -1,5 +1,6 @@
 package ru.aloyaloya.design_system.component.topbar
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -91,5 +92,35 @@ private fun TopAppBarThemeToggle(
                     .rotate(iconRotation)
             )
         }
+    }
+}
+/**
+ * Кнопка-иконка верхней панели.
+ *
+ * @param icon Иконка кнопки.
+ * @param contentDescription Описание действия для программ чтения с экрана.
+ * @param onClick Колбэк нажатия.
+ * @param modifier [Modifier], применяемый к кнопке.
+ */
+@Composable
+fun TopAppBarAction(
+    @DrawableRes icon: Int,
+    contentDescription: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(HereSize.TopAppBar.actionSize)
+            .clip(CircleShape)
+            .clickable(onClick = onClick)
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            tint = HereTheme.colors.textPrimary,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(HereSize.TopAppBar.actionIconSize)
+        )
     }
 }
