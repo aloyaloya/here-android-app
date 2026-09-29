@@ -79,7 +79,7 @@ fun HereMonthGrid(
                         /** Дни соседних месяцев по краям сетки — заполнение, а не содержание. */
                         mark = if (inShownMonth) markByDate[day] else null,
                         inShownMonth = inShownMonth,
-                        selected = day == selectedDate,
+                        selected = inShownMonth && day == selectedDate,
                         today = inShownMonth && day == today,
                         onClick = { onDayClick(day) },
                         modifier = Modifier.weight(1f)
