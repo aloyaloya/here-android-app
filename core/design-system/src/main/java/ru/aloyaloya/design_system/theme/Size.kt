@@ -258,5 +258,7 @@ object HereSize {
     /** Основная кнопка. */
     object PrimaryButton {
         val height = 56.dp
+        val disabledContainerAlpha = 0.12f
+        val disabledContentAlpha = 0.38f
     }
 }

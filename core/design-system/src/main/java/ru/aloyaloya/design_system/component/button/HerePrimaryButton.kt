@@ -20,7 +20,7 @@ import ru.aloyaloya.design_system.theme.HereTheme
 /**
  * Основная кнопка приложения Here — широкая пилюля акцентного цвета.
  *
- * Пока кнопка неактивна, она гасится до приглушенного фона.
+ * Неактивная кнопка серая, как в M3: так ее не спутать с полем ввода.
  *
  * @param text Подпись кнопки.
  * @param onClick Колбэк нажатия.
@@ -37,12 +37,20 @@ fun HerePrimaryButton(
     val colors = HereTheme.colors
 
     val background by animateColorAsState(
-        targetValue = if (enabled) colors.accent else colors.surfaceMuted,
+        targetValue = if (enabled) {
+            colors.accent
+        } else {
+            colors.textPrimary.copy(alpha = HereSize.PrimaryButton.disabledContainerAlpha)
+        },
         label = "primary-button-background"
     )
 
     val contentColor by animateColorAsState(
-        targetValue = if (enabled) colors.onAccent else colors.textTertiary,
+        targetValue = if (enabled) {
+            colors.onAccent
+        } else {
+            colors.textPrimary.copy(alpha = HereSize.PrimaryButton.disabledContentAlpha)
+        },
         label = "primary-button-content"
     )
 
