@@ -5,12 +5,15 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import ru.aloyaloya.design_system.extension.cardShadow
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.style.LineHeightStyle
+import ru.aloyaloya.design_system.extension.overlayShadow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.TextUnit
 import ru.aloyaloya.design_system.theme.HereSize
@@ -41,7 +44,7 @@ fun EmotionPin(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .size(size)
-            .cardShadow(CircleShape)
+            .overlayShadow(CircleShape)
             .background(color = color, shape = CircleShape)
             .border(
                 width = border,
@@ -49,9 +52,22 @@ fun EmotionPin(
                 shape = CircleShape
             )
     ) {
+        /**
+         * Эмодзи — единственный глиф в пине, и отступы строки сажают его на базовую
+         * линию, ниже центра круга. Строка ужимается до самого глифа, чтобы он встал
+         * по центру: в мелком пине смещение видно.
+         */
         Text(
             text = emoji,
-            fontSize = emojiSize
+            fontSize = emojiSize,
+            lineHeight = emojiSize,
+            style = LocalTextStyle.current.copy(
+                platformStyle = PlatformTextStyle(includeFontPadding = false),
+                lineHeightStyle = LineHeightStyle(
+                    alignment = LineHeightStyle.Alignment.Center,
+                    trim = LineHeightStyle.Trim.Both
+                )
+            )
         )
     }
 }

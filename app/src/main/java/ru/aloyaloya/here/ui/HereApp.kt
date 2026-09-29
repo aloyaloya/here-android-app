@@ -3,6 +3,9 @@ package ru.aloyaloya.here.ui
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.trace
 import androidx.navigation.NavController
 import androidx.navigation.NavDestination
@@ -18,6 +21,7 @@ import ru.aloyaloya.here.navigation.HereNavHost
 import ru.aloyaloya.here.navigation.TopLevelDestination
 import ru.aloyaloya.map.presentation.navigation.navigateToMap
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
+import ru.aloyaloya.map.R as MapR
 
 /**
  * Корневой composable приложения Here, который настраивает
@@ -45,15 +49,44 @@ fun HereApp(
     val currentDestination = navBackStackEntry?.destination
     val currentTopLevelDestination = currentDestination.toTopLevelDestination()
 
+    /**
+     * Выбор места — режим приложения, а не внутреннее состояние карты: пока он включен,
+     * верхнюю панель раздела подменяет шапка режима. Его видят и каркас, и экран,
+     * поэтому владеет им их общий родитель.
+     */
+    var placePicking by rememberSaveable { mutableStateOf(false) }
+
+    val contextMode = if (placePicking) {
+        HereContextMode(
+            titleResId = MapR.string.place_picker_title,
+            onExit = { placePicking = false }
+        )
+    } else {
+        null
+    }
+
     CompositionLocalProvider(LocalAppDarkTheme provides darkTheme) {
         HereScaffold(
             currentTopLevelDestination = currentTopLevelDestination,
+            contextMode = contextMode,
             destinations = TopLevelDestination.entries,
-            onNavigate = { navigateToTopLevelDestination(navController, it) },
+            onNavigate = { destination ->
+                /**
+                 * Нижняя навигация в режиме доступна, поэтому уход в другой раздел
+                 * молча выключает режим: иначе шапка «Выберите место» уехала бы
+                 * в раздел, которому она ничего не говорит.
+                 */
+                placePicking = false
+                navigateToTopLevelDestination(navController, destination)
+            },
             darkTheme = darkTheme,
             onThemeChange = onThemeChange
         ) {
-            HereNavHost(navController = navController)
+            HereNavHost(
+                navController = navController,
+                placePicking = placePicking,
+                onPlacePickingChange = { placePicking = it }
+            )
         }
     }
 }

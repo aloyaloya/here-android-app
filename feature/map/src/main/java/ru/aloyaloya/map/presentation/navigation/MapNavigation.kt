@@ -9,11 +9,11 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
+import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.map.di.MapComponent
-import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.map.presentation.MapScreen
 import ru.aloyaloya.map.presentation.MapViewModel
-import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.ui.di.ComponentProvider
 
 @Serializable
@@ -33,13 +33,17 @@ fun NavController.navigateToMap(navOptions: NavOptions) =
  * Регистрирует экран карты как destination в [NavGraphBuilder].
  *
  * Внутри функции добавляется composable-маршрут [MapRoute] и
- * размещается UI-контент экрана карты.
+ * размещается UI-контент экрана карты. *
  *
+ * @param picking Включен ли режим выбора места.
+ * @param onPickingChange Колбэк входа в режим выбора места и выхода из него.
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: вместе с эмоцией отдает
  * точку на карте, дальше идет экран нового места.
  * @param onMemoryClick Колбэк перехода к воспоминанию по нажатию на его метку.
  */
 fun NavGraphBuilder.mapScreen(
+    picking: Boolean,
+    onPickingChange: (Boolean) -> Unit,
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
     onMemoryClick: (Long) -> Unit
 ) {
@@ -60,11 +64,11 @@ fun NavGraphBuilder.mapScreen(
 
         MapScreen(
             uiState = uiState,
+            picking = picking,
             onEmotionConfirmed = onEmotionConfirmed,
             onMemoryClick = onMemoryClick,
-            onPickStart = viewModel::startPicking,
-            onPickCancel = viewModel::cancelPicking,
-            onPickPointChanged = viewModel::onPickPointChanged
+            onPickStart = { onPickingChange(true) },
+            onPickCancel = { onPickingChange(false) }
         )
     }
 }

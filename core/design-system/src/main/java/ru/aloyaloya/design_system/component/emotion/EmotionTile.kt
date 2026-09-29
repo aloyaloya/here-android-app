@@ -50,12 +50,12 @@ fun EmotionTile(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(HereSize.EmotionTile.contentSpacing),
         modifier = modifier
-            .clip(HereShape.cardLarge)
+            .clip(HereShape.tile)
             .background(color.soft)
             .border(
                 width = HereSize.EmotionTile.selectedBorder,
                 color = borderColor,
-                shape = HereShape.cardLarge
+                shape = HereShape.tile
             )
             .clickable(onClick = onClick)
             .padding(

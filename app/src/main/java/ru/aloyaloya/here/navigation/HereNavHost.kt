@@ -21,19 +21,27 @@ import ru.aloyaloya.memory.presentation.navigation.navigateToNewMemory
  * и регистрирует экраны приложения.
  *
  * @param navController Контроллер навигации, управляющий back stack и переходами.
+ * @param placePicking Включен ли режим выбора места: им владеет [ru.aloyaloya.here.ui.HereApp],
+ * потому что режим меняет не только карту, но и панели приложения.
+ * @param onPlacePickingChange Колбэк входа в режим выбора места и выхода из него.
  * @param modifier Модификатор для настройки внешнего вида контейнера навигации.
  */
 @Composable
 fun HereNavHost(
     navController: NavHostController,
+    placePicking: Boolean,
+    onPlacePickingChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // TODO: сделать анимацию перехода
     NavHost(
         navController = navController,
         startDestination = MapRoute,
         modifier = modifier
     ) {
         mapScreen(
+            picking = placePicking,
+            onPickingChange = onPlacePickingChange,
             onEmotionConfirmed = { emotion, point ->
                 navController.navigateToNewMemory(
                     emotion = emotion,

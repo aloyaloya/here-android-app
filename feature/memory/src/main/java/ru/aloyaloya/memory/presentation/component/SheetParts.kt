@@ -11,6 +11,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.button.HereSecondaryButton
+import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.memory.R
@@ -22,7 +23,7 @@ private const val CONFIRM_WEIGHT = 1.4f
 /**
  * Шапка листа выбора: тихая подпись и крупное текущее значение под ней.
  *
- * @param label Подпись листа.
+ * @param label Подпись листа. Регистр приводит сам компонент.
  * @param value Выбранное значение в готовом для показа виде.
  * @param modifier [Modifier], применяемый к шапке.
  */
@@ -38,14 +39,7 @@ fun SheetTitle(
         verticalArrangement = Arrangement.spacedBy(HereSize.Sheet.titleSpacing),
         modifier = modifier
     ) {
-        Text(
-            text = label.uppercase(),
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontSize = HereSize.Sheet.titleLabelSize,
-                letterSpacing = HereSize.Sheet.titleLabelLetterSpacing
-            ),
-            color = colors.textTertiary
-        )
+        HereSectionLabel(text = label)
 
         Text(
             text = value,
@@ -77,14 +71,12 @@ fun SheetActions(
         HereSecondaryButton(
             text = stringResource(R.string.sheet_cancel),
             onClick = onCancelClick,
-            height = HereSize.Sheet.actionHeight,
             modifier = Modifier.weight(CANCEL_WEIGHT)
         )
 
         HerePrimaryButton(
             text = stringResource(R.string.sheet_confirm),
             onClick = onConfirmClick,
-            height = HereSize.Sheet.actionHeight,
             modifier = Modifier.weight(CONFIRM_WEIGHT)
         )
     }

@@ -15,7 +15,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
@@ -31,19 +30,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import ru.aloyaloya.design_system.component.button.HereIconButton
 import ru.aloyaloya.design_system.component.emotion.EmotionPin
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
 import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
-import ru.aloyaloya.design_system.extension.sheetShadow
+import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
+import ru.aloyaloya.design_system.component.topbar.TopAppBarAction
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -51,12 +48,13 @@ import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.MemoryMedia
+import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.memory.R
 import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
-import ru.aloyaloya.memory.presentation.component.DeleteMemorySheet
+import ru.aloyaloya.memory.presentation.component.DeleteMemoryDialog
 import ru.aloyaloya.memory.presentation.component.MediaViewer
 import ru.aloyaloya.memory.presentation.component.MemoryActionsSheet
 import ru.aloyaloya.ui.emotion.color
@@ -70,7 +68,6 @@ import java.util.Locale
 import ru.aloyaloya.design_system.R as DesignSystemR
 
 private const val HALO_ALPHA = 0.42f
-private const val SCRIM_ALPHA = 0.28f
 private const val SHEET_MAX_HEIGHT_FRACTION = 0.6f
 private const val MAP_ZOOM = 15.5f
 
@@ -140,7 +137,7 @@ fun MemoryScreen(
                     onDismissRequest = onSheetDismiss
                 )
 
-                MemorySheet.DELETE -> DeleteMemorySheet(
+                MemorySheet.DELETE -> DeleteMemoryDialog(
                     title = uiState.memory.title,
                     onConfirmClick = onDeleteConfirm,
                     onDismissRequest = onSheetDismiss
@@ -169,70 +166,61 @@ private fun MemoryContent(
     val density = LocalDensity.current
     var sheetHeight by remember { mutableStateOf(0.dp) }
 
-    BoxWithConstraints(
+    Column(
         modifier = modifier
             .fillMaxSize()
             .background(HereTheme.colors.background)
     ) {
-        Box(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(bottom = mapBottomPadding(sheetHeight))
+        HereContextTopAppBar(
+            title = stringResource(R.string.memory_title),
+            navigationContentDescription = stringResource(R.string.memory_back),
+            onNavigateBack = onBackClick
         ) {
-            YandexMap(
-                modifier = Modifier.fillMaxSize(),
-                interactive = false,
-                locationEnabled = false,
-                isDarkTheme = LocalAppDarkTheme.current,
-                startPosition = MapPoint(memory.latitude, memory.longitude),
-                startZoom = MAP_ZOOM
-            )
-
-            MemoryPin(
-                emotion = memory.emotion,
-                modifier = Modifier.align(Alignment.Center)
+            TopAppBarAction(
+                icon = DesignSystemR.drawable.ic_more,
+                contentDescription = stringResource(R.string.memory_more),
+                onClick = onMoreClick
             )
         }
 
-        TopScrim(modifier = Modifier.align(Alignment.TopCenter))
-
-        HereIconButton(
-            icon = DesignSystemR.drawable.ic_arrow_back,
-            contentDescription = stringResource(R.string.memory_back),
-            onClick = onBackClick,
+        BoxWithConstraints(
             modifier = Modifier
-                .align(Alignment.TopStart)
-                .statusBarsPadding()
-                .padding(
-                    top = HereSize.Memory.actionsTopPadding,
-                    start = HereSize.Memory.actionsHorizontalPadding
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(bottom = mapBottomPadding(sheetHeight))
+            ) {
+                YandexMap(
+                    modifier = Modifier.fillMaxSize(),
+                    interactive = false,
+                    locationEnabled = false,
+                    isDarkTheme = LocalAppDarkTheme.current,
+                    startPosition = MapPoint(memory.latitude, memory.longitude),
+                    startZoom = MAP_ZOOM,
+                    logoPlacement = MapLogoPlacement.BelowTopBar
                 )
-        )
 
-        HereIconButton(
-            icon = DesignSystemR.drawable.ic_more,
-            contentDescription = stringResource(R.string.memory_more),
-            onClick = onMoreClick,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .statusBarsPadding()
-                .padding(
-                    top = HereSize.Memory.actionsTopPadding,
-                    end = HereSize.Memory.actionsHorizontalPadding
+                MemoryPin(
+                    emotion = memory.emotion,
+                    modifier = Modifier.align(Alignment.Center)
                 )
-        )
+            }
 
-        MemoryDetailSheet(
-            memory = memory,
-            address = address,
-            onMediaClick = onMediaClick,
-            modifier = Modifier
-                .align(Alignment.BottomCenter)
-                .heightIn(max = maxHeight * SHEET_MAX_HEIGHT_FRACTION)
-                .onSizeChanged { size ->
-                    sheetHeight = with(density) { size.height.toDp() }
-                }
-        )
+            MemoryDetailSheet(
+                memory = memory,
+                address = address,
+                onMediaClick = onMediaClick,
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .heightIn(max = maxHeight * SHEET_MAX_HEIGHT_FRACTION)
+                    .onSizeChanged { size ->
+                        sheetHeight = with(density) { size.height.toDp() }
+                    }
+            )
+        }
     }
 }
 
@@ -266,22 +254,7 @@ private fun MemoryPin(
     }
 }
 
-/** Затемнение под статус-баром: на светлой карте иначе не видно ни часов, ни кнопки. */
-@Composable
-private fun TopScrim(modifier: Modifier = Modifier) {
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .height(HereSize.Memory.scrimHeight)
-            .background(
-                Brush.verticalGradient(
-                    listOf(Color.Black.copy(alpha = SCRIM_ALPHA), Color.Transparent)
-                )
-            )
-    )
-}
-
-/** Лист с рассказом: эмоция, заголовок, когда и где это было, текст и медиа. */
+/** Лист с рассказом: эмоция, заголовок, когда и где это было, текст и медиа, если они есть. */
 @Composable
 private fun MemoryDetailSheet(
     memory: Memory,
@@ -295,8 +268,7 @@ private fun MemoryDetailSheet(
         verticalArrangement = Arrangement.spacedBy(HereSize.Memory.sheetSpacing),
         modifier = modifier
             .fillMaxWidth()
-            .sheetShadow(HereShape.sheetDetail)
-            .clip(HereShape.sheetDetail)
+            .clip(HereShape.sheet)
             .background(colors.background)
             .verticalScroll(rememberScrollState())
             .navigationBarsPadding()
@@ -315,7 +287,7 @@ private fun MemoryDetailSheet(
 
             Text(
                 text = memory.title,
-                style = MaterialTheme.typography.headlineMedium,
+                style = MaterialTheme.typography.titleLarge,
                 color = colors.textPrimary
             )
 
@@ -334,14 +306,16 @@ private fun MemoryDetailSheet(
             )
         }
 
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(HereSize.Memory.dividerThickness)
-                .background(colors.outline)
-        )
+        if (memory.media.isNotEmpty()) {
+            Box(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(HereSize.Memory.dividerThickness)
+                    .background(colors.outline)
+            )
 
-        MediaSection(media = memory.media, onMediaClick = onMediaClick)
+            MediaSection(media = memory.media, onMediaClick = onMediaClick)
+        }
     }
 }
 
@@ -351,23 +325,6 @@ private fun MediaSection(
     onMediaClick: (Int) -> Unit
 ) {
     val colors = HereTheme.colors
-
-    if (media.isEmpty()) {
-        Column(verticalArrangement = Arrangement.spacedBy(HereSize.Memory.mediaTextSpacing)) {
-            Text(
-                text = stringResource(R.string.memory_no_media_title),
-                style = MaterialTheme.typography.titleMedium,
-                color = colors.textPrimary
-            )
-
-            Text(
-                text = stringResource(R.string.memory_no_media_subtitle),
-                style = MaterialTheme.typography.bodySmall,
-                color = colors.textSecondary
-            )
-        }
-        return
-    }
 
     Column(verticalArrangement = Arrangement.spacedBy(HereSize.Memory.mediaSpacing)) {
         Text(

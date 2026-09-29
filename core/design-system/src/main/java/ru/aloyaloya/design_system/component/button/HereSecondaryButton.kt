@@ -11,7 +11,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.unit.Dp
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -24,14 +23,12 @@ import ru.aloyaloya.design_system.theme.HereTheme
  * @param text Подпись кнопки.
  * @param onClick Колбэк нажатия.
  * @param modifier [Modifier], применяемый к кнопке.
- * @param height Высота кнопки: в листах она ниже, чем на экране.
  */
 @Composable
 fun HereSecondaryButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    height: Dp = HereSize.PrimaryButton.height
+    modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
 
@@ -39,7 +36,7 @@ fun HereSecondaryButton(
         contentAlignment = Alignment.Center,
         modifier = modifier
             .fillMaxWidth()
-            .height(height)
+            .height(HereSize.PrimaryButton.height)
             .clip(HereShape.pill)
             .background(colors.surfaceMuted)
             .clickable(onClick = onClick)

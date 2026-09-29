@@ -42,8 +42,6 @@ import ru.aloyaloya.design_system.component.media.MediaAddTile
 import ru.aloyaloya.design_system.component.media.MediaTile
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.component.topbar.HereModalTopBar
-import ru.aloyaloya.design_system.component.topbar.HereModalTopBarAction
-import ru.aloyaloya.design_system.extension.cardShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
@@ -73,7 +71,7 @@ import ru.aloyaloya.design_system.R as DesignSystemR
 private const val ADDRESS_INITIAL_SCALE = 0.8f
 
 /** Дата занимает больше места, чем время: «15 июля 2026» против «19:30». */
-private const val DATE_WEIGHT = 1.35f
+private const val DATE_WEIGHT = 1.8f
 private const val TIME_WEIGHT = 1f
 
 /** Сколько файлов можно прикрепить к одному воспоминанию. */
@@ -88,8 +86,8 @@ private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguage
  * Форма воспоминания: и нового, и уже записанного.
  *
  * Открывается поверх карты после выбора эмоции или с экрана воспоминания, поэтому
- * у нее своя панель сверху и нет нижней навигации. Сохранить можно и действием
- * в панели, и кнопкой внизу: так в макете.
+ * у нее своя панель сверху и нет нижней навигации. Панель только закрывает форму,
+ * сохранение живет в кнопке внизу — одно действие, один орган управления.
  *
  * Чем форма занята, она узнает по [MemoryFormUiState.editing]: меняются только
  * заголовок панели и подпись кнопки, поля везде одни и те же.
@@ -130,27 +128,13 @@ fun MemoryFormScreen(
         modifier = modifier
             .fillMaxSize()
             .background(HereTheme.colors.background)
-            .imePadding()
     ) {
         HereModalTopBar(
             title = stringResource(
                 if (uiState.editing) R.string.memory_form_title_edit
                 else R.string.memory_form_title_new
             ),
-            navigation = {
-                HereModalTopBarAction(
-                    text = stringResource(R.string.memory_form_cancel),
-                    onClick = onCancelClick
-                )
-            },
-            action = {
-                HereModalTopBarAction(
-                    text = stringResource(R.string.memory_form_done),
-                    onClick = onSaveClick,
-                    accent = true,
-                    enabled = uiState.saveEnabled
-                )
-            }
+            onCloseClick = onCancelClick
         )
 
         Column(
@@ -158,6 +142,7 @@ fun MemoryFormScreen(
             modifier = Modifier
                 .weight(1f)
                 .verticalScroll(rememberScrollState())
+                .imePadding()
                 .padding(horizontal = HereSpacing.screenHorizontal)
                 .padding(vertical = HereSpacing.s)
         ) {
@@ -182,7 +167,7 @@ fun MemoryFormScreen(
                 HereTextField(
                     value = uiState.title,
                     onValueChange = onTitleChanged,
-                    placeholder = stringResource(R.string.memory_form_title_placeholder),
+                    label = stringResource(R.string.memory_form_title_label),
                     textStyle = MaterialTheme.typography.titleSmall,
                     singleLine = true
                 )
@@ -190,7 +175,7 @@ fun MemoryFormScreen(
                 HereTextField(
                     value = uiState.description,
                     onValueChange = onDescriptionChanged,
-                    placeholder = stringResource(R.string.memory_form_description_placeholder),
+                    label = stringResource(R.string.memory_form_description_label),
                     minHeight = HereSize.TextField.multilineMinHeight
                 )
 
@@ -219,6 +204,7 @@ fun MemoryFormScreen(
     when (uiState.activeSheet) {
         MemoryFormSheet.DATE -> DateSheet(
             initialDate = uiState.happenedAt.toLocalDate(),
+            emotionByDate = uiState.emotionByDate,
             onDismissRequest = onSheetDismiss,
             onDateSelected = onDateSelected
         )
@@ -301,8 +287,7 @@ private fun PlacePreview(
         modifier = Modifier
             .fillMaxWidth()
             .height(HereSize.PlacePreview.height)
-            .cardShadow(HereShape.card)
-            .clip(HereShape.card)
+            .clip(HereShape.tile)
             .background(colors.surfaceMuted)
     ) {
         if (point != null) {
@@ -345,7 +330,7 @@ private fun PlacePreview(
                 style = MaterialTheme.typography.titleMedium,
                 color = colors.textPrimary,
                 modifier = Modifier
-                    .clip(HereShape.chip)
+                    .clip(HereShape.tile)
                     .background(colors.surface)
                     .padding(
                         vertical = HereSize.PlacePreview.addressVerticalPadding,

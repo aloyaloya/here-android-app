@@ -8,16 +8,11 @@ import android.view.animation.OvershootInterpolator
 import androidx.activity.compose.BackHandler
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.EnterTransition
-import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
-import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,9 +44,9 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.map.R
 import ru.aloyaloya.map.model.MapUiState
 import ru.aloyaloya.map.presentation.component.PlaceMemoriesSheet
-import ru.aloyaloya.map.presentation.component.PlacePickerPanel
 import ru.aloyaloya.map.presentation.component.PlacePin
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapMarker
@@ -70,8 +65,6 @@ import ru.aloyaloya.design_system.R as DesignSystemR
 private const val USER_LOCATION_ACCURACY_ALPHA = 0.10f
 
 /** Кнопка внизу сначала сжимается, и только следом вырастает то, что ее сменяет. */
-private const val ACTIONS_EXIT_MILLIS = 180
-private const val ACTIONS_ENTER_MILLIS = 280
 
 /** Кнопки, плашка и прицел растут и сжимаются так же, как метки на карте. */
 private const val RESIZE_MILLIS = 260
@@ -97,23 +90,23 @@ private fun Context.hasLocationPermission(): Boolean =
  * это то место, которое пользователь видел под прицелом.
  *
  * @param uiState Состояние экрана.
+ * @param picking Включен ли режим выбора места. Режимом владеет приложение: он подменяет
+ * панели, поэтому экран о нем сообщает, но не хранит.
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: отдает наверх эмоцию
  * и выбранную точку.
  * @param onMemoryClick Колбэк нажатия на метку воспоминания: с карты сразу
  * открывается экран воспоминания. Воспоминания в одной точке сперва показываются списком.
  * @param onPickStart Колбэк входа в режим выбора места.
  * @param onPickCancel Колбэк выхода из режима выбора места.
- * @param onPickPointChanged Колбэк остановки камеры в режиме выбора: по точке
- * определяется адрес.
  */
 @Composable
 fun MapScreen(
     uiState: MapUiState,
+    picking: Boolean,
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
     onMemoryClick: (Long) -> Unit,
     onPickStart: () -> Unit,
-    onPickCancel: () -> Unit,
-    onPickPointChanged: (MapPoint) -> Unit
+    onPickCancel: () -> Unit
 ) {
     val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
@@ -150,7 +143,6 @@ fun MapScreen(
             var cameraMoving by remember { mutableStateOf(false) }
             var placeMemoryIds by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
             val mapState = rememberYandexMapState()
-            val picking = uiState.picking != null
 
             BackHandler(enabled = picking, onBack = onPickCancel)
 
@@ -162,22 +154,16 @@ fun MapScreen(
                 }
             }
 
-            LaunchedEffect(picking) {
-                if (picking) mapState.cameraTarget?.let(onPickPointChanged)
-            }
-
             Box(modifier = Modifier.fillMaxSize()) {
                 MapContent(
                     uiState = uiState,
                     mapState = mapState,
+                    picking = picking,
                     locationEnabled = locationGranted && !picking,
                     isDarkTheme = isDarkTheme,
                     onMarkerClick = onMemoryClick,
                     onClusterClick = { ids -> placeMemoryIds = ids },
-                    onCameraMove = { point, settled ->
-                        cameraMoving = !settled
-                        if (settled && picking) onPickPointChanged(point)
-                    },
+                    onCameraMove = { _, settled -> cameraMoving = !settled },
                     modifier = Modifier.fillMaxSize()
                 )
 
@@ -202,11 +188,11 @@ fun MapScreen(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(HereSize.Fab.stackSpacing),
                     modifier = Modifier
-                        .align(Alignment.BottomCenter)
-                        .fillMaxWidth()
+                        .align(Alignment.BottomEnd)
                         .navigationBarsPadding()
+                        .padding(bottom = HereSize.NavBar.height)
                         .padding(horizontal = HereSize.Fab.endMargin)
-                        .padding(bottom = HereSize.Fab.bottomMargin)
+                        .padding(bottom = HereSize.Fab.barSpacing)
                 ) {
                     AnimatedVisibility(
                         visible = locationGranted && mapState.awayFromUser,
@@ -216,43 +202,21 @@ fun MapScreen(
                         LocationFab(onClick = onLocationClick)
                     }
 
-                    AnimatedContent(
-                        targetState = uiState.picking,
-                        transitionSpec = {
-                            EnterTransition.None togetherWith ExitTransition.None using
-                                SizeTransform(clip = false)
-                        },
-                        contentAlignment = Alignment.BottomEnd,
-                        contentKey = { state -> state != null },
-                        label = "map-actions"
-                    ) { pickingState ->
-                        val origin = if (pickingState == null) TransformOrigin.Center else BottomOrigin
-                        val resize = Modifier.animateEnterExit(
-                            enter = scaleIn(
-                                tween(ACTIONS_ENTER_MILLIS, ACTIONS_EXIT_MILLIS, GrowEasing),
-                                transformOrigin = origin
-                            ),
-                            exit = scaleOut(
-                                tween(ACTIONS_EXIT_MILLIS, easing = ShrinkEasing),
-                                transformOrigin = origin
-                            )
-                        )
-
-                        if (pickingState == null) {
-                            HereFab(onClick = onPickStart, modifier = resize)
-                        } else {
-                            PlacePickerPanel(
-                                modifier = resize,
-                                address = pickingState.address,
-                                resolving = pickingState.resolving,
-                                onCancel = onPickCancel,
-                                onConfirm = {
-                                    pickedPoint = mapState.cameraTarget
-                                    emotionPickerVisible = true
-                                }
-                            )
+                    /**
+                     * Одна кнопка на оба состояния: в режиме выбора места она не
+                     * сменяется другой, а растягивается в подпись.
+                     */
+                    HereFab(
+                        text = stringResource(R.string.place_picker_here).takeIf { picking },
+                        onClick = {
+                            if (picking) {
+                                pickedPoint = mapState.cameraTarget
+                                emotionPickerVisible = true
+                            } else {
+                                onPickStart()
+                            }
                         }
-                    }
+                    )
                 }
             }
 
@@ -309,6 +273,7 @@ private fun LocationFab(onClick: () -> Unit) {
 private fun MapContent(
     uiState: MapUiState.Content,
     mapState: YandexMapState,
+    picking: Boolean,
     locationEnabled: Boolean,
     isDarkTheme: Boolean,
     onMarkerClick: (Long) -> Unit,
@@ -340,7 +305,7 @@ private fun MapContent(
         locationEnabled = locationEnabled,
         isDarkTheme = isDarkTheme,
         markers = markers,
-        markersVisible = uiState.picking == null,
+        markersVisible = !picking,
         onMarkerClick = onMarkerClick,
         onClusterClick = onClusterClick,
         onCameraMove = onCameraMove,

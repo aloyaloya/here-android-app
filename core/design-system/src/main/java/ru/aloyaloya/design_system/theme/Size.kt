@@ -27,30 +27,29 @@ object HereSize {
 
     /** Верхняя панель. */
     object TopAppBar {
-        val height = 74.dp
-        val horizontalMargin = 18.dp
-        val topMargin = 4.dp
-        val contentPadding = 11.dp
-        val titlePadding = 24.dp
-        val actionSize = 52.dp
+        val height = 64.dp
+        val contentPadding = 4.dp
+        val titlePadding = 16.dp
+        val actionSize = 48.dp
         val actionIconSize = 24.dp
     }
 
     /** Нижняя панель навигации. */
     object NavBar {
-        val height = 82.dp
-        val horizontalMargin = 22.dp
-        val bottomMargin = 20.dp
-        val itemIconSize = 28.dp
-        val itemIconLabelSpacing = 5.dp
+        val height = 80.dp
+        val itemIconSize = 24.dp
+        val itemIconLabelSpacing = 4.dp
+        val indicatorWidth = 64.dp
+        val indicatorHeight = 32.dp
     }
 
     /** FAB-кнопка. */
     object Fab {
-        val size = 72.dp
-        val iconSize = 28.dp
+        val size = 56.dp
+        val iconSize = 24.dp
         val endMargin = 18.dp
-        val bottomMargin = 126.dp
+        val barSpacing = 24.dp
+        val extendedPadding = 22.dp
         val stackSpacing = 14.dp
     }
 
@@ -62,11 +61,8 @@ object HereSize {
         val handleWidth = 48.dp
         val handleHeight = 5.dp
         val handleVerticalPadding = 17.dp
-        val actionHeight = 52.dp
         val actionSpacing = 10.dp
         val titleSpacing = 3.dp
-        val titleLabelSize = 12f.sp
-        val titleLabelLetterSpacing = 1.2f.sp
         val titleValueSize = 28.sp
     }
 
@@ -74,28 +70,29 @@ object HereSize {
     object Calendar {
         val gridSpacing = 6.dp
         val navButtonSize = 40.dp
+        val navIconSize = 20.dp
         val navButtonSpacing = 8.dp
         val selectedBorder = 1.5.dp
+        val pinSize = 33.dp
+        val pinBorder = 1.dp
+        val pinEmojiSize = 18f.sp
         val monthSize = 18.sp
         val weekdaySize = 10.5f.sp
         val daySize = 17.sp
     }
 
-    /** Барабаны в листе выбора времени. */
+    /** Барабан выбора времени и чипы частого времени над ним. */
     object TimeWheel {
-        val cardHeight = 172.dp
+        val cardHeight = 132.dp
         val itemHeight = 36.dp
-        val bandHeight = 48.dp
+        val bandHeight = 44.dp
         val bandHorizontalMargin = 14.dp
-        val fadeHeight = 44.dp
         val colonWidth = 22.dp
         val chipSpacing = 6.dp
         val chipVerticalPadding = 10.dp
         val chipHorizontalPadding = 12.dp
-        val selectedSize = 30.sp
-        val nearSize = 19.sp
-        val farSize = 15.sp
-        val colonSize = 26.sp
+        val itemSize = 24.sp
+        val colonSize = 24.sp
         val chipSize = 16f.sp
     }
 
@@ -140,7 +137,7 @@ object HereSize {
         val textSpacing = 3.dp
     }
 
-    /** Режим выбора места на карте: прицел по центру и панель с адресом. */
+    /** Режим выбора места на карте: прицел по центру. */
     object PlacePicker {
         val pinHeight = 52.dp
         val pinSize = 30.dp
@@ -149,25 +146,26 @@ object HereSize {
         val pinStemHeight = 14.dp
         val pinAnchor = 8.dp
         val pinLift = 10.dp
-        val panelPadding = 20.dp
-        val panelSpacing = 16.dp
-        val actionSpacing = 10.dp
-        val actionHeight = 52.dp
-        val addressSpacing = 3.dp
     }
 
     /** Панель модального экрана. */
     object ModalTopBar {
-        val horizontalPadding = 27.dp
-        val topPadding = 19.dp
-        val bottomPadding = 12.dp
+        val horizontalPadding = 8.dp
+        val topPadding = 8.dp
+        val bottomPadding = 8.dp
+        val closeSize = 48.dp
+        val closeIconSize = 24.dp
+        val titleSpacing = 16.dp
     }
 
     /** Поле ввода. */
     object TextField {
-        val verticalPadding = 16.dp
+        val verticalPadding = 12.dp
         val horizontalPadding = 20.dp
         val multilineMinHeight = 111.dp
+        val labelSlot = 16.dp
+        val labelSize = 12.sp
+        val focusBorder = 2.dp
     }
 
     /** Плашка даты или времени события. */
@@ -178,8 +176,9 @@ object HereSize {
         val labelSpacing = 1.dp
         val iconSize = 24.dp
         val spacing = 8.dp
-        val labelSize = 10.sp
-        val labelLetterSpacing = 0.8.sp
+
+        /** Кегль подписи общий с полем ввода: это одна и та же подпись над значением. */
+        val labelSize = 12.sp
     }
 
     /** Плитка медиа: превью снимка и кнопка добавления. */
@@ -191,21 +190,13 @@ object HereSize {
         val addGap = 5.dp
         val removeSize = 26.dp
         val removeIconSize = 11.dp
-        val removeMargin = 6.dp
-    }
-
-    /** Компактная кнопка на приглушенном акцентном фоне. */
-    object TonalButton {
-        val height = 52.dp
-        val horizontalPadding = 22.dp
-        val iconSize = 20.dp
-        val iconSpacing = 8.dp
+        val removeTouchSize = 38.dp
     }
 
     /** Круглая кнопка с иконкой поверх карты или фотографии. */
     object IconButton {
-        val size = 48.dp
-        val iconSize = 22.dp
+        val size = 40.dp
+        val iconSize = 24.dp
         val backgroundAlpha = 0.94f
     }
 
@@ -246,37 +237,28 @@ object HereSize {
         val pinSize = 94.dp
         val pinBorder = 5.dp
         val pinEmojiSize = 44.sp
-        val scrimHeight = 133.dp
-        val sheetCornerOverlap = 30.dp
-        val actionsHorizontalPadding = 22.dp
-        val actionsTopPadding = 12.dp
+        val sheetCornerOverlap = 28.dp
         val sheetHorizontalPadding = 27.dp
         val sheetTopPadding = 22.dp
         val sheetBottomPadding = 32.dp
         val sheetSpacing = 17.dp
         val headerSpacing = 6.dp
-        val mediaTextSpacing = 3.dp
         val mediaSpacing = 10.dp
         val mediaSize = 107.dp
         val dividerThickness = 1.dp
     }
 
-    /** Лист подтверждения необратимого действия. */
-    object ConfirmSheet {
-        val iconSize = 68.dp
-        val iconSymbolSize = 31.sp
-        val contentSpacing = 14.dp
-        val actionSpacing = 10.dp
-    }
-
     /** Пункт меню в листе действий. */
     object SheetAction {
         val height = 60.dp
+        val iconSize = 24.dp
         val iconSpacing = 14.dp
     }
 
     /** Основная кнопка. */
     object PrimaryButton {
-        val height = 65.dp
+        val height = 56.dp
+        val disabledContainerAlpha = 0.12f
+        val disabledContentAlpha = 0.38f
     }
 }

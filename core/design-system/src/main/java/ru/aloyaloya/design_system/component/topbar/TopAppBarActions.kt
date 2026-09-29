@@ -1,5 +1,6 @@
 package ru.aloyaloya.design_system.component.topbar
 
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.animateFloatAsState
@@ -7,9 +8,7 @@ import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.size
@@ -17,9 +16,9 @@ import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -51,10 +50,7 @@ fun TopAppBarActions(
 }
 
 /**
- * Круглая кнопка переключения темы.
- *
- * Показывает солнце или луну в зависимости от [darkTheme], смена иконки анимирована.
- * Ripple отключен: обратная связь — сама анимация иконки.
+ * Кнопка переключения темы.
  *
  * @param darkTheme Если `true`, отображается иконка солнца (переход к светлой теме).
  * @param onThemeChange Вызывается при нажатии на кнопку.
@@ -75,15 +71,8 @@ private fun TopAppBarThemeToggle(
     Box(
         modifier = modifier
             .size(HereSize.TopAppBar.actionSize)
-            .background(
-                color = HereTheme.colors.surfaceMuted,
-                shape = CircleShape
-            )
-            .clickable(
-                interactionSource = remember { MutableInteractionSource() },
-                indication = null,
-                onClick = onThemeChange
-            ),
+            .clip(CircleShape)
+            .clickable(onClick = onThemeChange),
         contentAlignment = Alignment.Center
     ) {
         AnimatedContent(
@@ -103,5 +92,35 @@ private fun TopAppBarThemeToggle(
                     .rotate(iconRotation)
             )
         }
+    }
+}
+/**
+ * Кнопка-иконка верхней панели.
+ *
+ * @param icon Иконка кнопки.
+ * @param contentDescription Описание действия для программ чтения с экрана.
+ * @param onClick Колбэк нажатия.
+ * @param modifier [Modifier], применяемый к кнопке.
+ */
+@Composable
+fun TopAppBarAction(
+    @DrawableRes icon: Int,
+    contentDescription: String?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Box(
+        contentAlignment = Alignment.Center,
+        modifier = modifier
+            .size(HereSize.TopAppBar.actionSize)
+            .clip(CircleShape)
+            .clickable(onClick = onClick)
+    ) {
+        Icon(
+            painter = painterResource(icon),
+            tint = HereTheme.colors.textPrimary,
+            contentDescription = contentDescription,
+            modifier = Modifier.size(HereSize.TopAppBar.actionIconSize)
+        )
     }
 }

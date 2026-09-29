@@ -36,6 +36,10 @@ class MemoryFormViewModel @Inject constructor(
 
     private var edited: Memory? = null
 
+    init {
+        observeEmotionByDate()
+    }
+
     fun setArgs(args: MemoryFormArgs) {
         if (this.args != null) return
         this.args = args
@@ -122,6 +126,20 @@ class MemoryFormViewModel @Inject constructor(
             if (edited == null) memoryRepository.create(memory) else memoryRepository.update(memory)
 
             _uiState.update { it.copy(saving = false, saved = true) }
+        }
+    }
+
+    private fun observeEmotionByDate() {
+        viewModelScope.launch {
+            memoryRepository.observeAll().collect { memories ->
+                val emotionByDate = memories
+                    .groupBy { memory -> memory.happenedAt.toLocalDateTime().toLocalDate() }
+                    .mapValues { (_, dayMemories) ->
+                        dayMemories.maxBy(Memory::happenedAt).emotion
+                    }
+
+                _uiState.update { it.copy(emotionByDate = emotionByDate) }
+            }
         }
     }
 

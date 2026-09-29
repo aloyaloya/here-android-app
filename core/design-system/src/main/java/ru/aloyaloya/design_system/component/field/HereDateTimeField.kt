@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 
@@ -30,7 +31,7 @@ import ru.aloyaloya.design_system.theme.HereTheme
  *
  * Ширину задает вызывающая сторона: в ряду дата обычно шире времени.
  *
- * @param label Подпись над значением. Регистр приводит сам компонент.
+ * @param label Подпись над значением.
  * @param value Значение — дата или время в готовом для показа виде.
  * @param icon Иконка справа от значения.
  * @param onClick Колбэк нажатия.
@@ -45,7 +46,7 @@ fun HereDateTimeField(
     modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
-    val shape = MaterialTheme.shapes.medium
+    val shape = HereShape.tile
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -61,10 +62,9 @@ fun HereDateTimeField(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(HereSize.DateTimeField.labelSpacing)) {
             Text(
-                text = label.uppercase(),
+                text = label,
                 style = MaterialTheme.typography.labelSmall.copy(
-                    fontSize = HereSize.DateTimeField.labelSize,
-                    letterSpacing = HereSize.DateTimeField.labelLetterSpacing
+                    fontSize = HereSize.DateTimeField.labelSize
                 ),
                 color = colors.textSecondary
             )
@@ -82,7 +82,7 @@ fun HereDateTimeField(
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
-            tint = colors.accent,
+            tint = colors.textSecondary,
             modifier = Modifier.size(HereSize.DateTimeField.iconSize)
         )
     }

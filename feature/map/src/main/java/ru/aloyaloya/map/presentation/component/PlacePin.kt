@@ -16,7 +16,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
-import ru.aloyaloya.design_system.extension.cardShadow
+import ru.aloyaloya.design_system.extension.overlayShadow
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 
@@ -63,7 +63,7 @@ fun PlacePin(
             Box(
                 modifier = Modifier
                     .size(sizes.pinSize)
-                    .cardShadow(CircleShape)
+                    .overlayShadow(CircleShape)
                     .background(color = colors.accent, shape = CircleShape)
                     .border(width = sizes.pinBorder, color = colors.surface, shape = CircleShape)
             )

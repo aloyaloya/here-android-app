@@ -56,7 +56,6 @@ data class HereColors(
     val accentContainer: Color,
     val onAccent: Color,
     val danger: Color,
-    val dangerContainer: Color,
     val emotions: EmotionColors,
 
     /** Темная ли палитра. В темной теме тени заменяются обводкой цветом [outline]. */
@@ -77,7 +76,6 @@ val LightHereColors = HereColors(
     accentContainer = LightAccentContainer,
     onAccent = LightOnAccent,
     danger = LightDanger,
-    dangerContainer = LightDangerContainer,
     emotions = EmotionColors(
         happy = EmotionColor(LightHappySolid, LightHappySoft),
         tender = EmotionColor(LightTenderSolid, LightTenderSoft),
@@ -103,7 +101,6 @@ val DarkHereColors = HereColors(
     accentContainer = DarkAccentContainer,
     onAccent = DarkOnAccent,
     danger = DarkDanger,
-    dangerContainer = DarkDangerContainer,
     emotions = EmotionColors(
         happy = EmotionColor(DarkHappySolid, DarkHappySoft),
         tender = EmotionColor(DarkTenderSolid, DarkTenderSoft),

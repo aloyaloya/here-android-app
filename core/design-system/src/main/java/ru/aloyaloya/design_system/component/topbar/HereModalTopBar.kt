@@ -6,34 +6,40 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
+import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
- * Панель модального экрана: заголовок по центру и текстовые действия по краям.
+ * Панель модального экрана: крестик и заголовок слева.
  *
- * В отличие от [TopAppBar] панель встроена в поток экрана и без фона: под ней идет
- * контент, который скроллится, а не карта.
+ * В отличие от [TopAppBar] панель встроена в поток экрана и без фона.
  *
  * @param title Заголовок экрана.
+ * @param onCloseClick Колбэк закрытия экрана.
  * @param modifier Внешний [Modifier] панели.
- * @param navigation Действие слева, обычно отмена.
- * @param action Действие справа, обычно подтверждение.
  */
 @Composable
 fun HereModalTopBar(
     title: String,
-    modifier: Modifier = Modifier,
-    navigation: @Composable () -> Unit = {},
-    action: @Composable () -> Unit = {}
+    onCloseClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Box(
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(HereSize.ModalTopBar.titleSpacing),
         modifier = modifier
             .statusBarsPadding()
             .fillMaxWidth()
@@ -43,53 +49,25 @@ fun HereModalTopBar(
                 bottom = HereSize.ModalTopBar.bottomPadding
             )
     ) {
-        Row(
-            modifier = Modifier.fillMaxWidth(),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(HereSize.ModalTopBar.closeSize)
+                .clip(CircleShape)
+                .clickable(onClick = onCloseClick)
         ) {
-            navigation()
-            action()
+            Icon(
+                painter = painterResource(R.drawable.ic_close),
+                contentDescription = stringResource(R.string.modal_close_content_description),
+                tint = HereTheme.colors.textPrimary,
+                modifier = Modifier.size(HereSize.ModalTopBar.closeIconSize)
+            )
         }
 
         Text(
             text = title,
             style = MaterialTheme.typography.titleLarge,
-            color = HereTheme.colors.textPrimary,
-            modifier = Modifier.align(Alignment.Center)
+            color = HereTheme.colors.textPrimary
         )
     }
-}
-
-/**
- * Текстовое действие в [HereModalTopBar].
- *
- * @param text Подпись действия.
- * @param onClick Колбэк нажатия.
- * @param modifier [Modifier], применяемый к подписи.
- * @param accent Выделять ли действие акцентным цветом. Так помечается основное действие.
- * @param enabled Активно ли действие.
- */
-@Composable
-fun HereModalTopBarAction(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    accent: Boolean = false,
-    enabled: Boolean = true
-) {
-    val colors = HereTheme.colors
-
-    val color = when {
-        !enabled -> colors.textTertiary
-        accent -> colors.accent
-        else -> colors.textSecondary
-    }
-
-    Text(
-        text = text,
-        style = MaterialTheme.typography.titleSmall,
-        color = color,
-        modifier = modifier.clickable(enabled = enabled, onClick = onClick)
-    )
 }

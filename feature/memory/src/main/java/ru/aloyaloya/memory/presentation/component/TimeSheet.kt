@@ -32,13 +32,10 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
-import ru.aloyaloya.design_system.extension.cardShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -50,6 +47,10 @@ import kotlin.math.abs
 
 /** Шаг барабана минут: до минуты воспоминание уточнять незачем. */
 private const val MINUTE_STEP = 10
+
+/** Прозрачность соседних значений: кегль у всех один, удаление показывает только она. */
+private const val NEAR_ALPHA = 0.5f
+private const val FAR_ALPHA = 0.25f
 
 private val Hours = (0..23).toList()
 private val Minutes = (0..59 step MINUTE_STEP).toList()
@@ -135,16 +136,15 @@ private fun TimeWheels(
         modifier = Modifier
             .fillMaxWidth()
             .height(HereSize.TimeWheel.cardHeight)
-            .cardShadow(HereShape.card)
-            .clip(HereShape.card)
-            .background(colors.surface)
+            .clip(HereShape.tile)
+            .background(colors.surfaceMuted)
     ) {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(horizontal = HereSize.TimeWheel.bandHorizontalMargin)
                 .height(HereSize.TimeWheel.bandHeight)
-                .clip(MaterialTheme.shapes.medium)
+                .clip(HereShape.pill)
                 .background(colors.accentContainer)
         )
 
@@ -174,8 +174,6 @@ private fun TimeWheels(
                 modifier = Modifier.weight(1f)
             )
         }
-
-        WheelFades()
     }
 }
 
@@ -209,6 +207,7 @@ private fun Wheel(
 
     val currentOnSelect by rememberUpdatedState(onSelect)
 
+    // TODO: добавить хаптики
     LaunchedEffect(listState) {
         snapshotFlow { centerIndex }.collect { index ->
             values.getOrNull(index)?.let(currentOnSelect)
@@ -229,16 +228,10 @@ private fun Wheel(
         items(values.size) { index ->
             val distance = abs(index - centerIndex)
 
-            val fontSize = when (distance) {
-                0 -> HereSize.TimeWheel.selectedSize
-                1 -> HereSize.TimeWheel.nearSize
-                else -> HereSize.TimeWheel.farSize
-            }
-
-            val color = when (distance) {
-                0 -> colors.textPrimary
-                1 -> colors.textTertiary
-                else -> colors.textQuaternary
+            val alpha = when (distance) {
+                0 -> 1f
+                1 -> NEAR_ALPHA
+                else -> FAR_ALPHA
             }
 
             Box(
@@ -248,37 +241,13 @@ private fun Wheel(
                 Text(
                     text = values[index].toString().padStart(2, '0'),
                     style = MaterialTheme.typography.headlineSmall.copy(
-                        fontSize = fontSize,
+                        fontSize = HereSize.TimeWheel.itemSize,
                         fontWeight = if (distance == 0) FontWeight.ExtraBold else FontWeight.SemiBold
                     ),
-                    color = color
+                    color = colors.textPrimary.copy(alpha = alpha)
                 )
             }
         }
-    }
-}
-
-/** Растворение значений у верхнего и нижнего края карточки. */
-@Composable
-private fun WheelFades() {
-    val surface = HereTheme.colors.surface
-
-    Column(modifier = Modifier.fillMaxSize()) {
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(HereSize.TimeWheel.fadeHeight)
-                .background(Brush.verticalGradient(listOf(surface, Color.Transparent)))
-        )
-
-        Box(modifier = Modifier.weight(1f))
-
-        Box(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(HereSize.TimeWheel.fadeHeight)
-                .background(Brush.verticalGradient(listOf(Color.Transparent, surface)))
-        )
     }
 }
 
@@ -329,7 +298,7 @@ private fun QuickTimeChip(
         ),
         color = if (selected) colors.accent else colors.textSecondary,
         modifier = Modifier
-            .clip(HereShape.chip)
+            .clip(HereShape.tile)
             .background(if (selected) colors.accentContainer else colors.surfaceMuted)
             .clickable(onClick = onClick)
             .padding(
