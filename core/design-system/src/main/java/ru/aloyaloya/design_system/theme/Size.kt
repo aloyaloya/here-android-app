@@ -174,7 +174,7 @@ object HereSize {
         val verticalPadding = 12.dp
         val horizontalPadding = 14.dp
         val labelSpacing = 1.dp
-        val iconSize = 28.dp
+        val iconSize = 24.dp
         val spacing = 8.dp
 
         /** Кегль подписи общий с полем ввода: это одна и та же подпись над значением. */

@@ -81,7 +81,7 @@ fun HereDateTimeField(
         Icon(
             painter = painterResource(icon),
             contentDescription = null,
-            tint = colors.accent,
+            tint = colors.textSecondary,
             modifier = Modifier.size(HereSize.DateTimeField.iconSize)
         )
     }
