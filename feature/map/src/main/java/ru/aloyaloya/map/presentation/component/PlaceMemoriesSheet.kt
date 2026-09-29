@@ -1,11 +1,7 @@
 package ru.aloyaloya.map.presentation.component
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
@@ -13,14 +9,10 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.text.style.TextOverflow
-import ru.aloyaloya.design_system.component.emotion.EmotionBadge
+import ru.aloyaloya.design_system.component.memory.HereMemoryRow
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
-import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Memory
@@ -66,57 +58,21 @@ fun PlaceMemoriesSheet(
             )
 
             Column(
-                verticalArrangement = Arrangement.spacedBy(HereSize.PlaceMemories.rowSpacing),
+                verticalArrangement = Arrangement.spacedBy(HereSize.MemoryRow.spacing),
                 modifier = Modifier.verticalScroll(rememberScrollState())
             ) {
                 memories.forEach { memory ->
-                    PlaceMemoryRow(
-                        memory = memory,
+                    HereMemoryRow(
+                        emoji = memory.emotion.emoji,
+                        color = memory.emotion.color.soft,
+                        title = memory.title,
+                        subtitle = DateFormat.format(
+                            Instant.ofEpochMilli(memory.happenedAt).atZone(ZoneId.systemDefault())
+                        ),
                         onClick = { onMemoryClick(memory.id) }
                     )
                 }
             }
-        }
-    }
-}
-
-@Composable
-private fun PlaceMemoryRow(
-    memory: Memory,
-    onClick: () -> Unit
-) {
-    val sizes = HereSize.PlaceMemories
-
-    Row(
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(sizes.badgeSpacing),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(HereShape.tile)
-            .background(HereTheme.colors.surface)
-            .clickable(onClick = onClick)
-            .padding(sizes.rowPadding)
-    ) {
-        EmotionBadge(
-            emoji = memory.emotion.emoji,
-            color = memory.emotion.color.soft
-        )
-
-        Column(verticalArrangement = Arrangement.spacedBy(sizes.textSpacing)) {
-            Text(
-                text = memory.title,
-                style = MaterialTheme.typography.titleMedium,
-                color = HereTheme.colors.textPrimary,
-                maxLines = 1,
-                overflow = TextOverflow.Ellipsis
-            )
-            Text(
-                text = DateFormat.format(
-                    Instant.ofEpochMilli(memory.happenedAt).atZone(ZoneId.systemDefault())
-                ),
-                style = MaterialTheme.typography.bodySmall,
-                color = HereTheme.colors.textTertiary
-            )
         }
     }
 }
