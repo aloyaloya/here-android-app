@@ -33,6 +33,7 @@ fun HereNavHost(
     onPlacePickingChange: (Boolean) -> Unit,
     modifier: Modifier = Modifier
 ) {
+    // TODO: сделать анимацию перехода
     NavHost(
         navController = navController,
         startDestination = MapRoute,
