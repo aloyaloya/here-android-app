@@ -8,4 +8,6 @@
     <string name="media_video">Видео</string>
     <string name="modal_close_content_description">Закрыть</string>
     <string name="context_bar_back_content_description">Выйти из режима</string>
+    <string name="calendar_previous_month">Предыдущий месяц</string>
+    <string name="calendar_next_month">Следующий месяц</string>
 </resources>

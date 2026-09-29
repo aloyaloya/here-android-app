@@ -1,4 +1,4 @@
-package ru.aloyaloya.memory.model
+package ru.aloyaloya.design_system.component.calendar
 
 import java.time.DayOfWeek
 import java.time.LocalDate
@@ -13,7 +13,7 @@ const val DAYS_IN_WEEK = 7
  * Сетка начинается с понедельника недели, в которую попало первое число, поэтому
  * по краям в нее попадают дни соседних месяцев.
  *
- * Недель всегда шесть, даже если месяц укладывается в пять: иначе лист прыгал бы
+ * Недель всегда шесть, даже если месяц укладывается в пять: иначе календарь прыгал бы
  * по высоте при переходе с одного месяца на другой.
  */
 fun monthGrid(month: YearMonth): List<LocalDate> {

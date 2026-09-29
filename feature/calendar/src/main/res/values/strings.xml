@@ -2,4 +2,6 @@
 <resources>
     <string name="calendar_screen_title">Календарь</string>
     <string name="calendar_screen_label">Календарь</string>
+    <string name="calendar_day_empty">В этот день воспоминаний нет</string>
+    <string name="calendar_today">Сегодня</string>
 </resources>
