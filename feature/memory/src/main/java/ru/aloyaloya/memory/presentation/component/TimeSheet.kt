@@ -48,6 +48,10 @@ import kotlin.math.abs
 /** Шаг барабана минут: до минуты воспоминание уточнять незачем. */
 private const val MINUTE_STEP = 10
 
+/** Прозрачность соседних значений: кегль у всех один, удаление показывает только она. */
+private const val NEAR_ALPHA = 0.5f
+private const val FAR_ALPHA = 0.25f
+
 private val Hours = (0..23).toList()
 private val Minutes = (0..59 step MINUTE_STEP).toList()
 
@@ -224,16 +228,10 @@ private fun Wheel(
         items(values.size) { index ->
             val distance = abs(index - centerIndex)
 
-            val fontSize = when (distance) {
-                0 -> HereSize.TimeWheel.selectedSize
-                1 -> HereSize.TimeWheel.nearSize
-                else -> HereSize.TimeWheel.farSize
-            }
-
-            val color = when (distance) {
-                0 -> colors.textPrimary
-                1 -> colors.textTertiary
-                else -> colors.textQuaternary
+            val alpha = when (distance) {
+                0 -> 1f
+                1 -> NEAR_ALPHA
+                else -> FAR_ALPHA
             }
 
             Box(
@@ -243,10 +241,10 @@ private fun Wheel(
                 Text(
                     text = values[index].toString().padStart(2, '0'),
                     style = MaterialTheme.typography.headlineSmall.copy(
-                        fontSize = fontSize,
+                        fontSize = HereSize.TimeWheel.itemSize,
                         fontWeight = if (distance == 0) FontWeight.ExtraBold else FontWeight.SemiBold
                     ),
-                    color = color
+                    color = colors.textPrimary.copy(alpha = alpha)
                 )
             }
         }

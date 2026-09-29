@@ -92,10 +92,8 @@ object HereSize {
         val chipSpacing = 6.dp
         val chipVerticalPadding = 10.dp
         val chipHorizontalPadding = 12.dp
-        val selectedSize = 30.sp
-        val nearSize = 19.sp
-        val farSize = 15.sp
-        val colonSize = 26.sp
+        val itemSize = 24.sp
+        val colonSize = 24.sp
         val chipSize = 16f.sp
     }
 
