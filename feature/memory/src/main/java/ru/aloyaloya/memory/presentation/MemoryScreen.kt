@@ -48,6 +48,7 @@ import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.MemoryMedia
+import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.memory.R
@@ -198,7 +199,8 @@ private fun MemoryContent(
                     locationEnabled = false,
                     isDarkTheme = LocalAppDarkTheme.current,
                     startPosition = MapPoint(memory.latitude, memory.longitude),
-                    startZoom = MAP_ZOOM
+                    startZoom = MAP_ZOOM,
+                    logoPlacement = MapLogoPlacement.BelowTopBar
                 )
 
                 MemoryPin(

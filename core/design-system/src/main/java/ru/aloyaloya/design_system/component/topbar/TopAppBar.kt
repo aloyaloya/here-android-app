@@ -34,7 +34,7 @@ fun TopAppBar(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(HereTheme.colors.surface)
+            .background(HereTheme.colors.background)
             .statusBarsPadding()
             .height(HereSize.TopAppBar.height)
             .padding(

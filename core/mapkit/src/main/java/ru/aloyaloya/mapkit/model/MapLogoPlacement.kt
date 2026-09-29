@@ -22,10 +22,21 @@ data class MapLogoPlacement(
     val verticalInset: Dp
 ) {
     companion object {
+        private val TopBarHeight = 64.dp
+        private val TopBarGap = 22.dp
+
+        /** Карта уходит под верхнюю панель: логотип опущен на ее высоту. */
         val UnderTopBar = MapLogoPlacement(
             corner = MapLogoCorner.TOP_CENTER,
             horizontalInset = 0.dp,
-            verticalInset = 86.dp
+            verticalInset = TopBarHeight + TopBarGap
+        )
+
+        /** Карта начинается сразу под верхней панелью. */
+        val BelowTopBar = MapLogoPlacement(
+            corner = MapLogoCorner.TOP_CENTER,
+            horizontalInset = 0.dp,
+            verticalInset = TopBarGap
         )
 
         val Card = MapLogoPlacement(
