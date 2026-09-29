@@ -1,13 +1,19 @@
 package ru.aloyaloya.calendar.presentation
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
@@ -17,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -27,6 +34,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.launch
 import ru.aloyaloya.calendar.R
 import ru.aloyaloya.calendar.model.CalendarUiState
 import ru.aloyaloya.design_system.component.calendar.CalendarDayMark
@@ -46,7 +54,19 @@ import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
 import java.time.format.DateTimeFormatter
+import java.time.temporal.ChronoUnit
 import java.util.Locale
+
+/** Первый месяц, до которого можно долистать: от него считаются страницы. */
+private val FirstMonth = YearMonth.of(1900, 1)
+
+/** Сколько месяцев в листалке: хватает и назад, и вперед на любую жизнь. */
+private const val MONTH_COUNT = 12 * 300
+
+private fun monthAt(page: Int): YearMonth = FirstMonth.plusMonths(page.toLong())
+
+private val YearMonth.page: Int
+    get() = ChronoUnit.MONTHS.between(FirstMonth, this).toInt()
 
 private val DayFormat = DateTimeFormatter.ofPattern("d MMMM", Locale.forLanguageTag("ru"))
 private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"))
@@ -90,14 +110,25 @@ fun CalendarScreen(
  * а за всем этим фон в цвет настроения месяца.
  *
  * Сразу выбран сегодняшний день: экран открывается с тем, что было сегодня.
+ *
+ * Месяцы листаются свайпом: показанный месяц — это текущая страница [HorizontalPager],
+ * стрелки в шапке только двигают его.
  */
 @Composable
 private fun CalendarContent(
     uiState: CalendarUiState.Content,
     onMemoryClick: (Long) -> Unit
 ) {
-    var shownMonth by rememberSaveable { mutableStateOf(YearMonth.now()) }
-    var selectedDate by rememberSaveable { mutableStateOf(LocalDate.now()) }
+    val today = LocalDate.now()
+    var selectedDate by rememberSaveable { mutableStateOf(today) }
+
+    val pagerState = rememberPagerState(initialPage = YearMonth.from(today).page) { MONTH_COUNT }
+    val shownMonth = monthAt(pagerState.currentPage)
+    val scope = rememberCoroutineScope()
+
+    fun showMonth(month: YearMonth) {
+        scope.launch { pagerState.animateScrollToPage(month.page) }
+    }
 
     val markByDate = uiState.emotionByDate.mapValues { (_, emotion) ->
         CalendarDayMark(emoji = emotion.emoji, color = emotion.color.solid)
@@ -133,43 +164,74 @@ private fun CalendarContent(
         ) {
             HereMonthHeader(
                 month = shownMonth,
-                onPreviousClick = { shownMonth = shownMonth.minusMonths(1) },
-                onNextClick = { shownMonth = shownMonth.plusMonths(1) }
+                onPreviousClick = { showMonth(shownMonth.minusMonths(1)) },
+                onNextClick = { showMonth(shownMonth.plusMonths(1)) }
             )
 
-            HereMonthGrid(
-                month = shownMonth,
-                selectedDate = selectedDate,
-                markByDate = markByDate,
-                onDayClick = { day ->
-                    selectedDate = day
-                    // День соседнего месяца в сетке ведет в его месяц
-                    shownMonth = YearMonth.from(day)
-                }
-            )
+            HorizontalPager(
+                state = pagerState,
+                verticalAlignment = Alignment.Top
+            ) { page ->
+                HereMonthGrid(
+                    month = monthAt(page),
+                    selectedDate = selectedDate,
+                    markByDate = markByDate,
+                    onDayClick = { day ->
+                        selectedDate = day
+                        // День соседнего месяца в сетке ведет в его месяц
+                        showMonth(YearMonth.from(day))
+                    }
+                )
+            }
         }
 
         DayMemories(
             date = selectedDate,
             memories = uiState.memoriesByDate[selectedDate].orEmpty(),
+            onTodayClick = if (selectedDate != today || shownMonth != YearMonth.from(today)) {
+                {
+                    selectedDate = today
+                    showMonth(YearMonth.from(today))
+                }
+            } else {
+                null
+            },
             onMemoryClick = onMemoryClick
         )
     }
 }
 
-/** Заголовок выбранного дня и его воспоминания, или подсказка, что их нет. */
+/**
+ * Заголовок выбранного дня и его воспоминания, или подсказка, что их нет.
+ *
+ * @param onTodayClick Колбэк возврата к сегодняшнему дню или `null`, если он и так выбран
+ * и его месяц на экране: тогда кнопки нет.
+ */
 @Composable
 private fun DayMemories(
     date: LocalDate,
     memories: List<Memory>,
+    onTodayClick: (() -> Unit)?,
     onMemoryClick: (Long) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(HereSize.MemoryRow.spacing)) {
-        Text(
-            text = DayFormat.format(date),
-            style = MaterialTheme.typography.titleMedium,
-            color = HereTheme.colors.textPrimary
-        )
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.SpaceBetween,
+            modifier = Modifier
+                .fillMaxWidth()
+                .heightIn(min = HereSize.Calendar.navButtonSize)
+        ) {
+            Text(
+                text = DayFormat.format(date),
+                style = MaterialTheme.typography.titleMedium,
+                color = HereTheme.colors.textPrimary
+            )
+
+            if (onTodayClick != null) {
+                TodayButton(onClick = onTodayClick)
+            }
+        }
 
         if (memories.isEmpty()) {
             Text(
@@ -191,6 +253,21 @@ private fun DayMemories(
             )
         }
     }
+}
+
+/** Кнопка возврата к сегодняшнему дню. */
+@Composable
+private fun TodayButton(onClick: () -> Unit) {
+    Text(
+        text = stringResource(R.string.calendar_today),
+        style = MaterialTheme.typography.labelMedium,
+        color = HereTheme.colors.accent,
+        modifier = Modifier
+            .clip(HereShape.pill)
+            .background(HereTheme.colors.accentContainer)
+            .clickable(onClick = onClick)
+            .padding(horizontal = HereSpacing.m, vertical = HereSpacing.s)
+    )
 }
 
 /**
