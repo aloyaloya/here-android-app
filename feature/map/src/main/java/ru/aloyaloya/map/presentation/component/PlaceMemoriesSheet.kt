@@ -92,7 +92,7 @@ private fun PlaceMemoryRow(
         horizontalArrangement = Arrangement.spacedBy(sizes.badgeSpacing),
         modifier = Modifier
             .fillMaxWidth()
-            .clip(HereShape.card)
+            .clip(HereShape.tile)
             .background(HereTheme.colors.surface)
             .clickable(onClick = onClick)
             .padding(sizes.rowPadding)

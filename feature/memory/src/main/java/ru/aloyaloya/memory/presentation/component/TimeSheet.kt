@@ -136,7 +136,7 @@ private fun TimeWheels(
         modifier = Modifier
             .fillMaxWidth()
             .height(HereSize.TimeWheel.cardHeight)
-            .clip(HereShape.card)
+            .clip(HereShape.tile)
             .background(colors.surfaceMuted)
     ) {
         Box(

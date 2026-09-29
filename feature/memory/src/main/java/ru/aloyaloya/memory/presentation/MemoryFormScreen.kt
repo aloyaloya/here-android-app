@@ -287,7 +287,7 @@ private fun PlacePreview(
         modifier = Modifier
             .fillMaxWidth()
             .height(HereSize.PlacePreview.height)
-            .clip(HereShape.card)
+            .clip(HereShape.tile)
             .background(colors.surfaceMuted)
     ) {
         if (point != null) {

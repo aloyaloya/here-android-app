@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.semantics.Role
+import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 
@@ -45,7 +46,7 @@ fun HereDateTimeField(
     modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
-    val shape = MaterialTheme.shapes.medium
+    val shape = HereShape.tile
 
     Row(
         verticalAlignment = Alignment.CenterVertically,

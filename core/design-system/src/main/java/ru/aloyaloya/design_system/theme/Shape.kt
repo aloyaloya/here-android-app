@@ -8,10 +8,7 @@ import androidx.compose.ui.unit.dp
  * Шкала скруглений приложения — ступени Material 3.
  */
 object HereShape {
-    /** Карточки и группы внутри экрана. */
-    val card = RoundedCornerShape(12.dp)
-
-    /** Плитки, поля, чипы и FAB. */
+    /** Карточки, плитки, поля, чипы и FAB. */
     val tile = RoundedCornerShape(16.dp)
 
     /** Диалоги. */
@@ -22,9 +19,9 @@ object HereShape {
 }
 
 val HereShapes = Shapes(
-    extraSmall = HereShape.card,
-    small = HereShape.card,
-    medium = HereShape.card,
+    extraSmall = HereShape.tile,
+    small = HereShape.tile,
+    medium = HereShape.tile,
     large = HereShape.tile,
     extraLarge = HereShape.dialog
 )
