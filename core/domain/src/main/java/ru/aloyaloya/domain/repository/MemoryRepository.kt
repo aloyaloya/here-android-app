@@ -24,4 +24,7 @@ interface MemoryRepository {
 
     /** Удаляет воспоминание и все его медиафайлы. */
     suspend fun delete(memory: Memory)
+
+    /** Удаляет все воспоминания и все медиафайлы. */
+    suspend fun deleteAll()
 }

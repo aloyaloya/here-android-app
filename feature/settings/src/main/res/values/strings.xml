@@ -10,4 +10,22 @@
     <string name="settings_section_feedback">Отклик</string>
     <string name="settings_haptics">Тактильный отклик</string>
     <string name="settings_haptics_description">Лёгкая вибрация при нажатиях</string>
+    <string name="settings_section_data">Данные</string>
+    <string name="settings_delete_all">Удалить все воспоминания</string>
+    <string name="settings_delete_all_empty">Воспоминаний пока нет</string>
+    <plurals name="settings_memory_count">
+        <item quantity="one">%d воспоминание вместе с фото и видео</item>
+        <item quantity="few">%d воспоминания вместе с фото и видео</item>
+        <item quantity="many">%d воспоминаний вместе с фото и видео</item>
+        <item quantity="other">%d воспоминания вместе с фото и видео</item>
+    </plurals>
+    <string name="settings_delete_all_title">Удалить все воспоминания?</string>
+    <plurals name="settings_delete_all_message">
+        <item quantity="one">%d воспоминание, его фото и видео исчезнут навсегда. Отменить это нельзя.</item>
+        <item quantity="few">%d воспоминания, их фото и видео исчезнут навсегда. Отменить это нельзя.</item>
+        <item quantity="many">%d воспоминаний, их фото и видео исчезнут навсегда. Отменить это нельзя.</item>
+        <item quantity="other">%d воспоминания, их фото и видео исчезнут навсегда. Отменить это нельзя.</item>
+    </plurals>
+    <string name="settings_delete_all_confirm">Удалить</string>
+    <string name="settings_cancel">Отмена</string>
 </resources>

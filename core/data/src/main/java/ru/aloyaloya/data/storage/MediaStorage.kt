@@ -50,6 +50,11 @@ class MediaStorage @Inject constructor(context: Context) {
         }
     }
 
+    /** Удаляет все сохраненные медиафайлы вместе с папкой. */
+    suspend fun clear() {
+        withContext(Dispatchers.IO) { root.deleteRecursively() }
+    }
+
     /** Имя копии с расширением: по нему Coil и плеер понимают, что за файл внутри. */
     private fun fileName(uri: Uri): String {
         val name = UUID.randomUUID().toString()

@@ -53,7 +53,8 @@ fun NavGraphBuilder.settingsScreen(
             uiState = uiState,
             onBackClick = onBackClick,
             onThemeSelected = viewModel::onThemeSelected,
-            onHapticsChange = viewModel::onHapticsChange
+            onHapticsChange = viewModel::onHapticsChange,
+            onDeleteAllConfirmed = viewModel::onDeleteAllConfirmed
         )
     }
 }

@@ -17,9 +17,14 @@ import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
@@ -38,6 +43,7 @@ import ru.aloyaloya.settings.model.SettingsUiState
  * @param onBackClick Колбэк стрелки назад.
  * @param onThemeSelected Колбэк выбора темы.
  * @param onHapticsChange Колбэк переключения тактильного отклика.
+ * @param onDeleteAllConfirmed Колбэк удаления всех воспоминаний, уже подтвержденного в диалоге.
  * @param modifier Внешний [Modifier] экрана.
  */
 @Composable
@@ -46,8 +52,11 @@ fun SettingsScreen(
     onBackClick: () -> Unit,
     onThemeSelected: (AppTheme) -> Unit,
     onHapticsChange: (Boolean) -> Unit,
+    onDeleteAllConfirmed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    var deleteAllDialogVisible by rememberSaveable { mutableStateOf(false) }
+
     Column(
         modifier = modifier
             .fillMaxSize()
@@ -85,7 +94,26 @@ fun SettingsScreen(
                     onCheckedChange = onHapticsChange
                 )
             }
+
+            SettingsSection(title = stringResource(R.string.settings_section_data)) {
+                DeleteAllRow(
+                    memoryCount = uiState.memoryCount,
+                    onClick = { deleteAllDialogVisible = true }
+                )
+            }
         }
+    }
+
+    val memoryCount = uiState.memoryCount
+    if (deleteAllDialogVisible && memoryCount != null && memoryCount > 0) {
+        DeleteAllDialog(
+            memoryCount = memoryCount,
+            onConfirmClick = {
+                deleteAllDialogVisible = false
+                onDeleteAllConfirmed()
+            },
+            onDismissRequest = { deleteAllDialogVisible = false }
+        )
     }
 }
 
@@ -212,5 +240,39 @@ private fun SwitchRow(
                 uncheckedBorderColor = colors.textTertiary
             )
         )
+    }
+}
+
+@Composable
+private fun DeleteAllRow(
+    memoryCount: Int?,
+    onClick: () -> Unit
+) {
+    val colors = HereTheme.colors
+    val enabled = memoryCount != null && memoryCount > 0
+
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clickable(enabled = enabled, onClick = onClick)
+            .padding(HereSpacing.l)
+    ) {
+        Text(
+            text = stringResource(R.string.settings_delete_all),
+            style = MaterialTheme.typography.titleMedium,
+            color = if (enabled) colors.danger else colors.textTertiary
+        )
+
+        if (memoryCount != null) {
+            Text(
+                text = if (memoryCount > 0) {
+                    pluralStringResource(R.plurals.settings_memory_count, memoryCount, memoryCount)
+                } else {
+                    stringResource(R.string.settings_delete_all_empty)
+                },
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.textSecondary
+            )
+        }
     }
 }

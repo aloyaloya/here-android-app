@@ -41,4 +41,8 @@ interface MemoryDao {
     /** Удаляет воспоминание и все его медиафайлы (каскадное удаление). */
     @Delete
     suspend fun delete(memory: MemoryEntity)
+
+    /** Удаляет все воспоминания, а с ними и записи о медиа (каскадное удаление). */
+    @Query("DELETE FROM memories")
+    suspend fun deleteAll()
 }

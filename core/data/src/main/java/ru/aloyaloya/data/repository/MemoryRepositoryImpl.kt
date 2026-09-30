@@ -1,7 +1,9 @@
 package ru.aloyaloya.data.repository
 
+import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.withContext
 import ru.aloyaloya.data.mapper.MemoryMapper.toDomain
 import ru.aloyaloya.data.mapper.MemoryMapper.toEntity
 import ru.aloyaloya.data.storage.MediaStorage
@@ -56,6 +58,11 @@ class MemoryRepositoryImpl @Inject constructor(
     override suspend fun delete(memory: Memory) {
         memoryDao.delete(memory.toEntity())
         mediaStorage.delete(memory.media.map { it.uri })
+    }
+
+    override suspend fun deleteAll() = withContext(NonCancellable) {
+        memoryDao.deleteAll()
+        mediaStorage.clear()
     }
 
     private suspend fun persist(media: List<MemoryMedia>): List<MemoryMedia> =
