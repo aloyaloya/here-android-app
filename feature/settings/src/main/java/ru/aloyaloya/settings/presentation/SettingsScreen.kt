@@ -27,6 +27,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -40,6 +42,8 @@ import ru.aloyaloya.settings.R
 import ru.aloyaloya.settings.model.BackupStatus
 import ru.aloyaloya.settings.model.SettingsUiState
 import java.time.LocalDate
+
+private const val YANDEX_MAPS_TERMS_URL = "https://yandex.ru/legal/maps_termsofuse/"
 
 private const val ZIP_MIME_TYPE = "application/zip"
 
@@ -82,6 +86,7 @@ fun SettingsScreen(
     val status = uiState.backupStatus
     val busy = status == BackupStatus.Exporting || status == BackupStatus.Importing
     val hasMemories = (uiState.memoryCount ?: 0) > 0
+    val uriHandler = LocalUriHandler.current
 
     Column(
         modifier = modifier
@@ -150,6 +155,22 @@ fun SettingsScreen(
                     enabled = !busy && hasMemories,
                     onClick = { deleteAllDialogVisible = true },
                     titleColor = HereTheme.colors.danger
+                )
+            }
+
+            SettingsSection(title = stringResource(R.string.settings_section_about)) {
+                ActionRow(
+                    title = stringResource(R.string.settings_version),
+                    description = appVersionName(),
+                    enabled = false,
+                    onClick = {},
+                    disabledTitleColor = HereTheme.colors.textPrimary
+                )
+                ActionRow(
+                    title = stringResource(R.string.settings_yandex_maps_terms),
+                    description = stringResource(R.string.settings_yandex_maps_terms_description),
+                    enabled = true,
+                    onClick = { uriHandler.openUri(YANDEX_MAPS_TERMS_URL) }
                 )
             }
         }
@@ -301,7 +322,8 @@ private fun ActionRow(
     enabled: Boolean,
     onClick: () -> Unit,
     titleColor: Color = HereTheme.colors.textPrimary,
-    descriptionColor: Color = HereTheme.colors.textSecondary
+    descriptionColor: Color = HereTheme.colors.textSecondary,
+    disabledTitleColor: Color = HereTheme.colors.textTertiary
 ) {
     Column(
         modifier = Modifier
@@ -312,7 +334,7 @@ private fun ActionRow(
         Text(
             text = title,
             style = MaterialTheme.typography.titleMedium,
-            color = if (enabled) titleColor else HereTheme.colors.textTertiary
+            color = if (enabled) titleColor else disabledTitleColor
         )
 
         if (description != null) {
@@ -350,4 +372,10 @@ private fun deleteAllDescription(memoryCount: Int?): String? = when {
     memoryCount == null -> null
     memoryCount > 0 -> pluralStringResource(R.plurals.settings_memory_count, memoryCount, memoryCount)
     else -> stringResource(R.string.settings_delete_all_empty)
+}
+
+@Composable
+private fun appVersionName(): String {
+    val context = LocalContext.current
+    return context.packageManager.getPackageInfo(context.packageName, 0).versionName.orEmpty()
 }

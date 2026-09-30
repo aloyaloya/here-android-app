@@ -38,5 +38,9 @@
         <item quantity="other">%d воспоминания, их фото и видео исчезнут навсегда. Отменить это нельзя.</item>
     </plurals>
     <string name="settings_delete_all_confirm">Удалить</string>
+    <string name="settings_section_about">О приложении</string>
+    <string name="settings_version">Версия</string>
+    <string name="settings_yandex_maps_terms">Условия использования Яндекс Карт</string>
+    <string name="settings_yandex_maps_terms_description">Карта в приложении работает на MapKit</string>
     <string name="settings_cancel">Отмена</string>
 </resources>
