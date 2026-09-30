@@ -29,6 +29,8 @@ class HereApplication : ComponentProvider, SingletonImageLoader.Factory, Applica
         appComponent = DaggerAppComponent.factory().create(this)
 
         appComponent.inject(this)
+
+        appComponent.reminderScheduler.sync()
     }
 
     /**

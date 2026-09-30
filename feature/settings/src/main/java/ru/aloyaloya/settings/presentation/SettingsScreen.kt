@@ -1,5 +1,9 @@
 package ru.aloyaloya.settings.presentation
 
+import android.Manifest
+import android.content.Context
+import android.content.pm.PackageManager
+import android.os.Build
 import androidx.annotation.StringRes
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
@@ -32,6 +36,7 @@ import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.core.content.ContextCompat
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.theme.HereShape
@@ -42,8 +47,12 @@ import ru.aloyaloya.settings.R
 import ru.aloyaloya.settings.model.BackupStatus
 import ru.aloyaloya.settings.model.SettingsUiState
 import java.time.LocalDate
+import java.time.LocalTime
+import java.time.format.DateTimeFormatter
 
 private const val YANDEX_MAPS_TERMS_URL = "https://yandex.ru/legal/maps_termsofuse/"
+
+internal val ReminderTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 private const val ZIP_MIME_TYPE = "application/zip"
 
@@ -57,6 +66,8 @@ private val ZIP_OPEN_MIME_TYPES = arrayOf(ZIP_MIME_TYPE, "application/octet-stre
  * @param onBackClick Колбэк стрелки назад.
  * @param onThemeSelected Колбэк выбора темы.
  * @param onHapticsChange Колбэк переключения тактильного отклика.
+ * @param onReminderEnabledChange Колбэк включения вечернего напоминания.
+ * @param onReminderTimeChange Колбэк выбора времени напоминания.
  * @param onExport Колбэк экспорта в выбранный файл.
  * @param onImport Колбэк импорта из выбранного файла.
  * @param onDeleteAllConfirmed Колбэк удаления всех воспоминаний, уже подтвержденного в диалоге.
@@ -68,12 +79,24 @@ fun SettingsScreen(
     onBackClick: () -> Unit,
     onThemeSelected: (AppTheme) -> Unit,
     onHapticsChange: (Boolean) -> Unit,
+    onReminderEnabledChange: (Boolean) -> Unit,
+    onReminderTimeChange: (LocalTime) -> Unit,
     onExport: (destination: String) -> Unit,
     onImport: (source: String) -> Unit,
     onDeleteAllConfirmed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
     var deleteAllDialogVisible by rememberSaveable { mutableStateOf(false) }
+    var reminderTimeSheetVisible by rememberSaveable { mutableStateOf(false) }
+    var notificationsDenied by rememberSaveable { mutableStateOf(false) }
+
+    val notificationPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { granted ->
+        notificationsDenied = !granted
+        if (granted) onReminderEnabledChange(true)
+    }
 
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument(ZIP_MIME_TYPE)
@@ -126,6 +149,37 @@ fun SettingsScreen(
                 )
             }
 
+            SettingsSection(title = stringResource(R.string.settings_section_reminder)) {
+                SwitchRow(
+                    title = stringResource(R.string.settings_reminder),
+                    description = if (notificationsDenied) {
+                        stringResource(R.string.settings_reminder_denied)
+                    } else {
+                        stringResource(R.string.settings_reminder_description)
+                    },
+                    checked = uiState.reminder.enabled,
+                    onCheckedChange = { enabled ->
+                        if (enabled && needsNotificationPermission(context)) {
+                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        } else {
+                            notificationsDenied = false
+                            onReminderEnabledChange(enabled)
+                        }
+                    },
+                    descriptionColor = if (notificationsDenied) {
+                        HereTheme.colors.danger
+                    } else {
+                        HereTheme.colors.textSecondary
+                    }
+                )
+                ActionRow(
+                    title = stringResource(R.string.settings_reminder_time),
+                    description = uiState.reminder.time.format(ReminderTimeFormat),
+                    enabled = uiState.reminder.enabled,
+                    onClick = { reminderTimeSheetVisible = true }
+                )
+            }
+
             SettingsSection(title = stringResource(R.string.settings_section_data)) {
                 ActionRow(
                     title = stringResource(R.string.settings_export),
@@ -174,6 +228,17 @@ fun SettingsScreen(
                 )
             }
         }
+    }
+
+    if (reminderTimeSheetVisible) {
+        ReminderTimeSheet(
+            initialTime = uiState.reminder.time,
+            onTimeSelected = { time ->
+                reminderTimeSheetVisible = false
+                onReminderTimeChange(time)
+            },
+            onDismissRequest = { reminderTimeSheetVisible = false }
+        )
     }
 
     val memoryCount = uiState.memoryCount
@@ -275,7 +340,8 @@ private fun SwitchRow(
     title: String,
     description: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit
+    onCheckedChange: (Boolean) -> Unit,
+    descriptionColor: Color = HereTheme.colors.textSecondary
 ) {
     val colors = HereTheme.colors
 
@@ -296,7 +362,7 @@ private fun SwitchRow(
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = colors.textSecondary
+                color = descriptionColor
             )
         }
 
@@ -373,6 +439,11 @@ private fun deleteAllDescription(memoryCount: Int?): String? = when {
     memoryCount > 0 -> pluralStringResource(R.plurals.settings_memory_count, memoryCount, memoryCount)
     else -> stringResource(R.string.settings_delete_all_empty)
 }
+
+private fun needsNotificationPermission(context: Context): Boolean =
+    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
+        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
+        PackageManager.PERMISSION_GRANTED
 
 @Composable
 private fun appVersionName(): String {

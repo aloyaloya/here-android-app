@@ -11,11 +11,14 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import ru.aloyaloya.domain.model.AppTheme
+import ru.aloyaloya.domain.model.DailyReminder
 import ru.aloyaloya.domain.repository.BackupRepository
 import ru.aloyaloya.domain.repository.MemoryRepository
 import ru.aloyaloya.domain.repository.SettingsRepository
+import ru.aloyaloya.domain.scheduler.ReminderScheduler
 import ru.aloyaloya.settings.model.BackupStatus
 import ru.aloyaloya.settings.model.SettingsUiState
+import java.time.LocalTime
 import javax.inject.Inject
 
 /**
@@ -24,7 +27,8 @@ import javax.inject.Inject
 class SettingsViewModel @Inject constructor(
     private val settingsRepository: SettingsRepository,
     private val memoryRepository: MemoryRepository,
-    private val backupRepository: BackupRepository
+    private val backupRepository: BackupRepository,
+    private val reminderScheduler: ReminderScheduler
 ) : ViewModel() {
 
     private val backupStatus = MutableStateFlow<BackupStatus>(BackupStatus.Idle)
@@ -32,6 +36,7 @@ class SettingsViewModel @Inject constructor(
     val uiState: StateFlow<SettingsUiState> = combine(
         settingsRepository.theme,
         settingsRepository.hapticsEnabled,
+        settingsRepository.reminder,
         memoryRepository.observeAll().map { it.size },
         backupStatus,
         ::SettingsUiState
@@ -41,6 +46,7 @@ class SettingsViewModel @Inject constructor(
         initialValue = SettingsUiState(
             theme = settingsRepository.theme.value,
             hapticsEnabled = settingsRepository.hapticsEnabled.value,
+            reminder = settingsRepository.reminder.value,
             memoryCount = null,
             backupStatus = BackupStatus.Idle
         )
@@ -49,6 +55,10 @@ class SettingsViewModel @Inject constructor(
     fun onThemeSelected(theme: AppTheme) = settingsRepository.setTheme(theme)
 
     fun onHapticsChange(enabled: Boolean) = settingsRepository.setHapticsEnabled(enabled)
+
+    fun onReminderEnabledChange(enabled: Boolean) = updateReminder { it.copy(enabled = enabled) }
+
+    fun onReminderTimeChange(time: LocalTime) = updateReminder { it.copy(time = time) }
 
     fun onDeleteAllConfirmed() {
         viewModelScope.launch { memoryRepository.deleteAll() }
@@ -66,6 +76,11 @@ class SettingsViewModel @Inject constructor(
         failed = BackupStatus.ImportFailed
     ) {
         BackupStatus.Imported(backupRepository.import(source))
+    }
+
+    private fun updateReminder(transform: (DailyReminder) -> DailyReminder) {
+        settingsRepository.setReminder(transform(settingsRepository.reminder.value))
+        reminderScheduler.sync()
     }
 
     private fun runBackup(

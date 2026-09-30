@@ -10,6 +10,12 @@
     <string name="settings_section_feedback">Отклик</string>
     <string name="settings_haptics">Тактильный отклик</string>
     <string name="settings_haptics_description">Лёгкая вибрация при нажатиях</string>
+    <string name="settings_section_reminder">Напоминание</string>
+    <string name="settings_reminder">Напоминать вечером</string>
+    <string name="settings_reminder_description">Уведомление записать, как прошёл день</string>
+    <string name="settings_reminder_denied">Уведомления запрещены — разреши их в настройках системы</string>
+    <string name="settings_reminder_time">Время</string>
+    <string name="settings_reminder_time_title">Время напоминания</string>
     <string name="settings_section_data">Данные</string>
     <string name="settings_export">Сохранить резервную копию</string>
     <string name="settings_export_description">Воспоминания, фото и видео в один zip-файл</string>

@@ -9,6 +9,8 @@ import ru.aloyaloya.summary.di.SummaryComponent
 import ru.aloyaloya.calendar.di.CalendarComponent
 import ru.aloyaloya.data.di.DataModule
 import ru.aloyaloya.database.di.DatabaseModule
+import ru.aloyaloya.domain.repository.SettingsRepository
+import ru.aloyaloya.domain.scheduler.ReminderScheduler
 import ru.aloyaloya.here.HereApplication
 import ru.aloyaloya.map.di.MapComponent
 import ru.aloyaloya.mapkit.di.MapKitModule
@@ -48,6 +50,12 @@ interface AppComponent {
 
     /** Фабрика для создания `ViewModel` через Dagger multibinding. */
     val viewModelFactory: ViewModelProvider.Factory
+
+    /** Настройки приложения. */
+    val settingsRepository: SettingsRepository
+
+    /** Планировщик вечернего напоминания. */
+    val reminderScheduler: ReminderScheduler
 
     /** Фабрика подкомпонента фичи карты. */
     val mapComponentFactory: MapComponent.Factory

@@ -8,7 +8,9 @@ import dagger.multibindings.IntoMap
 import ru.aloyaloya.settings.di.SettingsComponent
 import ru.aloyaloya.summary.di.SummaryComponent
 import ru.aloyaloya.calendar.di.CalendarComponent
+import ru.aloyaloya.domain.scheduler.ReminderScheduler
 import ru.aloyaloya.here.MainViewModel
+import ru.aloyaloya.here.reminder.ReminderSchedulerImpl
 import ru.aloyaloya.map.di.MapComponent
 import ru.aloyaloya.ui.di.DaggerVMFactory
 import ru.aloyaloya.ui.di.ViewModelKey
@@ -33,6 +35,10 @@ interface AppModule {
     /** Привязывает реализацию [DaggerVMFactory] к [ViewModelProvider.Factory]. */
     @Binds
     fun bindsViewModelFactory(daggerVMFactory: DaggerVMFactory): ViewModelProvider.Factory
+
+    /** Привязывает [ReminderSchedulerImpl] к [ReminderScheduler]. */
+    @Binds
+    fun bindReminderScheduler(impl: ReminderSchedulerImpl): ReminderScheduler
 
     /** Регистрирует [MainViewModel] в карту `ViewModel` для фабрики. */
     @Binds
