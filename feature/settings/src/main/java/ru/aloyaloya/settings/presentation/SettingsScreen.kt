@@ -1,6 +1,8 @@
 package ru.aloyaloya.settings.presentation
 
 import androidx.annotation.StringRes
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +26,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -34,7 +37,14 @@ import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.AppTheme
 import ru.aloyaloya.settings.R
+import ru.aloyaloya.settings.model.BackupStatus
 import ru.aloyaloya.settings.model.SettingsUiState
+import java.time.LocalDate
+
+private const val ZIP_MIME_TYPE = "application/zip"
+
+/** Некоторые файловые менеджеры отдают zip как произвольные байты. */
+private val ZIP_OPEN_MIME_TYPES = arrayOf(ZIP_MIME_TYPE, "application/octet-stream")
 
 /**
  * Экран настроек.
@@ -43,6 +53,8 @@ import ru.aloyaloya.settings.model.SettingsUiState
  * @param onBackClick Колбэк стрелки назад.
  * @param onThemeSelected Колбэк выбора темы.
  * @param onHapticsChange Колбэк переключения тактильного отклика.
+ * @param onExport Колбэк экспорта в выбранный файл.
+ * @param onImport Колбэк импорта из выбранного файла.
  * @param onDeleteAllConfirmed Колбэк удаления всех воспоминаний, уже подтвержденного в диалоге.
  * @param modifier Внешний [Modifier] экрана.
  */
@@ -52,10 +64,24 @@ fun SettingsScreen(
     onBackClick: () -> Unit,
     onThemeSelected: (AppTheme) -> Unit,
     onHapticsChange: (Boolean) -> Unit,
+    onExport: (destination: String) -> Unit,
+    onImport: (source: String) -> Unit,
     onDeleteAllConfirmed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     var deleteAllDialogVisible by rememberSaveable { mutableStateOf(false) }
+
+    val exportLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.CreateDocument(ZIP_MIME_TYPE)
+    ) { uri -> uri?.let { onExport(it.toString()) } }
+
+    val importLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.OpenDocument()
+    ) { uri -> uri?.let { onImport(it.toString()) } }
+
+    val status = uiState.backupStatus
+    val busy = status == BackupStatus.Exporting || status == BackupStatus.Importing
+    val hasMemories = (uiState.memoryCount ?: 0) > 0
 
     Column(
         modifier = modifier
@@ -96,9 +122,34 @@ fun SettingsScreen(
             }
 
             SettingsSection(title = stringResource(R.string.settings_section_data)) {
-                DeleteAllRow(
-                    memoryCount = uiState.memoryCount,
-                    onClick = { deleteAllDialogVisible = true }
+                ActionRow(
+                    title = stringResource(R.string.settings_export),
+                    description = exportDescription(status),
+                    enabled = !busy && hasMemories,
+                    onClick = { exportLauncher.launch("here-${LocalDate.now()}.zip") },
+                    descriptionColor = if (status == BackupStatus.ExportFailed) {
+                        HereTheme.colors.danger
+                    } else {
+                        HereTheme.colors.textSecondary
+                    }
+                )
+                ActionRow(
+                    title = stringResource(R.string.settings_import),
+                    description = importDescription(status),
+                    enabled = !busy,
+                    onClick = { importLauncher.launch(ZIP_OPEN_MIME_TYPES) },
+                    descriptionColor = if (status == BackupStatus.ImportFailed) {
+                        HereTheme.colors.danger
+                    } else {
+                        HereTheme.colors.textSecondary
+                    }
+                )
+                ActionRow(
+                    title = stringResource(R.string.settings_delete_all),
+                    description = deleteAllDescription(uiState.memoryCount),
+                    enabled = !busy && hasMemories,
+                    onClick = { deleteAllDialogVisible = true },
+                    titleColor = HereTheme.colors.danger
                 )
             }
         }
@@ -244,13 +295,14 @@ private fun SwitchRow(
 }
 
 @Composable
-private fun DeleteAllRow(
-    memoryCount: Int?,
-    onClick: () -> Unit
+private fun ActionRow(
+    title: String,
+    description: String?,
+    enabled: Boolean,
+    onClick: () -> Unit,
+    titleColor: Color = HereTheme.colors.textPrimary,
+    descriptionColor: Color = HereTheme.colors.textSecondary
 ) {
-    val colors = HereTheme.colors
-    val enabled = memoryCount != null && memoryCount > 0
-
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -258,21 +310,44 @@ private fun DeleteAllRow(
             .padding(HereSpacing.l)
     ) {
         Text(
-            text = stringResource(R.string.settings_delete_all),
+            text = title,
             style = MaterialTheme.typography.titleMedium,
-            color = if (enabled) colors.danger else colors.textTertiary
+            color = if (enabled) titleColor else HereTheme.colors.textTertiary
         )
 
-        if (memoryCount != null) {
+        if (description != null) {
             Text(
-                text = if (memoryCount > 0) {
-                    pluralStringResource(R.plurals.settings_memory_count, memoryCount, memoryCount)
-                } else {
-                    stringResource(R.string.settings_delete_all_empty)
-                },
+                text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = colors.textSecondary
+                color = descriptionColor
             )
         }
     }
+}
+
+@Composable
+private fun exportDescription(status: BackupStatus): String = when (status) {
+    BackupStatus.Exporting -> stringResource(R.string.settings_export_running)
+    is BackupStatus.Exported -> stringResource(R.string.settings_export_done, status.count)
+    BackupStatus.ExportFailed -> stringResource(R.string.settings_export_failed)
+    else -> stringResource(R.string.settings_export_description)
+}
+
+@Composable
+private fun importDescription(status: BackupStatus): String = when (status) {
+    BackupStatus.Importing -> stringResource(R.string.settings_import_running)
+    is BackupStatus.Imported -> if (status.count > 0) {
+        stringResource(R.string.settings_import_done, status.count)
+    } else {
+        stringResource(R.string.settings_import_nothing_new)
+    }
+    BackupStatus.ImportFailed -> stringResource(R.string.settings_import_failed)
+    else -> stringResource(R.string.settings_import_description)
+}
+
+@Composable
+private fun deleteAllDescription(memoryCount: Int?): String? = when {
+    memoryCount == null -> null
+    memoryCount > 0 -> pluralStringResource(R.plurals.settings_memory_count, memoryCount, memoryCount)
+    else -> stringResource(R.string.settings_delete_all_empty)
 }

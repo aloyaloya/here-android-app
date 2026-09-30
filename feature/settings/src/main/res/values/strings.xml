@@ -11,6 +11,17 @@
     <string name="settings_haptics">Тактильный отклик</string>
     <string name="settings_haptics_description">Лёгкая вибрация при нажатиях</string>
     <string name="settings_section_data">Данные</string>
+    <string name="settings_export">Сохранить резервную копию</string>
+    <string name="settings_export_description">Воспоминания, фото и видео в один zip-файл</string>
+    <string name="settings_export_running">Сохраняю…</string>
+    <string name="settings_export_done">Сохранено воспоминаний: %d</string>
+    <string name="settings_export_failed">Не получилось сохранить копию</string>
+    <string name="settings_import">Восстановить из копии</string>
+    <string name="settings_import_description">Добавит воспоминания, которых здесь ещё нет</string>
+    <string name="settings_import_running">Добавляю…</string>
+    <string name="settings_import_done">Добавлено воспоминаний: %d</string>
+    <string name="settings_import_nothing_new">Все воспоминания из копии уже здесь</string>
+    <string name="settings_import_failed">Не получилось прочитать копию</string>
     <string name="settings_delete_all">Удалить все воспоминания</string>
     <string name="settings_delete_all_empty">Воспоминаний пока нет</string>
     <plurals name="settings_memory_count">

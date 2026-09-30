@@ -7,6 +7,7 @@ import android.webkit.MimeTypeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.InputStream
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -35,6 +36,16 @@ class MediaStorage @Inject constructor(context: Context) {
             file.delete()
             null
         }
+    }
+
+    /** Сохраняет поток в новый файл с расширением [extension] и возвращает путь к нему. */
+    suspend fun save(input: InputStream, extension: String?): String = withContext(Dispatchers.IO) {
+        val name = UUID.randomUUID().toString()
+        val file = File(root, if (extension == null) name else "$name.$extension")
+
+        root.mkdirs()
+        file.outputStream().use(input::copyTo)
+        file.path
     }
 
     suspend fun delete(paths: List<String>) {
