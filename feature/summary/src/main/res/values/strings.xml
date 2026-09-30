@@ -9,6 +9,8 @@
     <string name="summary_title_all_time">За всё время</string>
     <string name="summary_dominant_label">Чаще всего</string>
     <string name="summary_emotions_title">Эмоции</string>
+    <string name="summary_places_title">Места настроения</string>
+    <string name="summary_place_unknown">Место без адреса</string>
     <plurals name="summary_memory_count">
         <item quantity="one">%d воспоминание</item>
         <item quantity="few">%d воспоминания</item>

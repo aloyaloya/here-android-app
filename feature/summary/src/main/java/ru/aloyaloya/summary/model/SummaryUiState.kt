@@ -12,7 +12,8 @@ sealed class SummaryUiState {
         val memoryCount: Int,
         val dayCount: Int,
         val dominantEmotion: Emotion?,
-        val emotionShares: List<EmotionShare>
+        val emotionShares: List<EmotionShare>,
+        val places: List<MoodPlace>
     ) : SummaryUiState()
 }
 

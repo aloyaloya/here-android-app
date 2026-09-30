@@ -24,12 +24,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import ru.aloyaloya.design_system.component.memory.HereMemoryRow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.summary.R
 import ru.aloyaloya.summary.model.EmotionShare
+import ru.aloyaloya.summary.model.MoodPlace
 import ru.aloyaloya.summary.model.SummaryPeriod
 import ru.aloyaloya.summary.model.SummaryUiState
 import ru.aloyaloya.ui.emotion.color
@@ -108,7 +110,9 @@ private fun SummaryContent(
 
         EmotionMixCard(uiState.emotionShares, total = uiState.memoryCount)
 
-        // TODO: места настроения и «Вспомнить»
+        MoodPlaces(uiState.places)
+
+        // TODO: «Вспомнить»
     }
 }
 
@@ -237,6 +241,35 @@ private fun EmotionMixCard(
                     color = colors.textSecondary
                 )
             }
+        }
+    }
+}
+
+/**
+ * Места настроения: где воспоминаний больше всего и что там чувствовалось.
+ */
+@Composable
+private fun MoodPlaces(places: List<MoodPlace>) {
+    Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
+        Text(
+            text = stringResource(R.string.summary_places_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = HereTheme.colors.textPrimary
+        )
+
+        places.forEach { place ->
+            HereMemoryRow(
+                emoji = place.dominantEmotion.emoji,
+                color = place.dominantEmotion.color.soft,
+                title = place.address ?: stringResource(R.string.summary_place_unknown),
+                subtitle = pluralStringResource(
+                    R.plurals.summary_memory_count,
+                    place.memoryCount,
+                    place.memoryCount
+                ),
+                // TODO: открыть место на карте
+                onClick = {}
+            )
         }
     }
 }
