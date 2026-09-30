@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="summary_screen_title">Итоги</string>
+    <string name="summary_screen_label">Итоги</string>
+    <string name="summary_period_month">Месяц</string>
+    <string name="summary_period_year">Год</string>
+    <string name="summary_period_all_time">Всё время</string>
+</resources>

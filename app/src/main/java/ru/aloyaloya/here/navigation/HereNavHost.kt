@@ -4,7 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import ru.aloyaloya.analytic.presentation.navigation.analyticScreen
+import ru.aloyaloya.summary.presentation.navigation.summaryScreen
 import ru.aloyaloya.calendar.presentation.navigation.calendarScreen
 import ru.aloyaloya.map.presentation.navigation.MapRoute
 import ru.aloyaloya.map.presentation.navigation.mapScreen
@@ -59,6 +59,6 @@ fun HereNavHost(
         calendarScreen(
             onMemoryClick = { memoryId -> navController.navigateToMemory(memoryId) }
         )
-        analyticScreen()
+        summaryScreen()
     }
 }

@@ -4,7 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import dagger.BindsInstance
 import dagger.Component
-import ru.aloyaloya.analytic.di.AnalyticComponent
+import ru.aloyaloya.summary.di.SummaryComponent
 import ru.aloyaloya.calendar.di.CalendarComponent
 import ru.aloyaloya.data.di.DataModule
 import ru.aloyaloya.database.di.DatabaseModule
@@ -57,6 +57,6 @@ interface AppComponent {
     /** Фабрика подкомпонента фичи календаря. */
     val calendarComponentFactory: CalendarComponent.Factory
 
-    /** Фабрика подкомпонента фичи аналитики. */
-    val analyticComponentFactory: AnalyticComponent.Factory
+    /** Фабрика подкомпонента фичи итогов. */
+    val summaryComponentFactory: SummaryComponent.Factory
 }

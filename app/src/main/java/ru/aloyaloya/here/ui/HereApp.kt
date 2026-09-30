@@ -15,7 +15,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import ru.aloyaloya.analytic.presentation.navigation.navigateToAnalytic
+import ru.aloyaloya.summary.presentation.navigation.navigateToSummary
 import ru.aloyaloya.calendar.presentation.navigation.navigateToCalendar
 import ru.aloyaloya.here.navigation.HereNavHost
 import ru.aloyaloya.here.navigation.TopLevelDestination
@@ -143,7 +143,7 @@ private fun navigateToTopLevelDestination(
         when (topLevelDestination) {
             TopLevelDestination.MAP -> navController.navigateToMap(topLevelNavOptions)
             TopLevelDestination.CALENDAR -> navController.navigateToCalendar(topLevelNavOptions)
-            TopLevelDestination.ANALYTIC -> navController.navigateToAnalytic(topLevelNavOptions)
+            TopLevelDestination.SUMMARY -> navController.navigateToSummary(topLevelNavOptions)
         }
     }
 }
