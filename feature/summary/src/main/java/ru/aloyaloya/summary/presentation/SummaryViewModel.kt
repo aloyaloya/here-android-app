@@ -7,7 +7,10 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.stateIn
+import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.domain.model.dominantEmotion
 import ru.aloyaloya.domain.repository.MemoryRepository
+import ru.aloyaloya.summary.model.EmotionShare
 import ru.aloyaloya.summary.model.SummaryPeriod
 import ru.aloyaloya.summary.model.SummaryUiState
 import java.time.Instant
@@ -24,12 +27,20 @@ class SummaryViewModel @Inject constructor(
     val uiState: StateFlow<SummaryUiState> =
         combine(memoryRepository.observeAll(), period) { memories, period ->
             val today = LocalDate.now()
+            val inPeriod = memories.filter { memory ->
+                period.contains(memory.happenedAt.toLocalDate(), today)
+            }
 
             SummaryUiState.Content(
                 period = period,
-                memories = memories.filter { memory ->
-                    period.contains(memory.happenedAt.toLocalDate(), today)
-                }
+                memoryCount = inPeriod.size,
+                dayCount = inPeriod.distinctBy { it.happenedAt.toLocalDate() }.size,
+                dominantEmotion = inPeriod.dominantEmotion(),
+                emotionShares = inPeriod
+                    .groupingBy(Memory::emotion)
+                    .eachCount()
+                    .map { (emotion, count) -> EmotionShare(emotion, count) }
+                    .sortedByDescending(EmotionShare::count)
             )
         }
             .stateIn(
