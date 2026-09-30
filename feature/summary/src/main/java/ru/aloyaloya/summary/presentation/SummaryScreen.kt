@@ -49,12 +49,14 @@ private val MonthFormat = DateTimeFormatter.ofPattern("LLLL yyyy", Locale.forLan
  *
  * @param uiState Состояние экрана.
  * @param onPeriodSelected Колбэк выбора периода.
+ * @param onPlaceClick Колбэк нажатия на место настроения: отдает его точку.
  * @param modifier Внешний [Modifier] экрана.
  */
 @Composable
 fun SummaryScreen(
     uiState: SummaryUiState,
     onPeriodSelected: (SummaryPeriod) -> Unit,
+    onPlaceClick: (latitude: Double, longitude: Double) -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -72,7 +74,8 @@ fun SummaryScreen(
 
             is SummaryUiState.Content -> SummaryContent(
                 uiState = uiState,
-                onPeriodSelected = onPeriodSelected
+                onPeriodSelected = onPeriodSelected,
+                onPlaceClick = onPlaceClick
             )
         }
     }
@@ -81,7 +84,8 @@ fun SummaryScreen(
 @Composable
 private fun SummaryContent(
     uiState: SummaryUiState.Content,
-    onPeriodSelected: (SummaryPeriod) -> Unit
+    onPeriodSelected: (SummaryPeriod) -> Unit,
+    onPlaceClick: (latitude: Double, longitude: Double) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
@@ -110,7 +114,7 @@ private fun SummaryContent(
 
         EmotionMixCard(uiState.emotionShares, total = uiState.memoryCount)
 
-        MoodPlaces(uiState.places)
+        MoodPlaces(uiState.places, onPlaceClick)
 
         // TODO: «Вспомнить»
     }
@@ -249,7 +253,10 @@ private fun EmotionMixCard(
  * Места настроения: где воспоминаний больше всего и что там чувствовалось.
  */
 @Composable
-private fun MoodPlaces(places: List<MoodPlace>) {
+private fun MoodPlaces(
+    places: List<MoodPlace>,
+    onPlaceClick: (latitude: Double, longitude: Double) -> Unit
+) {
     Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
         Text(
             text = stringResource(R.string.summary_places_title),
@@ -267,8 +274,7 @@ private fun MoodPlaces(places: List<MoodPlace>) {
                     place.memoryCount,
                     place.memoryCount
                 ),
-                // TODO: открыть место на карте
-                onClick = {}
+                onClick = { onPlaceClick(place.latitude, place.longitude) }
             )
         }
     }

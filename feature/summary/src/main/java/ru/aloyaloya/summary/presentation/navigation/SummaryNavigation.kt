@@ -32,8 +32,13 @@ fun NavController.navigateToSummary(navOptions: NavOptions) =
  *
  * Внутри функции добавляется composable-маршрут [SummaryRoute] и
  * размещается UI-контент экрана итогов.
+ *
+ * @param onPlaceClick Колбэк нажатия на место настроения: отдает его точку,
+ * чтобы показать место на карте.
  */
-fun NavGraphBuilder.summaryScreen() {
+fun NavGraphBuilder.summaryScreen(
+    onPlaceClick: (latitude: Double, longitude: Double) -> Unit
+) {
     composable<SummaryRoute> { navBackStackEntry ->
 
         val context = LocalContext.current.applicationContext
@@ -51,7 +56,8 @@ fun NavGraphBuilder.summaryScreen() {
 
         SummaryScreen(
             uiState = uiState,
-            onPeriodSelected = viewModel::onPeriodSelected
+            onPeriodSelected = viewModel::onPeriodSelected,
+            onPlaceClick = onPlaceClick
         )
     }
 }

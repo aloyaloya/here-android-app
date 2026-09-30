@@ -98,11 +98,15 @@ private fun Context.hasLocationPermission(): Boolean =
  * открывается экран воспоминания. Воспоминания в одной точке сперва показываются списком.
  * @param onPickStart Колбэк входа в режим выбора места.
  * @param onPickCancel Колбэк выхода из режима выбора места.
+ * @param focus Точка, которую нужно показать, или `null`. Приходит с других экранов.
+ * @param onFocusShown Колбэк: камера встала на [focus], точку можно забыть.
  */
 @Composable
 fun MapScreen(
     uiState: MapUiState,
     picking: Boolean,
+    focus: MapPoint?,
+    onFocusShown: () -> Unit,
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
     onMemoryClick: (Long) -> Unit,
     onPickStart: () -> Unit,
@@ -143,6 +147,12 @@ fun MapScreen(
             var cameraMoving by remember { mutableStateOf(false) }
             var placeMemoryIds by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
             val mapState = rememberYandexMapState()
+
+            LaunchedEffect(focus) {
+                focus ?: return@LaunchedEffect
+                mapState.moveTo(focus, uiState.mapConfig.userLocationZoom)
+                onFocusShown()
+            }
 
             BackHandler(enabled = picking, onBack = onPickCancel)
 

@@ -104,6 +104,12 @@ internal class UserLocationBinder(
         manager.requestSingleUpdate(listener)
     }
 
+    /** Отменяет наведение на пользователя: камеру уже навели на другую точку. */
+    fun skipCentering() {
+        centered = true
+        cancelPendingMove()
+    }
+
     /** Отменяет ожидание свежего фикса: камеру уже ведет пользователь. */
     fun cancelPendingMove() {
         locationListener?.let { locationManager?.unsubscribe(it) }
