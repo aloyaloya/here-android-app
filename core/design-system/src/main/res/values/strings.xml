@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="theme_toggle_content_description">Сменить тему</string>
+    <string name="settings_content_description">Настройки</string>
     <string name="fab_add_memory_content_description">Добавить воспоминание</string>
     <string name="fab_location_content_description">Показать мое место</string>
     <string name="media_add">+ медиа</string>

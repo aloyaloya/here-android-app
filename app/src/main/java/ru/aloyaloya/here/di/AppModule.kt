@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModelProvider
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
+import ru.aloyaloya.settings.di.SettingsComponent
 import ru.aloyaloya.summary.di.SummaryComponent
 import ru.aloyaloya.calendar.di.CalendarComponent
 import ru.aloyaloya.here.MainViewModel
@@ -23,7 +24,8 @@ import ru.aloyaloya.ui.di.ViewModelKey
     subcomponents = [
         MapComponent::class,
         CalendarComponent::class,
-        SummaryComponent::class
+        SummaryComponent::class,
+        SettingsComponent::class
     ]
 )
 interface AppModule {

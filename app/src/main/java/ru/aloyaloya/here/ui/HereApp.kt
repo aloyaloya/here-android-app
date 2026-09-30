@@ -21,6 +21,7 @@ import ru.aloyaloya.calendar.presentation.navigation.navigateToCalendar
 import ru.aloyaloya.here.navigation.HereNavHost
 import ru.aloyaloya.here.navigation.TopLevelDestination
 import ru.aloyaloya.map.presentation.navigation.navigateToMap
+import ru.aloyaloya.settings.presentation.navigation.navigateToSettings
 import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 import ru.aloyaloya.map.R as MapR
@@ -37,13 +38,12 @@ import ru.aloyaloya.map.R as MapR
  * [rememberNavController], а для наблюдения за текущим destination —
  * [currentBackStackEntryAsState].
  *
- * @param darkTheme Текущий режим темы, влияющий на отображение кнопки в top bar.
- * @param onThemeChange Колбэк переключения темы, пробрасываемый в [HereScaffold].
+ * @param darkTheme Итоговая тема. Раздается через [LocalAppDarkTheme] экранам, которые красят
+ * не цветами темы, например карте.
  */
 @Composable
 fun HereApp(
-    darkTheme: Boolean,
-    onThemeChange: () -> Unit
+    darkTheme: Boolean
 ) {
     val navController = rememberNavController()
 
@@ -87,8 +87,10 @@ fun HereApp(
                 placePicking = false
                 navigateToTopLevelDestination(navController, destination)
             },
-            darkTheme = darkTheme,
-            onThemeChange = onThemeChange
+            onSettingsClick = {
+                placePicking = false
+                navController.navigateToSettings()
+            }
         ) {
             HereNavHost(
                 navController = navController,

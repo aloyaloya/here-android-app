@@ -4,6 +4,7 @@ import android.content.Context
 import androidx.lifecycle.ViewModelProvider
 import dagger.BindsInstance
 import dagger.Component
+import ru.aloyaloya.settings.di.SettingsComponent
 import ru.aloyaloya.summary.di.SummaryComponent
 import ru.aloyaloya.calendar.di.CalendarComponent
 import ru.aloyaloya.data.di.DataModule
@@ -59,4 +60,7 @@ interface AppComponent {
 
     /** Фабрика подкомпонента фичи итогов. */
     val summaryComponentFactory: SummaryComponent.Factory
+
+    /** Фабрика подкомпонента фичи настроек. */
+    val settingsComponentFactory: SettingsComponent.Factory
 }
