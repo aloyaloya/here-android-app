@@ -262,6 +262,7 @@ object HereSize {
         val barHeight = 12.dp
         val barGap = 2.dp
         val legendEmojiSize = 18.sp
+        val recallPhotoHeight = 200.dp
     }
 
     /** Основная кнопка. */

@@ -1,6 +1,7 @@
 package ru.aloyaloya.summary.model
 
 import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.domain.model.Memory
 
 /**
  * Состояние экрана [ru.aloyaloya.summary.presentation.SummaryScreen].
@@ -13,7 +14,9 @@ sealed class SummaryUiState {
         val dayCount: Int,
         val dominantEmotion: Emotion?,
         val emotionShares: List<EmotionShare>,
-        val places: List<MoodPlace>
+        val places: List<MoodPlace>,
+        val recall: Memory?,
+        val canRecallAnother: Boolean
     ) : SummaryUiState()
 }
 

@@ -35,9 +35,11 @@ fun NavController.navigateToSummary(navOptions: NavOptions) =
  *
  * @param onPlaceClick Колбэк нажатия на место настроения: отдает его точку,
  * чтобы показать место на карте.
+ * @param onMemoryClick Колбэк перехода к воспоминанию.
  */
 fun NavGraphBuilder.summaryScreen(
-    onPlaceClick: (latitude: Double, longitude: Double) -> Unit
+    onPlaceClick: (latitude: Double, longitude: Double) -> Unit,
+    onMemoryClick: (Long) -> Unit
 ) {
     composable<SummaryRoute> { navBackStackEntry ->
 
@@ -57,7 +59,9 @@ fun NavGraphBuilder.summaryScreen(
         SummaryScreen(
             uiState = uiState,
             onPeriodSelected = viewModel::onPeriodSelected,
-            onPlaceClick = onPlaceClick
+            onPlaceClick = onPlaceClick,
+            onMemoryClick = onMemoryClick,
+            onRecallAnother = viewModel::onRecallAnother
         )
     }
 }

@@ -24,6 +24,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.graphics.RectangleShape
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
+import ru.aloyaloya.design_system.component.button.HereSecondaryButton
+import ru.aloyaloya.design_system.component.emotion.EmotionBadge
+import ru.aloyaloya.design_system.component.media.MediaPhoto
+import ru.aloyaloya.design_system.component.media.MediaPlayBadge
+import ru.aloyaloya.domain.model.MediaType
+import ru.aloyaloya.domain.model.Memory
+import java.time.Instant
+import java.time.ZoneId
 import ru.aloyaloya.design_system.component.memory.HereMemoryRow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
@@ -43,6 +54,10 @@ import java.util.Locale
 import kotlin.math.roundToInt
 
 private val MonthFormat = DateTimeFormatter.ofPattern("LLLL yyyy", Locale.forLanguageTag("ru"))
+private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru"))
+
+/** С меньшим числом воспоминаний итогам не о чем рассказать. */
+private const val MIN_MEMORY_COUNT = 3
 
 /**
  * Экран итогов: что и где чувствовалось за выбранный период.
@@ -50,6 +65,8 @@ private val MonthFormat = DateTimeFormatter.ofPattern("LLLL yyyy", Locale.forLan
  * @param uiState Состояние экрана.
  * @param onPeriodSelected Колбэк выбора периода.
  * @param onPlaceClick Колбэк нажатия на место настроения: отдает его точку.
+ * @param onMemoryClick Колбэк нажатия на воспоминание в «Вспомнить».
+ * @param onRecallAnother Колбэк кнопки «Другое».
  * @param modifier Внешний [Modifier] экрана.
  */
 @Composable
@@ -57,6 +74,8 @@ fun SummaryScreen(
     uiState: SummaryUiState,
     onPeriodSelected: (SummaryPeriod) -> Unit,
     onPlaceClick: (latitude: Double, longitude: Double) -> Unit,
+    onMemoryClick: (Long) -> Unit,
+    onRecallAnother: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Box(
@@ -75,7 +94,9 @@ fun SummaryScreen(
             is SummaryUiState.Content -> SummaryContent(
                 uiState = uiState,
                 onPeriodSelected = onPeriodSelected,
-                onPlaceClick = onPlaceClick
+                onPlaceClick = onPlaceClick,
+                onMemoryClick = onMemoryClick,
+                onRecallAnother = onRecallAnother
             )
         }
     }
@@ -85,7 +106,9 @@ fun SummaryScreen(
 private fun SummaryContent(
     uiState: SummaryUiState.Content,
     onPeriodSelected: (SummaryPeriod) -> Unit,
-    onPlaceClick: (latitude: Double, longitude: Double) -> Unit
+    onPlaceClick: (latitude: Double, longitude: Double) -> Unit,
+    onMemoryClick: (Long) -> Unit,
+    onRecallAnother: () -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
@@ -107,8 +130,10 @@ private fun SummaryContent(
             onSelect = onPeriodSelected
         )
 
-        // TODO: состояние «мало данных» вместо пустоты
-        if (uiState.memoryCount == 0) return@Column
+        if (uiState.memoryCount < MIN_MEMORY_COUNT) {
+            NotEnoughMemories()
+            return@Column
+        }
 
         PeriodCard(uiState)
 
@@ -116,7 +141,14 @@ private fun SummaryContent(
 
         MoodPlaces(uiState.places, onPlaceClick)
 
-        // TODO: «Вспомнить»
+        uiState.recall?.let { memory ->
+            Recall(
+                memory = memory,
+                canRecallAnother = uiState.canRecallAnother,
+                onClick = { onMemoryClick(memory.id) },
+                onAnotherClick = onRecallAnother
+            )
+        }
     }
 }
 
@@ -278,6 +310,104 @@ private fun MoodPlaces(
             )
         }
     }
+}
+
+/**
+ * «Вспомнить»: одно случайное воспоминание периода, лучше со снимком.
+ */
+@Composable
+private fun Recall(
+    memory: Memory,
+    canRecallAnother: Boolean,
+    onClick: () -> Unit,
+    onAnotherClick: () -> Unit
+) {
+    val colors = HereTheme.colors
+    val media = memory.media.firstOrNull()
+
+    Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
+        Text(
+            text = stringResource(R.string.summary_recall_title),
+            style = MaterialTheme.typography.titleMedium,
+            color = colors.textPrimary
+        )
+
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .clip(HereShape.tile)
+                .background(colors.surface)
+                .clickable(onClick = onClick)
+        ) {
+            if (media != null) {
+                val video = media.type == MediaType.VIDEO
+
+                Box(contentAlignment = Alignment.Center) {
+                    MediaPhoto(
+                        uri = media.uri,
+                        video = video,
+                        shape = RectangleShape,
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .height(HereSize.Summary.recallPhotoHeight)
+                    )
+
+                    if (video) MediaPlayBadge()
+                }
+            }
+
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(HereSize.MemoryRow.badgeSpacing),
+                modifier = Modifier.padding(HereSize.MemoryRow.padding)
+            ) {
+                EmotionBadge(
+                    emoji = memory.emotion.emoji,
+                    color = memory.emotion.color.soft
+                )
+
+                Column(verticalArrangement = Arrangement.spacedBy(HereSize.MemoryRow.textSpacing)) {
+                    Text(
+                        text = memory.title,
+                        style = MaterialTheme.typography.titleMedium,
+                        color = colors.textPrimary,
+                        maxLines = 1,
+                        overflow = TextOverflow.Ellipsis
+                    )
+                    Text(
+                        text = DateFormat.format(
+                            Instant.ofEpochMilli(memory.happenedAt).atZone(ZoneId.systemDefault())
+                        ),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = colors.textTertiary
+                    )
+                }
+            }
+        }
+
+        if (canRecallAnother) {
+            HereSecondaryButton(
+                text = stringResource(R.string.summary_recall_another),
+                onClick = onAnotherClick
+            )
+        }
+    }
+}
+
+/** Вместо итогов, пока воспоминаний меньше [MIN_MEMORY_COUNT]. */
+@Composable
+private fun NotEnoughMemories() {
+    Text(
+        text = stringResource(R.string.summary_not_enough),
+        style = MaterialTheme.typography.bodyMedium,
+        color = HereTheme.colors.textSecondary,
+        textAlign = TextAlign.Center,
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(HereShape.tile)
+            .background(HereTheme.colors.surface)
+            .padding(HereSpacing.xl)
+    )
 }
 
 /** Заголовок карточки: текущий месяц, текущий год или «За всё время». */

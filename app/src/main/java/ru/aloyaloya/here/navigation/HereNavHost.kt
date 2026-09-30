@@ -70,7 +70,8 @@ fun HereNavHost(
             onMemoryClick = { memoryId -> navController.navigateToMemory(memoryId) }
         )
         summaryScreen(
-            onPlaceClick = { latitude, longitude -> onShowOnMap(MapPoint(latitude, longitude)) }
+            onPlaceClick = { latitude, longitude -> onShowOnMap(MapPoint(latitude, longitude)) },
+            onMemoryClick = { memoryId -> navController.navigateToMemory(memoryId) }
         )
     }
 }

@@ -23,6 +23,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import javax.inject.Inject
+import kotlin.random.Random
 
 /** Воспоминания ближе этого расстояния друг к другу считаются одним местом. */
 private const val PLACE_RADIUS_METERS = 150f
@@ -40,14 +41,26 @@ class SummaryViewModel @Inject constructor(
 
     private val period = MutableStateFlow(SummaryPeriod.MONTH)
 
+    /** Порядок перебора «Вспомнить»: свой на каждый запуск, постоянный внутри него. */
+    private val recallSeed = Random.nextLong()
+
+    /** Сколько раз нажали «Другое»: номер воспоминания в перемешанном порядке. */
+    private val recallIndex = MutableStateFlow(0)
+
     private val addresses = MutableStateFlow<Map<PlacePoint, String?>>(emptyMap())
 
     val uiState: StateFlow<SummaryUiState> =
-        combine(memoryRepository.observeAll(), period, addresses) { memories, period, addresses ->
+        combine(
+            memoryRepository.observeAll(),
+            period,
+            addresses,
+            recallIndex
+        ) { memories, period, addresses, recallIndex ->
             val today = LocalDate.now()
             val inPeriod = memories.filter { memory ->
                 period.contains(memory.happenedAt.toLocalDate(), today)
             }
+            val recalls = inPeriod.recallOrder(recallSeed)
 
             SummaryUiState.Content(
                 period = period,
@@ -62,7 +75,9 @@ class SummaryViewModel @Inject constructor(
                 places = inPeriod
                     .groupIntoPlaces()
                     .take(PLACE_COUNT)
-                    .map { place -> place.toMoodPlace(addresses) }
+                    .map { place -> place.toMoodPlace(addresses) },
+                recall = recalls.getOrNull(recallIndex % recalls.size.coerceAtLeast(1)),
+                canRecallAnother = recalls.size > 1
             )
         }
             .onEach { state -> state.places.forEach(::resolveAddress) }
@@ -74,6 +89,10 @@ class SummaryViewModel @Inject constructor(
 
     fun onPeriodSelected(period: SummaryPeriod) {
         this.period.value = period
+    }
+
+    fun onRecallAnother() {
+        recallIndex.update { it + 1 }
     }
 
     private fun resolveAddress(place: MoodPlace) {
@@ -101,6 +120,19 @@ private fun List<Memory>.groupIntoPlaces(): List<List<Memory>> {
             .thenByDescending { it.first().happenedAt }
     )
 }
+
+/**
+ * Воспоминания для «Вспомнить» в перемешанном порядке. Со снимками вспоминать
+ * приятнее, поэтому без снимков берутся, только если снимков нет совсем.
+ *
+ * Перемешивание идет от порядка по [Memory.id], а не от порядка из базы:
+ * при том же наборе воспоминаний порядок выходит тем же.
+ */
+private fun List<Memory>.recallOrder(seed: Long): List<Memory> =
+    filter { it.media.isNotEmpty() }
+        .ifEmpty { this }
+        .sortedBy(Memory::id)
+        .shuffled(Random(seed))
 
 private fun Memory.isNear(other: Memory): Boolean {
     val distance = FloatArray(1)
