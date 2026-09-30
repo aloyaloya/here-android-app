@@ -40,9 +40,13 @@ fun NavController.navigateToMap(navOptions: NavOptions) =
  * @param onEmotionConfirmed Колбэк выбора эмоции в листе: вместе с эмоцией отдает
  * точку на карте, дальше идет экран нового места.
  * @param onMemoryClick Колбэк перехода к воспоминанию по нажатию на его метку.
+ * @param focus Точка, которую карта должна показать, или `null`.
+ * @param onFocusShown Колбэк: камера встала на [focus].
  */
 fun NavGraphBuilder.mapScreen(
     picking: Boolean,
+    focus: MapPoint?,
+    onFocusShown: () -> Unit,
     onPickingChange: (Boolean) -> Unit,
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
     onMemoryClick: (Long) -> Unit
@@ -65,6 +69,8 @@ fun NavGraphBuilder.mapScreen(
         MapScreen(
             uiState = uiState,
             picking = picking,
+            focus = focus,
+            onFocusShown = onFocusShown,
             onEmotionConfirmed = onEmotionConfirmed,
             onMemoryClick = onMemoryClick,
             onPickStart = { onPickingChange(true) },

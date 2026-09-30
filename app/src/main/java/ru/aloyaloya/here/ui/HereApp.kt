@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.util.trace
@@ -15,11 +16,12 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import ru.aloyaloya.analytic.presentation.navigation.navigateToAnalytic
+import ru.aloyaloya.summary.presentation.navigation.navigateToSummary
 import ru.aloyaloya.calendar.presentation.navigation.navigateToCalendar
 import ru.aloyaloya.here.navigation.HereNavHost
 import ru.aloyaloya.here.navigation.TopLevelDestination
 import ru.aloyaloya.map.presentation.navigation.navigateToMap
+import ru.aloyaloya.mapkit.model.MapPoint
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 import ru.aloyaloya.map.R as MapR
 
@@ -56,6 +58,12 @@ fun HereApp(
      */
     var placePicking by rememberSaveable { mutableStateOf(false) }
 
+    /**
+     * Точка, которую карта должна показать, когда откроется: ее кладут другие разделы,
+     * а карта забирает. Поэтому ею, как и выбором места, владеет общий родитель.
+     */
+    var mapFocus by remember { mutableStateOf<MapPoint?>(null) }
+
     val contextMode = if (placePicking) {
         HereContextMode(
             titleResId = MapR.string.place_picker_title,
@@ -85,7 +93,14 @@ fun HereApp(
             HereNavHost(
                 navController = navController,
                 placePicking = placePicking,
-                onPlacePickingChange = { placePicking = it }
+                onPlacePickingChange = { placePicking = it },
+                mapFocus = mapFocus,
+                onShowOnMap = { point ->
+                    placePicking = false
+                    mapFocus = point
+                    navigateToTopLevelDestination(navController, TopLevelDestination.MAP)
+                },
+                onMapFocusShown = { mapFocus = null }
             )
         }
     }
@@ -143,7 +158,7 @@ private fun navigateToTopLevelDestination(
         when (topLevelDestination) {
             TopLevelDestination.MAP -> navController.navigateToMap(topLevelNavOptions)
             TopLevelDestination.CALENDAR -> navController.navigateToCalendar(topLevelNavOptions)
-            TopLevelDestination.ANALYTIC -> navController.navigateToAnalytic(topLevelNavOptions)
+            TopLevelDestination.SUMMARY -> navController.navigateToSummary(topLevelNavOptions)
         }
     }
 }

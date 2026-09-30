@@ -255,6 +255,16 @@ object HereSize {
         val iconSpacing = 14.dp
     }
 
+    /** Экран итогов. */
+    object Summary {
+        val emojiSize = 44.sp
+        val cardSpacing = 12.dp
+        val barHeight = 12.dp
+        val barGap = 2.dp
+        val legendEmojiSize = 18.sp
+        val recallPhotoHeight = 200.dp
+    }
+
     /** Основная кнопка. */
     object PrimaryButton {
         val height = 56.dp

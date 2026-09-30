@@ -46,7 +46,7 @@ class HereApplication : ComponentProvider, SingletonImageLoader.Factory, Applica
      *
      * Маршрутизирует запросы к фабрикам подкомпонентов из [appComponent].
      *
-     * @param key Ключ компонента: `map`, `memory`, `calendar` или `analytic`.
+     * @param key Ключ компонента: `map`, `memory`, `calendar` или `summary`.
      * @param clazz Ожидаемый тип компонента.
      * @return Созданный экземпляр компонента типа [T].
      * @throws IllegalArgumentException Если передан неизвестный ключ.
@@ -56,7 +56,7 @@ class HereApplication : ComponentProvider, SingletonImageLoader.Factory, Applica
             "map" -> appComponent.mapComponentFactory.create() as T
             "memory" -> appComponent.memoryComponentFactory.create() as T
             "calendar" -> appComponent.calendarComponentFactory.create() as T
-            "analytic" -> appComponent.analyticComponentFactory.create() as T
+            "summary" -> appComponent.summaryComponentFactory.create() as T
             else -> throw IllegalArgumentException("Unknown component key: $key")
         }
     }

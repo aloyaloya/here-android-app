@@ -2,16 +2,13 @@ package ru.aloyaloya.here.navigation
 
 import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
-import ru.aloyaloya.analytic.presentation.navigation.AnalyticRoute
 import ru.aloyaloya.calendar.presentation.navigation.CalendarRoute
 import ru.aloyaloya.map.presentation.navigation.MapRoute
+import ru.aloyaloya.summary.presentation.navigation.SummaryRoute
 import kotlin.reflect.KClass
 
 /**
  * Перечисление верхнеуровневых разделов навигации в приложении Here.
- *
- * Каждый раздел содержит метаданные, необходимые для навигации и отображения в UI:
- * иконку, подпись и информацию о маршруте.
  *
  * @property iconUnselectedResId Идентификатор ресурса активной иконки для отображения в панели навигации.
  * @property iconSelectedResId Идентификатор ресурса неактивной иконки для отображения в панели навигации.
@@ -42,11 +39,11 @@ enum class TopLevelDestination(
         titleResId = ru.aloyaloya.calendar.R.string.calendar_screen_title,
         route = CalendarRoute::class
     ),
-    ANALYTIC(
-        iconUnselectedResId = ru.aloyaloya.analytic.R.drawable.ic_analytic_outline,
-        iconSelectedResId = ru.aloyaloya.analytic.R.drawable.ic_analytic_solid,
-        labelResId = ru.aloyaloya.analytic.R.string.analytic_screen_label,
-        titleResId = ru.aloyaloya.analytic.R.string.analytic_screen_title,
-        route = AnalyticRoute::class
+    SUMMARY(
+        iconUnselectedResId = ru.aloyaloya.summary.R.drawable.ic_summary_outline,
+        iconSelectedResId = ru.aloyaloya.summary.R.drawable.ic_summary_solid,
+        labelResId = ru.aloyaloya.summary.R.string.summary_screen_label,
+        titleResId = ru.aloyaloya.summary.R.string.summary_screen_title,
+        route = SummaryRoute::class
     )
 }

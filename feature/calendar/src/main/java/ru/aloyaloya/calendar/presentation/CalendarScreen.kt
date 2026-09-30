@@ -45,7 +45,7 @@ import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
-import ru.aloyaloya.domain.model.Emotion
+import ru.aloyaloya.domain.model.dominantEmotion
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
@@ -133,8 +133,12 @@ private fun CalendarContent(
     val markByDate = uiState.emotionByDate.mapValues { (_, emotion) ->
         CalendarDayMark(emoji = emotion.emoji, color = emotion.color.solid)
     }
-    val monthEmotion = remember(uiState.emotionByDate, shownMonth) {
-        uiState.emotionByDate.dominantEmotionIn(shownMonth)
+    val monthEmotion = remember(uiState.memoriesByDate, shownMonth) {
+        uiState.memoriesByDate
+            .filterKeys { YearMonth.from(it) == shownMonth }
+            .values
+            .flatten()
+            .dominantEmotion()
     }
 
     // TODO: плавно менять цвет фона при перелистывании месяца
@@ -296,22 +300,6 @@ private fun MoodGlow(color: Color?) {
             }
     )
 }
-
-/**
- * Эмоция, которая чаще других встречается в днях [month].
- *
- * При равенстве побеждает та, что была позже: она ближе к тому,
- * чем месяц закончился.
- */
-private fun Map<LocalDate, Emotion>.dominantEmotionIn(month: YearMonth): Emotion? =
-    filterKeys { YearMonth.from(it) == month }
-        .entries
-        .groupBy({ it.value }, { it.key })
-        .maxWithOrNull(
-            compareBy<Map.Entry<Emotion, List<LocalDate>>> { it.value.size }
-                .thenBy { it.value.max() }
-        )
-        ?.key
 
 /** Насыщенность пятна: фон подсказывает настроение, а не спорит с днями. */
 private const val GLOW_ALPHA = 0.45f
