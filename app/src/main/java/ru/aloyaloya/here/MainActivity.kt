@@ -5,6 +5,7 @@ import android.os.Bundle
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.Crossfade
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
@@ -13,6 +14,7 @@ import androidx.compose.runtime.getValue
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.design_system.theme.ThemeMode
 import ru.aloyaloya.here.ui.HereApp
+import ru.aloyaloya.onboarding.presentation.OnboardingScreen
 
 /**
  * Главная Activity приложения.
@@ -20,6 +22,7 @@ import ru.aloyaloya.here.ui.HereApp
  * Подписывается на режим темы из [MainViewModel] и передает его в [HereTheme],
  * чтобы переключение применялось ко всему UI. Разрешенное значение темы нужно
  * и самой Activity: по нему подбирается вид системных баров.
+ * Пока онбординг не пройден, вместо приложения показывается он.
  */
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
@@ -34,6 +37,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContent {
             val themeMode by viewModel.themeMode.collectAsState()
+            val onboardingCompleted by viewModel.onboardingCompleted.collectAsState()
             val darkTheme = when (themeMode) {
                 ThemeMode.AUTO -> isSystemInDarkTheme()
                 ThemeMode.LIGHT -> false
@@ -56,7 +60,13 @@ class MainActivity : AppCompatActivity() {
             }
 
             HereTheme(themeMode = themeMode) {
-                HereApp(darkTheme = darkTheme)
+                Crossfade(targetState = onboardingCompleted, label = "onboarding") { completed ->
+                    if (completed) {
+                        HereApp(darkTheme = darkTheme)
+                    } else {
+                        OnboardingScreen(onFinished = viewModel::completeOnboarding)
+                    }
+                }
             }
         }
     }

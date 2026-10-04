@@ -15,11 +15,13 @@ import javax.inject.Inject
  * ViewModel корневого экрана приложения.
  *
  * Отдает в UI режим темы из [SettingsRepository]. Меняют его на экране настроек,
- * а сюда он приходит через общий репозиторий.
+ * а сюда он приходит через общий репозиторий. Здесь же флаг онбординга.
  */
 class MainViewModel @Inject constructor(
-    settingsRepository: SettingsRepository
+    private val settingsRepository: SettingsRepository
 ) : ViewModel() {
+
+    val onboardingCompleted: StateFlow<Boolean> = settingsRepository.onboardingCompleted
 
     val themeMode: StateFlow<ThemeMode> = settingsRepository.theme
         .map { it.toThemeMode() }
@@ -28,6 +30,10 @@ class MainViewModel @Inject constructor(
             started = SharingStarted.Eagerly,
             initialValue = settingsRepository.theme.value.toThemeMode()
         )
+
+    fun completeOnboarding() {
+        settingsRepository.completeOnboarding()
+    }
 
     private fun AppTheme.toThemeMode(): ThemeMode = when (this) {
         AppTheme.AUTO -> ThemeMode.AUTO

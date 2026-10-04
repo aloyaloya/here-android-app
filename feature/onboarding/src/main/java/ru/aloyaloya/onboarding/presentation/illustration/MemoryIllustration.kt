@@ -68,7 +68,7 @@ fun MemoryIllustration(modifier: Modifier = Modifier) {
             )
 
             Text(
-                text = stringResource(R.string.onboarding_memory_title),
+                text = stringResource(R.string.onboarding_card_title),
                 style = MaterialTheme.typography.titleSmall,
                 color = colors.textPrimary,
                 maxLines = 1,
@@ -82,7 +82,7 @@ fun MemoryIllustration(modifier: Modifier = Modifier) {
             )
 
             Text(
-                text = stringResource(R.string.onboarding_memory_note),
+                text = stringResource(R.string.onboarding_card_note),
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.textBody,
                 maxLines = 2,

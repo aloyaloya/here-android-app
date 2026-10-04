@@ -18,6 +18,8 @@ interface SettingsRepository {
 
     val language: AppLanguage
 
+    val onboardingCompleted: StateFlow<Boolean>
+
     fun setTheme(theme: AppTheme)
 
     fun setHapticsEnabled(enabled: Boolean)
@@ -25,4 +27,6 @@ interface SettingsRepository {
     fun setReminder(reminder: DailyReminder)
 
     fun setLanguage(language: AppLanguage)
+
+    fun completeOnboarding()
 }

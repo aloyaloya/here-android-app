@@ -36,6 +36,11 @@ class SettingsRepositoryImpl @Inject constructor(
     private val _reminder = MutableStateFlow(readReminder())
     override val reminder: StateFlow<DailyReminder> = _reminder.asStateFlow()
 
+    private val _onboardingCompleted = MutableStateFlow(
+        preferences.getBoolean(KEY_ONBOARDING_COMPLETED, false)
+    )
+    override val onboardingCompleted: StateFlow<Boolean> = _onboardingCompleted.asStateFlow()
+
     override val language: AppLanguage
         get() = when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
             LANGUAGE_RUSSIAN -> AppLanguage.RUSSIAN
@@ -70,6 +75,11 @@ class SettingsRepositoryImpl @Inject constructor(
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tags))
     }
 
+    override fun completeOnboarding() {
+        _onboardingCompleted.value = true
+        preferences.edit().putBoolean(KEY_ONBOARDING_COMPLETED, true).apply()
+    }
+
     private fun readTheme(): AppTheme {
         val stored = preferences.getString(KEY_THEME_MODE, null) ?: return AppTheme.AUTO
 
@@ -91,6 +101,7 @@ class SettingsRepositoryImpl @Inject constructor(
         const val KEY_HAPTICS_ENABLED = "key_haptics_enabled"
         const val KEY_REMINDER_ENABLED = "key_reminder_enabled"
         const val KEY_REMINDER_MINUTE_OF_DAY = "key_reminder_minute_of_day"
+        const val KEY_ONBOARDING_COMPLETED = "key_onboarding_completed"
         const val DEFAULT_REMINDER_MINUTE_OF_DAY = 21 * 60
         const val LANGUAGE_RUSSIAN = "ru"
         const val LANGUAGE_ENGLISH = "en"

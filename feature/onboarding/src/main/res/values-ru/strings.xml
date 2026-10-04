@@ -1,8 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name="onboarding_skip">Пропустить</string>
+    <string name="onboarding_next">Дальше</string>
+    <string name="onboarding_map_title">Карта твоих эмоций</string>
+    <string name="onboarding_map_body">Отмечай места, где тебя что-то тронуло, — они останутся на твоей карте.</string>
+    <string name="onboarding_memory_title">Сохрани момент целиком</string>
+    <string name="onboarding_memory_body">Эмоция, заметка, фото и видео — всё, что хочется запомнить о моменте.</string>
+    <string name="onboarding_calendar_title">Возвращайся к своим дням</string>
+    <string name="onboarding_calendar_body">Календарь и итоги покажут, как менялось настроение.</string>
+    <string name="onboarding_location_title">Покажем, где ты сейчас</string>
+    <string name="onboarding_location_body">Карта откроется там, где ты, а новое воспоминание сразу встанет на это место. Геолокация никуда не отправляется.</string>
+    <string name="permission_allow">Разрешить</string>
+    <string name="permission_not_now">Не сейчас</string>
     <string name="onboarding_location_here">Ты здесь</string>
     <string name="onboarding_pick_hint">Двигай карту к нужному месту</string>
-    <string name="onboarding_memory_title">Кофе у Патриарших</string>
-    <string name="onboarding_memory_note">Сидели на лавочке, пока не стемнело. Хочу сюда ещё.</string>
+    <string name="onboarding_card_title">Кофе у Патриарших</string>
+    <string name="onboarding_card_note">Сидели на лавочке, пока не стемнело. Хочу сюда ещё.</string>
     <string name="onboarding_calendar_summary">Итоги</string>
 </resources>
