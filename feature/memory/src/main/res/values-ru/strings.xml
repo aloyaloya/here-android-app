@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="memory_form_title_new">Новое место</string>
+    <string name="memory_form_title_edit">Изменить</string>
+
+    <string name="memory_form_date_label">Дата</string>
+    <string name="memory_form_time_label">Время</string>
+
+    <string name="memory_form_emotion_label">Что чувствуешь</string>
+    <string name="memory_form_title_label">Как назовем место?</string>
+    <string name="memory_form_description_label">Что запомнилось?</string>
+    <string name="memory_form_save_new">Сохранить воспоминание</string>
+    <string name="memory_form_save_edit">Сохранить изменения</string>
+
+    <string name="memory_title">Воспоминание</string>
+    <string name="memory_back">Назад</string>
+    <string name="memory_media_title">Фото и видео</string>
+    <string name="memory_media_close">Закрыть просмотр</string>
+    <string name="memory_media_counter">%1$d из %2$d</string>
+    <string name="memory_more">Действия</string>
+    <string name="memory_action_edit">Редактировать</string>
+    <string name="memory_action_delete">Удалить</string>
+    <string name="memory_delete_title">Удалить «%1$s»?</string>
+    <string name="memory_delete_message">Воспоминание и его фотографии исчезнут с карты навсегда.</string>
+    <string name="memory_delete_confirm">Удалить</string>
+
+
+    <string name="sheet_cancel">Отмена</string>
+
+    <string name="date_sheet_label">Когда это было</string>
+
+    <string name="time_sheet_label">Во сколько</string>
+    <string name="time_sheet_now">Сейчас</string>
+</resources>

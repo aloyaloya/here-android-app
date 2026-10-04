@@ -1,17 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="map_screen_title">Карта эмоций</string>
-    <string name="map_screen_label">Карта</string>
+    <string name="map_screen_title">Map of emotions</string>
+    <string name="map_screen_label">Map</string>
 
-    <string name="emotion_picker_title">Что чувствуешь здесь?</string>
-    <string name="emotion_picker_next">Дальше</string>
+    <string name="emotion_picker_title">How do you feel here?</string>
+    <string name="emotion_picker_next">Next</string>
 
-    <string name="place_picker_title">Выберите место</string>
-    <string name="place_picker_here">Здесь</string>
+    <string name="place_picker_title">Pick a place</string>
+    <string name="place_picker_here">Here</string>
     <plurals name="place_memories_title">
-        <item quantity="one">Здесь %d воспоминание</item>
-        <item quantity="few">Здесь %d воспоминания</item>
-        <item quantity="many">Здесь %d воспоминаний</item>
-        <item quantity="other">Здесь %d воспоминания</item>
+        <item quantity="one">%d memory here</item>
+        <item quantity="other">%d memories here</item>
     </plurals>
 </resources>
