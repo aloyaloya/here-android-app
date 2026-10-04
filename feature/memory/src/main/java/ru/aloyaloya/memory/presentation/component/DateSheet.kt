@@ -14,6 +14,8 @@ import ru.aloyaloya.design_system.component.calendar.CalendarDayMark
 import ru.aloyaloya.design_system.component.calendar.HereMonthGrid
 import ru.aloyaloya.design_system.component.calendar.HereMonthHeader
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
+import ru.aloyaloya.design_system.component.sheet.HereSheetActions
+import ru.aloyaloya.design_system.component.sheet.HereSheetTitle
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.memory.R
@@ -60,7 +62,7 @@ fun DateSheet(
                 bottom = HereSize.Sheet.bottomPadding
             )
         ) {
-            SheetTitle(
+            HereSheetTitle(
                 label = stringResource(R.string.date_sheet_label),
                 value = FullDateFormat.format(selectedDate)
             )
@@ -78,7 +80,7 @@ fun DateSheet(
                 onDayClick = { selectedDate = it }
             )
 
-            SheetActions(
+            HereSheetActions(
                 onCancelClick = onDismissRequest,
                 onConfirmClick = { onDateSelected(selectedDate) }
             )

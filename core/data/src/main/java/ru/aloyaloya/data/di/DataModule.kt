@@ -2,8 +2,12 @@ package ru.aloyaloya.data.di
 
 import dagger.Binds
 import dagger.Module
+import ru.aloyaloya.data.repository.BackupRepositoryImpl
 import ru.aloyaloya.data.repository.MemoryRepositoryImpl
+import ru.aloyaloya.data.repository.SettingsRepositoryImpl
+import ru.aloyaloya.domain.repository.BackupRepository
 import ru.aloyaloya.domain.repository.MemoryRepository
+import ru.aloyaloya.domain.repository.SettingsRepository
 import javax.inject.Singleton
 
 /**
@@ -18,4 +22,13 @@ interface DataModule {
     @Binds
     @Singleton
     fun bindMemoryRepository(impl: MemoryRepositoryImpl): MemoryRepository
+
+    /** Привязывает [SettingsRepositoryImpl] к [SettingsRepository]. */
+    @Binds
+    @Singleton
+    fun bindSettingsRepository(impl: SettingsRepositoryImpl): SettingsRepository
+
+    /** Привязывает [BackupRepositoryImpl] к [BackupRepository]. */
+    @Binds
+    fun bindBackupRepository(impl: BackupRepositoryImpl): BackupRepository
 }

@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import ru.aloyaloya.settings.presentation.navigation.settingsScreen
 import ru.aloyaloya.summary.presentation.navigation.summaryScreen
 import ru.aloyaloya.calendar.presentation.navigation.calendarScreen
 import ru.aloyaloya.map.presentation.navigation.MapRoute
@@ -73,5 +74,6 @@ fun HereNavHost(
             onPlaceClick = { latitude, longitude -> onShowOnMap(MapPoint(latitude, longitude)) },
             onMemoryClick = { memoryId -> navController.navigateToMemory(memoryId) }
         )
+        settingsScreen(onBackClick = { navController.popBackStack() })
     }
 }

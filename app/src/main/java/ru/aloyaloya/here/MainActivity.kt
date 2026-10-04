@@ -56,10 +56,7 @@ class MainActivity : ComponentActivity() {
             }
 
             HereTheme(themeMode = themeMode) {
-                HereApp(
-                    darkTheme = darkTheme,
-                    onThemeChange = { viewModel.onThemeChange(darkTheme) }
-                )
+                HereApp(darkTheme = darkTheme)
             }
         }
     }

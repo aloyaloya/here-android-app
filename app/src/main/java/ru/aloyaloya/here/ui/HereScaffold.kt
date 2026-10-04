@@ -36,8 +36,7 @@ import ru.aloyaloya.design_system.R as DesignSystemR
  * @param contextMode Текущий режим приложения или `null`, если приложение не в режиме.
  * @param destinations Список объектов [TopLevelDestination].
  * @param onNavigate Колбэк, вызываемый при нажатии на элемент навигации.
- * @param darkTheme Текущее состояние темы для кнопки в верхней панели.
- * @param onThemeChange Колбэк переключения темы.
+ * @param onSettingsClick Колбэк нажатия на кнопку настроек в верхней панели.
  * @param modifier [Modifier], применяемый к контейнеру [Box].
  * @param content Основной контент экрана.
  */
@@ -47,8 +46,7 @@ fun HereScaffold(
     contextMode: HereContextMode?,
     destinations: List<TopLevelDestination>,
     onNavigate: (TopLevelDestination) -> Unit,
-    darkTheme: Boolean,
-    onThemeChange: () -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
@@ -72,8 +70,7 @@ fun HereScaffold(
             } else {
                 TopAppBar(
                     title = stringResource(currentTopLevelDestination.titleResId),
-                    darkTheme = darkTheme,
-                    onThemeChange = onThemeChange,
+                    onSettingsClick = onSettingsClick,
                     modifier = Modifier.align(Alignment.TopCenter)
                 )
             }

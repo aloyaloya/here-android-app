@@ -14,21 +14,19 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
- * Верхняя панель приложения с заголовком текущего раздела и action-кнопкой темы.
+ * Верхняя панель приложения с заголовком текущего раздела и кнопкой настроек.
  *
  * Панель во всю ширину и без скруглений: это край экрана, а не плашка поверх него.
  * Фон непрозрачный и уходит под статус-бар, поэтому контент под панель не просвечивает.
  *
  * @param title Заголовок текущего раздела.
- * @param darkTheme Текущее состояние темы для анимированного switcher'а.
- * @param onThemeChange Колбэк переключения темы.
+ * @param onSettingsClick Колбэк нажатия на кнопку настроек.
  * @param modifier Внешний [Modifier] панели.
  */
 @Composable
 fun TopAppBar(
     title: String,
-    darkTheme: Boolean,
-    onThemeChange: () -> Unit,
+    onSettingsClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     Row(
@@ -48,9 +46,6 @@ fun TopAppBar(
             title = title,
             modifier = Modifier.weight(1f)
         )
-        TopAppBarActions(
-            darkTheme = darkTheme,
-            onThemeChange = onThemeChange
-        )
+        TopAppBarActions(onSettingsClick = onSettingsClick)
     }
 }

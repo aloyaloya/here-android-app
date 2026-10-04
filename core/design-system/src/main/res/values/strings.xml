@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="theme_toggle_content_description">Сменить тему</string>
+    <string name="settings_content_description">Настройки</string>
     <string name="fab_add_memory_content_description">Добавить воспоминание</string>
     <string name="fab_location_content_description">Показать мое место</string>
     <string name="media_add">+ медиа</string>
@@ -10,4 +10,6 @@
     <string name="context_bar_back_content_description">Выйти из режима</string>
     <string name="calendar_previous_month">Предыдущий месяц</string>
     <string name="calendar_next_month">Следующий месяц</string>
+    <string name="sheet_cancel">Отмена</string>
+    <string name="sheet_confirm">Выбрать</string>
 </resources>

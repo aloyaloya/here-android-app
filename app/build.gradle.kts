@@ -51,6 +51,7 @@ dependencies {
     implementation(project(":feature:memory"))
     implementation(project(":feature:calendar"))
     implementation(project(":feature:summary"))
+    implementation(project(":feature:settings"))
 
     implementation(libs.coil.core)
 

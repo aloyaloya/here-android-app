@@ -7,6 +7,7 @@ import android.webkit.MimeTypeMap
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import java.io.File
+import java.io.InputStream
 import java.util.UUID
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -37,6 +38,16 @@ class MediaStorage @Inject constructor(context: Context) {
         }
     }
 
+    /** Сохраняет поток в новый файл с расширением [extension] и возвращает путь к нему. */
+    suspend fun save(input: InputStream, extension: String?): String = withContext(Dispatchers.IO) {
+        val name = UUID.randomUUID().toString()
+        val file = File(root, if (extension == null) name else "$name.$extension")
+
+        root.mkdirs()
+        file.outputStream().use(input::copyTo)
+        file.path
+    }
+
     suspend fun delete(paths: List<String>) {
         if (paths.isEmpty()) return
 
@@ -48,6 +59,11 @@ class MediaStorage @Inject constructor(context: Context) {
                 if (file.canonicalPath.startsWith(rootPath)) file.delete()
             }
         }
+    }
+
+    /** Удаляет все сохраненные медиафайлы вместе с папкой. */
+    suspend fun clear() {
+        withContext(Dispatchers.IO) { root.deleteRecursively() }
     }
 
     /** Имя копии с расширением: по нему Coil и плеер понимают, что за файл внутри. */

@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="settings_title">Настройки</string>
+    <string name="settings_back">Назад</string>
+    <string name="settings_section_appearance">Оформление</string>
+    <string name="settings_theme">Тема</string>
+    <string name="settings_theme_auto">Системная</string>
+    <string name="settings_theme_light">Светлая</string>
+    <string name="settings_theme_dark">Тёмная</string>
+    <string name="settings_section_feedback">Отклик</string>
+    <string name="settings_haptics">Тактильный отклик</string>
+    <string name="settings_haptics_description">Лёгкая вибрация при нажатиях</string>
+    <string name="settings_section_reminder">Напоминание</string>
+    <string name="settings_reminder">Напоминать вечером</string>
+    <string name="settings_reminder_description">Уведомление записать, как прошёл день</string>
+    <string name="settings_reminder_denied">Уведомления запрещены — разреши их в настройках системы</string>
+    <string name="settings_reminder_time">Время</string>
+    <string name="settings_reminder_time_title">Время напоминания</string>
+    <string name="settings_section_data">Данные</string>
+    <string name="settings_export">Сохранить резервную копию</string>
+    <string name="settings_export_description">Воспоминания, фото и видео в один zip-файл</string>
+    <string name="settings_export_running">Сохраняю…</string>
+    <string name="settings_export_done">Сохранено воспоминаний: %d</string>
+    <string name="settings_export_failed">Не получилось сохранить копию</string>
+    <string name="settings_import">Восстановить из копии</string>
+    <string name="settings_import_description">Добавит воспоминания, которых здесь ещё нет</string>
+    <string name="settings_import_running">Добавляю…</string>
+    <string name="settings_import_done">Добавлено воспоминаний: %d</string>
+    <string name="settings_import_nothing_new">Все воспоминания из копии уже здесь</string>
+    <string name="settings_import_failed">Не получилось прочитать копию</string>
+    <string name="settings_delete_all">Удалить все воспоминания</string>
+    <string name="settings_delete_all_empty">Воспоминаний пока нет</string>
+    <plurals name="settings_memory_count">
+        <item quantity="one">%d воспоминание вместе с фото и видео</item>
+        <item quantity="few">%d воспоминания вместе с фото и видео</item>
+        <item quantity="many">%d воспоминаний вместе с фото и видео</item>
+        <item quantity="other">%d воспоминания вместе с фото и видео</item>
+    </plurals>
+    <string name="settings_delete_all_title">Удалить все воспоминания?</string>
+    <plurals name="settings_delete_all_message">
+        <item quantity="one">%d воспоминание, его фото и видео исчезнут навсегда. Отменить это нельзя.</item>
+        <item quantity="few">%d воспоминания, их фото и видео исчезнут навсегда. Отменить это нельзя.</item>
+        <item quantity="many">%d воспоминаний, их фото и видео исчезнут навсегда. Отменить это нельзя.</item>
+        <item quantity="other">%d воспоминания, их фото и видео исчезнут навсегда. Отменить это нельзя.</item>
+    </plurals>
+    <string name="settings_delete_all_confirm">Удалить</string>
+    <string name="settings_section_about">О приложении</string>
+    <string name="settings_version">Версия</string>
+    <string name="settings_yandex_maps_terms">Условия использования Яндекс Карт</string>
+    <string name="settings_yandex_maps_terms_description">Карта в приложении работает на MapKit</string>
+    <string name="settings_cancel">Отмена</string>
+</resources>

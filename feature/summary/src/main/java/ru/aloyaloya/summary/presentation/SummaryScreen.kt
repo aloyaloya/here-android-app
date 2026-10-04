@@ -22,24 +22,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import ru.aloyaloya.design_system.component.button.HereSecondaryButton
 import ru.aloyaloya.design_system.component.emotion.EmotionBadge
 import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
-import ru.aloyaloya.domain.model.MediaType
-import ru.aloyaloya.domain.model.Memory
-import java.time.Instant
-import java.time.ZoneId
 import ru.aloyaloya.design_system.component.memory.HereMemoryRow
+import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
+import ru.aloyaloya.domain.model.MediaType
+import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.summary.R
 import ru.aloyaloya.summary.model.EmotionShare
 import ru.aloyaloya.summary.model.MoodPlace
@@ -48,7 +47,9 @@ import ru.aloyaloya.summary.model.SummaryUiState
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
 import ru.aloyaloya.ui.emotion.labelResId
+import java.time.Instant
 import java.time.LocalDate
+import java.time.ZoneId
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import kotlin.math.roundToInt
@@ -225,57 +226,55 @@ private fun EmotionMixCard(
 ) {
     val colors = HereTheme.colors
 
-    Column(
-        verticalArrangement = Arrangement.spacedBy(HereSize.Summary.cardSpacing),
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(HereShape.tile)
-            .background(colors.surface)
-            .padding(HereSpacing.l)
-    ) {
-        Text(
-            text = stringResource(R.string.summary_emotions_title),
-            style = MaterialTheme.typography.titleMedium,
-            color = colors.textPrimary
-        )
+    Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
+        SummarySectionLabel(stringResource(R.string.summary_emotions_title))
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(HereSize.Summary.barGap),
+        Column(
+            verticalArrangement = Arrangement.spacedBy(HereSize.Summary.cardSpacing),
             modifier = Modifier
                 .fillMaxWidth()
-                .height(HereSize.Summary.barHeight)
-                .clip(HereShape.pill)
+                .clip(HereShape.tile)
+                .background(colors.surface)
+                .padding(HereSpacing.l)
         ) {
-            shares.forEach { share ->
-                Box(
-                    modifier = Modifier
-                        .weight(share.count.toFloat())
-                        .fillMaxHeight()
-                        .background(share.emotion.color.solid)
-                )
-            }
-        }
-
-        shares.forEach { share ->
             Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(HereSpacing.s)
+                horizontalArrangement = Arrangement.spacedBy(HereSize.Summary.barGap),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .height(HereSize.Summary.barHeight)
+                    .clip(HereShape.pill)
             ) {
-                Text(
-                    text = share.emotion.emoji,
-                    fontSize = HereSize.Summary.legendEmojiSize
-                )
-                Text(
-                    text = stringResource(share.emotion.labelResId),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colors.textPrimary,
-                    modifier = Modifier.weight(1f)
-                )
-                Text(
-                    text = "${(share.count * 100f / total).roundToInt()}%",
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = colors.textSecondary
-                )
+                shares.forEach { share ->
+                    Box(
+                        modifier = Modifier
+                            .weight(share.count.toFloat())
+                            .fillMaxHeight()
+                            .background(share.emotion.color.solid)
+                    )
+                }
+            }
+
+            shares.forEach { share ->
+                Row(
+                    verticalAlignment = Alignment.CenterVertically,
+                    horizontalArrangement = Arrangement.spacedBy(HereSpacing.s)
+                ) {
+                    Text(
+                        text = share.emotion.emoji,
+                        fontSize = HereSize.Summary.legendEmojiSize
+                    )
+                    Text(
+                        text = stringResource(share.emotion.labelResId),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.textPrimary,
+                        modifier = Modifier.weight(1f)
+                    )
+                    Text(
+                        text = "${(share.count * 100f / total).roundToInt()}%",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.textSecondary
+                    )
+                }
             }
         }
     }
@@ -290,11 +289,7 @@ private fun MoodPlaces(
     onPlaceClick: (latitude: Double, longitude: Double) -> Unit
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
-        Text(
-            text = stringResource(R.string.summary_places_title),
-            style = MaterialTheme.typography.titleMedium,
-            color = HereTheme.colors.textPrimary
-        )
+        SummarySectionLabel(stringResource(R.string.summary_places_title))
 
         places.forEach { place ->
             HereMemoryRow(
@@ -326,11 +321,7 @@ private fun Recall(
     val media = memory.media.firstOrNull()
 
     Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
-        Text(
-            text = stringResource(R.string.summary_recall_title),
-            style = MaterialTheme.typography.titleMedium,
-            color = colors.textPrimary
-        )
+        SummarySectionLabel(stringResource(R.string.summary_recall_title))
 
         Column(
             modifier = Modifier
@@ -455,5 +446,13 @@ private fun PeriodChip(
             .background(if (selected) colors.accentContainer else colors.surfaceMuted)
             .clickable(onClick = onClick)
             .padding(horizontal = HereSpacing.l, vertical = HereSpacing.s)
+    )
+}
+
+@Composable
+private fun SummarySectionLabel(text: String) {
+    HereSectionLabel(
+        text = text,
+        modifier = Modifier.padding(horizontal = HereSpacing.xs)
     )
 }

@@ -1,4 +1,4 @@
-package ru.aloyaloya.memory.presentation.component
+package ru.aloyaloya.design_system.component.sheet
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -9,12 +9,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.button.HereSecondaryButton
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
-import ru.aloyaloya.memory.R
 
 /** Доли ширины кнопок: подтверждение заметно шире отказа. */
 private const val CANCEL_WEIGHT = 1f
@@ -28,7 +28,7 @@ private const val CONFIRM_WEIGHT = 1.4f
  * @param modifier [Modifier], применяемый к шапке.
  */
 @Composable
-fun SheetTitle(
+fun HereSheetTitle(
     label: String,
     value: String,
     modifier: Modifier = Modifier
@@ -59,7 +59,7 @@ fun SheetTitle(
  * @param modifier [Modifier], применяемый к ряду кнопок.
  */
 @Composable
-fun SheetActions(
+fun HereSheetActions(
     onCancelClick: () -> Unit,
     onConfirmClick: () -> Unit,
     modifier: Modifier = Modifier
