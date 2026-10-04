@@ -39,6 +39,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.core.content.ContextCompat
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
+import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -48,11 +49,8 @@ import ru.aloyaloya.settings.model.BackupStatus
 import ru.aloyaloya.settings.model.SettingsUiState
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
 
 private const val YANDEX_MAPS_TERMS_URL = "https://yandex.ru/legal/maps_termsofuse/"
-
-internal val ReminderTimeFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 private const val ZIP_MIME_TYPE = "application/zip"
 
@@ -174,7 +172,7 @@ fun SettingsScreen(
                 )
                 ActionRow(
                     title = stringResource(R.string.settings_reminder_time),
-                    description = uiState.reminder.time.format(ReminderTimeFormat),
+                    description = uiState.reminder.time.format(TimeFormat),
                     enabled = uiState.reminder.enabled,
                     onClick = { reminderTimeSheetVisible = true }
                 )

@@ -24,18 +24,15 @@ import ru.aloyaloya.design_system.component.picker.HereTimeWheel
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
 import ru.aloyaloya.design_system.component.sheet.HereSheetActions
 import ru.aloyaloya.design_system.component.sheet.HereSheetTitle
+import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.memory.R
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 
 /** Шаг барабана минут: до минуты воспоминание уточнять незачем. */
 private const val MINUTE_STEP = 10
-
-private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"))
 
 /** Время, которое предлагают чипы. */
 private val QuickTimes = listOf(

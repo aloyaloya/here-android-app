@@ -33,6 +33,9 @@ import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
 import ru.aloyaloya.design_system.component.memory.HereMemoryRow
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
+import ru.aloyaloya.design_system.format.FullDateFormat
+import ru.aloyaloya.design_system.format.MonthYearFormat
+import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
@@ -50,12 +53,7 @@ import ru.aloyaloya.ui.emotion.labelResId
 import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import kotlin.math.roundToInt
-
-private val MonthFormat = DateTimeFormatter.ofPattern("LLLL yyyy", Locale.forLanguageTag("ru"))
-private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru"))
 
 /** С меньшим числом воспоминаний итогам не о чем рассказать. */
 private const val MIN_MEMORY_COUNT = 3
@@ -317,6 +315,8 @@ private fun Recall(
     onClick: () -> Unit,
     onAnotherClick: () -> Unit
 ) {
+    val dateFormat = FullDateFormat.withLocale(currentLocale())
+
     val colors = HereTheme.colors
     val media = memory.media.firstOrNull()
 
@@ -366,7 +366,7 @@ private fun Recall(
                         overflow = TextOverflow.Ellipsis
                     )
                     Text(
-                        text = DateFormat.format(
+                        text = dateFormat.format(
                             Instant.ofEpochMilli(memory.happenedAt).atZone(ZoneId.systemDefault())
                         ),
                         style = MaterialTheme.typography.bodySmall,
@@ -405,9 +405,10 @@ private fun NotEnoughMemories() {
 @Composable
 private fun periodTitle(period: SummaryPeriod): String {
     val today = LocalDate.now()
+    val monthFormat = MonthYearFormat.withLocale(currentLocale())
 
     return when (period) {
-        SummaryPeriod.MONTH -> MonthFormat.format(today).replaceFirstChar { it.uppercase() }
+        SummaryPeriod.MONTH -> monthFormat.format(today).replaceFirstChar { it.uppercase() }
         SummaryPeriod.YEAR -> stringResource(R.string.summary_title_year, today.year)
         SummaryPeriod.ALL_TIME -> stringResource(R.string.summary_title_all_time)
     }

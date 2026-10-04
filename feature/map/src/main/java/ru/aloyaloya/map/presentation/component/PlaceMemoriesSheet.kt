@@ -13,6 +13,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import ru.aloyaloya.design_system.component.memory.HereMemoryRow
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
+import ru.aloyaloya.design_system.format.FullDateFormat
+import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Memory
@@ -21,10 +23,6 @@ import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
 import java.time.Instant
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
-
-private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru"))
 
 /**
  * Лист с воспоминаниями, которые стоят в одной точке карты.
@@ -39,6 +37,8 @@ fun PlaceMemoriesSheet(
     onMemoryClick: (Long) -> Unit,
     onDismissRequest: () -> Unit
 ) {
+    val dateFormat = FullDateFormat.withLocale(currentLocale())
+
     HereBottomSheet(onDismissRequest = onDismissRequest) {
         Column(
             verticalArrangement = Arrangement.spacedBy(HereSize.Sheet.contentSpacing),
@@ -66,7 +66,7 @@ fun PlaceMemoriesSheet(
                         emoji = memory.emotion.emoji,
                         color = memory.emotion.color.soft,
                         title = memory.title,
-                        subtitle = DateFormat.format(
+                        subtitle = dateFormat.format(
                             Instant.ofEpochMilli(memory.happenedAt).atZone(ZoneId.systemDefault())
                         ),
                         onClick = { onMemoryClick(memory.id) }

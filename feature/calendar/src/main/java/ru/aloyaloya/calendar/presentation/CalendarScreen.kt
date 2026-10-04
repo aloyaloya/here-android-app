@@ -41,6 +41,9 @@ import ru.aloyaloya.design_system.component.calendar.CalendarDayMark
 import ru.aloyaloya.design_system.component.calendar.HereMonthGrid
 import ru.aloyaloya.design_system.component.calendar.HereMonthHeader
 import ru.aloyaloya.design_system.component.memory.HereMemoryRow
+import ru.aloyaloya.design_system.format.DayMonthFormat
+import ru.aloyaloya.design_system.format.TimeFormat
+import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
@@ -53,9 +56,7 @@ import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
-import java.util.Locale
 
 /** Первый месяц, до которого можно долистать: от него считаются страницы. */
 private val FirstMonth = YearMonth.of(1900, 1)
@@ -67,9 +68,6 @@ private fun monthAt(page: Int): YearMonth = FirstMonth.plusMonths(page.toLong())
 
 private val YearMonth.page: Int
     get() = ChronoUnit.MONTHS.between(FirstMonth, this).toInt()
-
-private val DayFormat = DateTimeFormatter.ofPattern("d MMMM", Locale.forLanguageTag("ru"))
-private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"))
 
 /**
  * Экран календаря: воспоминания по дням месяца.
@@ -218,6 +216,8 @@ private fun DayMemories(
     onTodayClick: (() -> Unit)?,
     onMemoryClick: (Long) -> Unit
 ) {
+    val dayFormat = DayMonthFormat.withLocale(currentLocale())
+
     Column(verticalArrangement = Arrangement.spacedBy(HereSize.MemoryRow.spacing)) {
         Row(
             verticalAlignment = Alignment.CenterVertically,
@@ -227,7 +227,7 @@ private fun DayMemories(
                 .heightIn(min = HereSize.Calendar.navButtonSize)
         ) {
             Text(
-                text = DayFormat.format(date),
+                text = dayFormat.format(date),
                 style = MaterialTheme.typography.titleMedium,
                 color = HereTheme.colors.textPrimary
             )

@@ -14,6 +14,7 @@ import ru.aloyaloya.design_system.component.picker.HereTimeWheel
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
 import ru.aloyaloya.design_system.component.sheet.HereSheetActions
 import ru.aloyaloya.design_system.component.sheet.HereSheetTitle
+import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.settings.R
 import java.time.LocalTime
@@ -53,7 +54,7 @@ fun ReminderTimeSheet(
         ) {
             HereSheetTitle(
                 label = stringResource(R.string.settings_reminder_time_title),
-                value = selectedTime.format(ReminderTimeFormat)
+                value = selectedTime.format(TimeFormat)
             )
 
             HereTimeWheel(
