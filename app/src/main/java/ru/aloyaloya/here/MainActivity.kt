@@ -2,10 +2,10 @@ package ru.aloyaloya.here
 
 import android.graphics.Color
 import android.os.Bundle
-import androidx.activity.ComponentActivity
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
@@ -21,7 +21,7 @@ import ru.aloyaloya.here.ui.HereApp
  * чтобы переключение применялось ко всему UI. Разрешенное значение темы нужно
  * и самой Activity: по нему подбирается вид системных баров.
  */
-class MainActivity : ComponentActivity() {
+class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
