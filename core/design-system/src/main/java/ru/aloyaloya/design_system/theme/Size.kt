@@ -271,4 +271,43 @@ object HereSize {
         val disabledContainerAlpha = 0.12f
         val disabledContentAlpha = 0.38f
     }
+
+    /** Индикатор страниц пейджера. */
+    object PagerIndicator {
+        val dotSize = 8.dp
+        val activeWidth = 24.dp
+        val spacing = 6.dp
+    }
+
+    /** Текстовая кнопка без фона. */
+    object TextButton {
+        val height = 48.dp
+        val horizontalPadding = 18.dp
+        val textSize = 16.sp
+        val compactTextSize = 15.sp
+    }
+
+    /** Плашка с путем в системных настройках. */
+    object SettingsPathCard {
+        val verticalPadding = 12.dp
+        val horizontalPadding = 14.dp
+        val spacing = 12.dp
+        val textSpacing = 2.dp
+        val iconSize = 20.dp
+        val labelSize = 12.sp
+        val pathSize = 14.sp
+    }
+
+    /** Отметка «Ты здесь» на карте. */
+    object UserLocation {
+        val haloSize = 76.dp
+        val dotSize = 18.dp
+        val dotBorder = 3.dp
+        val labelSpacing = 4.dp
+        val labelCorner = 12.dp
+        val labelVerticalPadding = 4.dp
+        val labelHorizontalPadding = 10.dp
+        val haloAlpha = 0.10f
+        val darkHaloAlpha = 0.12f
+    }
 }

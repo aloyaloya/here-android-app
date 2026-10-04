@@ -40,6 +40,7 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import ru.aloyaloya.design_system.component.button.HereFab
+import ru.aloyaloya.design_system.component.picker.PlacePin
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
@@ -47,7 +48,6 @@ import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.map.R
 import ru.aloyaloya.map.model.MapUiState
 import ru.aloyaloya.map.presentation.component.PlaceMemoriesSheet
-import ru.aloyaloya.map.presentation.component.PlacePin
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapMarker
 import ru.aloyaloya.mapkit.model.MapMarkerIcon

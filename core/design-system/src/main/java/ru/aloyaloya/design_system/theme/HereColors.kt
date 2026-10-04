@@ -49,6 +49,10 @@ data class HereColors(
     val outlineStrong: Color,
 
     val textPrimary: Color,
+
+    /** Текст пояснений: [textPrimary] на 72%. */
+    val textBody: Color,
+
     val textSecondary: Color,
     val textTertiary: Color,
     val textQuaternary: Color,
@@ -69,6 +73,7 @@ val LightHereColors = HereColors(
     outline = LightOutline,
     outlineStrong = LightOutlineStrong,
     textPrimary = LightTextPrimary,
+    textBody = LightTextBody,
     textSecondary = LightTextSecondary,
     textTertiary = LightTextTertiary,
     textQuaternary = LightTextQuaternary,
@@ -94,6 +99,7 @@ val DarkHereColors = HereColors(
     outline = DarkOutline,
     outlineStrong = DarkOutlineStrong,
     textPrimary = DarkTextPrimary,
+    textBody = DarkTextBody,
     textSecondary = DarkTextSecondary,
     textTertiary = DarkTextTertiary,
     textQuaternary = DarkTextQuaternary,

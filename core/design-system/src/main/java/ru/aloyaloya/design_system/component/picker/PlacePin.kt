@@ -1,4 +1,4 @@
-package ru.aloyaloya.map.presentation.component
+package ru.aloyaloya.design_system.component.picker
 
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.background
