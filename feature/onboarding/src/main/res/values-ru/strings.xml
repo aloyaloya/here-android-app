@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_location_here">Ты здесь</string>
+    <string name="onboarding_pick_hint">Двигай карту к нужному месту</string>
+    <string name="onboarding_memory_title">Кофе у Патриарших</string>
+    <string name="onboarding_memory_note">Сидели на лавочке, пока не стемнело. Хочу сюда ещё.</string>
+    <string name="onboarding_calendar_summary">Итоги</string>
+</resources>

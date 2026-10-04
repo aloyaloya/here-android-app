@@ -308,4 +308,18 @@ object HereSize {
         val textTopSpacing = 24.dp
         val largeFontScale = 1.15f
     }
+
+    /** Иллюстрации онбординга. */
+    object OnboardingIllustration {
+        val canvasWidth = 316.dp
+        val canvasHeight = 264.dp
+        val pinBorder = 3.dp
+        val pinEmojiRatio = 0.47f
+        val hintIconSize = 18.dp
+        val previewSize = 56.dp
+        val previewBadgeSize = 24.dp
+        val previewBadgeIconSize = 12.dp
+        val dayCellSize = 24.dp
+        val dayEmojiSize = 12.sp
+    }
 }

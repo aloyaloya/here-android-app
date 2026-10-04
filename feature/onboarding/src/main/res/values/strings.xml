@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_location_here">You\'re here</string>
+    <string name="onboarding_pick_hint">Drag the map to the spot</string>
+    <string name="onboarding_memory_title">Coffee by the ponds</string>
+    <string name="onboarding_memory_note">We sat on the bench until it got dark. I want to come back.</string>
+    <string name="onboarding_calendar_summary">Summary</string>
+</resources>
