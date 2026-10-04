@@ -43,6 +43,7 @@ import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
+import ru.aloyaloya.domain.model.AppLanguage
 import ru.aloyaloya.domain.model.AppTheme
 import ru.aloyaloya.settings.R
 import ru.aloyaloya.settings.model.BackupStatus
@@ -63,6 +64,7 @@ private val ZIP_OPEN_MIME_TYPES = arrayOf(ZIP_MIME_TYPE, "application/octet-stre
  * @param uiState Состояние экрана.
  * @param onBackClick Колбэк стрелки назад.
  * @param onThemeSelected Колбэк выбора темы.
+ * @param onLanguageSelected Колбэк выбора языка.
  * @param onHapticsChange Колбэк переключения тактильного отклика.
  * @param onReminderEnabledChange Колбэк включения вечернего напоминания.
  * @param onReminderTimeChange Колбэк выбора времени напоминания.
@@ -76,6 +78,7 @@ fun SettingsScreen(
     uiState: SettingsUiState,
     onBackClick: () -> Unit,
     onThemeSelected: (AppTheme) -> Unit,
+    onLanguageSelected: (AppLanguage) -> Unit,
     onHapticsChange: (Boolean) -> Unit,
     onReminderEnabledChange: (Boolean) -> Unit,
     onReminderTimeChange: (LocalTime) -> Unit,
@@ -132,9 +135,17 @@ fun SettingsScreen(
                 )
         ) {
             SettingsSection(title = stringResource(R.string.settings_section_appearance)) {
-                ThemeSelector(
+                OptionSelector(
+                    title = stringResource(R.string.settings_theme),
+                    options = ThemeOptions,
                     selected = uiState.theme,
                     onSelect = onThemeSelected
+                )
+                OptionSelector(
+                    title = stringResource(R.string.settings_language),
+                    options = LanguageOptions,
+                    selected = uiState.language,
+                    onSelect = onLanguageSelected
                 )
             }
 
@@ -283,27 +294,35 @@ private val ThemeOptions: List<Pair<AppTheme, Int>> = listOf(
     AppTheme.DARK to R.string.settings_theme_dark
 )
 
+private val LanguageOptions: List<Pair<AppLanguage, Int>> = listOf(
+    AppLanguage.SYSTEM to R.string.settings_language_system,
+    AppLanguage.RUSSIAN to R.string.settings_language_russian,
+    AppLanguage.ENGLISH to R.string.settings_language_english
+)
+
 @Composable
-private fun ThemeSelector(
-    selected: AppTheme,
-    onSelect: (AppTheme) -> Unit
+private fun <T> OptionSelector(
+    title: String,
+    options: List<Pair<T, Int>>,
+    selected: T,
+    onSelect: (T) -> Unit
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.m),
         modifier = Modifier.padding(HereSpacing.l)
     ) {
         Text(
-            text = stringResource(R.string.settings_theme),
+            text = title,
             style = MaterialTheme.typography.titleMedium,
             color = HereTheme.colors.textPrimary
         )
 
         Row(horizontalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
-            ThemeOptions.forEach { (theme, labelResId) ->
-                ThemeChip(
+            options.forEach { (option, labelResId) ->
+                OptionChip(
                     labelResId = labelResId,
-                    selected = theme == selected,
-                    onClick = { onSelect(theme) },
+                    selected = option == selected,
+                    onClick = { onSelect(option) },
                     modifier = Modifier.weight(1f)
                 )
             }
@@ -312,7 +331,7 @@ private fun ThemeSelector(
 }
 
 @Composable
-private fun ThemeChip(
+private fun OptionChip(
     @StringRes labelResId: Int,
     selected: Boolean,
     onClick: () -> Unit,

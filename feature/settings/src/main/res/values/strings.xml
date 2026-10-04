@@ -7,6 +7,10 @@
     <string name="settings_theme_auto">System</string>
     <string name="settings_theme_light">Light</string>
     <string name="settings_theme_dark">Dark</string>
+    <string name="settings_language">Language</string>
+    <string name="settings_language_system">System</string>
+    <string name="settings_language_russian" translatable="false">Русский</string>
+    <string name="settings_language_english" translatable="false">English</string>
     <string name="settings_section_feedback">Feedback</string>
     <string name="settings_haptics">Haptic feedback</string>
     <string name="settings_haptics_description">A light vibration on taps</string>
