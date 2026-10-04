@@ -30,4 +30,5 @@ dependencies {
     ksp(libs.dagger.compiler)
 
     implementation(libs.kotlinx.coroutines.core)
+    implementation(libs.androidx.appcompat)
 }

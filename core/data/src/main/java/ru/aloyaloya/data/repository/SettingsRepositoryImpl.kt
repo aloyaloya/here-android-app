@@ -1,9 +1,12 @@
 package ru.aloyaloya.data.repository
 
 import android.content.Context
+import androidx.appcompat.app.AppCompatDelegate
+import androidx.core.os.LocaleListCompat
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import ru.aloyaloya.domain.model.AppLanguage
 import ru.aloyaloya.domain.model.AppTheme
 import ru.aloyaloya.domain.model.DailyReminder
 import ru.aloyaloya.domain.repository.SettingsRepository
@@ -33,6 +36,13 @@ class SettingsRepositoryImpl @Inject constructor(
     private val _reminder = MutableStateFlow(readReminder())
     override val reminder: StateFlow<DailyReminder> = _reminder.asStateFlow()
 
+    override val language: AppLanguage
+        get() = when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
+            LANGUAGE_RUSSIAN -> AppLanguage.RUSSIAN
+            LANGUAGE_ENGLISH -> AppLanguage.ENGLISH
+            else -> AppLanguage.SYSTEM
+        }
+
     override fun setTheme(theme: AppTheme) {
         _theme.value = theme
         preferences.edit().putString(KEY_THEME_MODE, theme.name).apply()
@@ -49,6 +59,15 @@ class SettingsRepositoryImpl @Inject constructor(
             .putBoolean(KEY_REMINDER_ENABLED, reminder.enabled)
             .putInt(KEY_REMINDER_MINUTE_OF_DAY, reminder.time.hour * 60 + reminder.time.minute)
             .apply()
+    }
+
+    override fun setLanguage(language: AppLanguage) {
+        val tags = when (language) {
+            AppLanguage.SYSTEM -> ""
+            AppLanguage.RUSSIAN -> LANGUAGE_RUSSIAN
+            AppLanguage.ENGLISH -> LANGUAGE_ENGLISH
+        }
+        AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tags))
     }
 
     private fun readTheme(): AppTheme {
@@ -73,5 +92,7 @@ class SettingsRepositoryImpl @Inject constructor(
         const val KEY_REMINDER_ENABLED = "key_reminder_enabled"
         const val KEY_REMINDER_MINUTE_OF_DAY = "key_reminder_minute_of_day"
         const val DEFAULT_REMINDER_MINUTE_OF_DAY = 21 * 60
+        const val LANGUAGE_RUSSIAN = "ru"
+        const val LANGUAGE_ENGLISH = "en"
     }
 }

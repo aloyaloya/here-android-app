@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="summary_screen_title">Итоги</string>
+    <string name="summary_screen_label">Итоги</string>
+    <string name="summary_period_month">Месяц</string>
+    <string name="summary_period_year">Год</string>
+    <string name="summary_period_all_time">Всё время</string>
+    <string name="summary_title_year">%d год</string>
+    <string name="summary_title_all_time">За всё время</string>
+    <string name="summary_dominant_label">Чаще всего</string>
+    <string name="summary_emotions_title">Эмоции</string>
+    <string name="summary_places_title">Места настроения</string>
+    <string name="summary_place_unknown">Место без адреса</string>
+    <string name="summary_recall_title">Вспомнить</string>
+    <string name="summary_recall_another">Вспомнить другое</string>
+    <string name="summary_not_enough">Добавь ещё пару воспоминаний, и здесь появятся твои места</string>
+    <plurals name="summary_memory_count">
+        <item quantity="one">%d воспоминание</item>
+        <item quantity="few">%d воспоминания</item>
+        <item quantity="many">%d воспоминаний</item>
+        <item quantity="other">%d воспоминания</item>
+    </plurals>
+    <plurals name="summary_day_count">
+        <item quantity="one">%d день</item>
+        <item quantity="few">%d дня</item>
+        <item quantity="many">%d дней</item>
+        <item quantity="other">%d дня</item>
+    </plurals>
+</resources>

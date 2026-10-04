@@ -41,6 +41,9 @@ import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.component.topbar.TopAppBarAction
+import ru.aloyaloya.design_system.format.FullDateFormat
+import ru.aloyaloya.design_system.format.TimeFormat
+import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -63,8 +66,6 @@ import ru.aloyaloya.ui.emotion.labelResId
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 import java.time.Instant
 import java.time.ZoneId
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import ru.aloyaloya.design_system.R as DesignSystemR
 
 private const val HALO_ALPHA = 0.42f
@@ -72,8 +73,6 @@ private const val SHEET_MAX_HEIGHT_FRACTION = 0.6f
 private const val MAP_ZOOM = 15.5f
 
 private const val SEPARATOR = " · "
-private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru"))
-private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"))
 
 /**
  * Экран воспоминания.
@@ -359,9 +358,11 @@ private fun MediaSection(
 }
 
 /** Когда и где это было: дата, время и адрес одной строкой. */
+@Composable
 private fun subtitle(happenedAt: Long, address: String?): String {
+    val dateFormat = FullDateFormat.withLocale(currentLocale())
     val moment = Instant.ofEpochMilli(happenedAt).atZone(ZoneId.systemDefault())
-    val dateTime = DateFormat.format(moment) + SEPARATOR + TimeFormat.format(moment)
+    val dateTime = dateFormat.format(moment) + SEPARATOR + TimeFormat.format(moment)
 
     return if (address == null) dateTime else dateTime + SEPARATOR + address
 }

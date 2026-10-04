@@ -18,14 +18,12 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.R
+import ru.aloyaloya.design_system.format.MonthYearFormat
+import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
-import java.util.Locale
-
-private val MonthFormat = DateTimeFormatter.ofPattern("LLLL yyyy", Locale.forLanguageTag("ru"))
 
 /**
  * Название месяца и стрелки перелистывания.
@@ -42,13 +40,15 @@ fun HereMonthHeader(
     onNextClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val monthFormat = MonthYearFormat.withLocale(currentLocale())
+
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween,
         modifier = modifier.fillMaxWidth()
     ) {
         Text(
-            text = MonthFormat.format(
+            text = monthFormat.format(
                 month.atDay(1)
             ).replaceFirstChar { it.uppercase() },
             style = MaterialTheme.typography.titleMedium.copy(

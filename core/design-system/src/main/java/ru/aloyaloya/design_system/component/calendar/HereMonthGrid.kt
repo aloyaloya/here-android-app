@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import ru.aloyaloya.design_system.component.emotion.EmotionPin
+import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -93,9 +94,10 @@ fun HereMonthGrid(
 /** Строка с сокращенными названиями дней недели. */
 @Composable
 private fun WeekdayRow() {
-    val weekdays = remember {
+    val locale = currentLocale()
+    val weekdays = remember(locale) {
         monthGrid(YearMonth.of(2024, 1)).take(DAYS_IN_WEEK).map { day ->
-            day.dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, Locale.forLanguageTag("ru"))
+            day.dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, locale)
         }
     }
 

@@ -53,6 +53,7 @@ fun NavGraphBuilder.settingsScreen(
             uiState = uiState,
             onBackClick = onBackClick,
             onThemeSelected = viewModel::onThemeSelected,
+            onLanguageSelected = viewModel::onLanguageSelected,
             onHapticsChange = viewModel::onHapticsChange,
             onReminderEnabledChange = viewModel::onReminderEnabledChange,
             onReminderTimeChange = viewModel::onReminderTimeChange,

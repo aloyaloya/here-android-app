@@ -10,6 +10,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
+import ru.aloyaloya.domain.model.AppLanguage
 import ru.aloyaloya.domain.model.AppTheme
 import ru.aloyaloya.domain.model.DailyReminder
 import ru.aloyaloya.domain.repository.BackupRepository
@@ -33,18 +34,22 @@ class SettingsViewModel @Inject constructor(
 
     private val backupStatus = MutableStateFlow<BackupStatus>(BackupStatus.Idle)
 
+    private val language = MutableStateFlow(settingsRepository.language)
+
     val uiState: StateFlow<SettingsUiState> = combine(
-        settingsRepository.theme,
+        combine(settingsRepository.theme, language, ::Pair),
         settingsRepository.hapticsEnabled,
         settingsRepository.reminder,
         memoryRepository.observeAll().map { it.size },
-        backupStatus,
-        ::SettingsUiState
-    ).stateIn(
+        backupStatus
+    ) { (theme, appLanguage), hapticsEnabled, reminder, memoryCount, status ->
+        SettingsUiState(theme, appLanguage, hapticsEnabled, reminder, memoryCount, status)
+    }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
         initialValue = SettingsUiState(
             theme = settingsRepository.theme.value,
+            language = language.value,
             hapticsEnabled = settingsRepository.hapticsEnabled.value,
             reminder = settingsRepository.reminder.value,
             memoryCount = null,
@@ -53,6 +58,11 @@ class SettingsViewModel @Inject constructor(
     )
 
     fun onThemeSelected(theme: AppTheme) = settingsRepository.setTheme(theme)
+
+    fun onLanguageSelected(language: AppLanguage) {
+        this.language.value = language
+        settingsRepository.setLanguage(language)
+    }
 
     fun onHapticsChange(enabled: Boolean) = settingsRepository.setHapticsEnabled(enabled)
 

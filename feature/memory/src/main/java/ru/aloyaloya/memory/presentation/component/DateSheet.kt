@@ -16,6 +16,8 @@ import ru.aloyaloya.design_system.component.calendar.HereMonthHeader
 import ru.aloyaloya.design_system.component.sheet.HereBottomSheet
 import ru.aloyaloya.design_system.component.sheet.HereSheetActions
 import ru.aloyaloya.design_system.component.sheet.HereSheetTitle
+import ru.aloyaloya.design_system.format.FullDateFormat
+import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.memory.R
@@ -23,10 +25,6 @@ import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
 import java.time.LocalDate
 import java.time.YearMonth
-import java.time.format.DateTimeFormatter
-import java.util.Locale
-
-private val FullDateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru"))
 
 /**
  * Лист выбора даты события.
@@ -47,6 +45,8 @@ fun DateSheet(
     onDismissRequest: () -> Unit,
     onDateSelected: (LocalDate) -> Unit
 ) {
+    val fullDateFormat = FullDateFormat.withLocale(currentLocale())
+
     var selectedDate by rememberSaveable { mutableStateOf(initialDate) }
     var shownMonth by rememberSaveable { mutableStateOf(YearMonth.from(initialDate)) }
     val markByDate = emotionByDate.mapValues { (_, emotion) ->
@@ -64,7 +64,7 @@ fun DateSheet(
         ) {
             HereSheetTitle(
                 label = stringResource(R.string.date_sheet_label),
-                value = FullDateFormat.format(selectedDate)
+                value = fullDateFormat.format(selectedDate)
             )
 
             HereMonthHeader(

@@ -42,6 +42,9 @@ import ru.aloyaloya.design_system.component.media.MediaAddTile
 import ru.aloyaloya.design_system.component.media.MediaTile
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.component.topbar.HereModalTopBar
+import ru.aloyaloya.design_system.format.FullDateFormat
+import ru.aloyaloya.design_system.format.TimeFormat
+import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
@@ -63,8 +66,6 @@ import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-import java.util.Locale
 import ru.aloyaloya.design_system.R as DesignSystemR
 
 /** Масштаб, с которого плашка адреса вырастает до полного размера. */
@@ -78,9 +79,6 @@ private const val TIME_WEIGHT = 1f
 private const val MEDIA_LIMIT = 10
 
 private const val VIDEO_MIME_PREFIX = "video/"
-
-private val DateFormat = DateTimeFormatter.ofPattern("d MMMM yyyy", Locale.forLanguageTag("ru"))
-private val TimeFormat = DateTimeFormatter.ofPattern("HH:mm", Locale.forLanguageTag("ru"))
 
 /**
  * Форма воспоминания: и нового, и уже записанного.
@@ -348,10 +346,12 @@ private fun DateTimeSection(
     onDateClick: () -> Unit,
     onTimeClick: () -> Unit
 ) {
+    val dateFormat = FullDateFormat.withLocale(currentLocale())
+
     Row(horizontalArrangement = Arrangement.spacedBy(HereSize.DateTimeField.spacing)) {
         HereDateTimeField(
             label = stringResource(R.string.memory_form_date_label),
-            value = DateFormat.format(happenedAt),
+            value = dateFormat.format(happenedAt),
             icon = DesignSystemR.drawable.ic_calendar_outline,
             onClick = onDateClick,
             modifier = Modifier.weight(DATE_WEIGHT)

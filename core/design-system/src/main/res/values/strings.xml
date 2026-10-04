@@ -1,15 +1,15 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="settings_content_description">Настройки</string>
-    <string name="fab_add_memory_content_description">Добавить воспоминание</string>
-    <string name="fab_location_content_description">Показать мое место</string>
-    <string name="media_add">+ медиа</string>
-    <string name="media_remove">Убрать медиафайл</string>
-    <string name="media_video">Видео</string>
-    <string name="modal_close_content_description">Закрыть</string>
-    <string name="context_bar_back_content_description">Выйти из режима</string>
-    <string name="calendar_previous_month">Предыдущий месяц</string>
-    <string name="calendar_next_month">Следующий месяц</string>
-    <string name="sheet_cancel">Отмена</string>
-    <string name="sheet_confirm">Выбрать</string>
+    <string name="settings_content_description">Settings</string>
+    <string name="fab_add_memory_content_description">Add a memory</string>
+    <string name="fab_location_content_description">Show my location</string>
+    <string name="media_add">+ media</string>
+    <string name="media_remove">Remove media</string>
+    <string name="media_video">Video</string>
+    <string name="modal_close_content_description">Close</string>
+    <string name="context_bar_back_content_description">Exit mode</string>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="sheet_cancel">Cancel</string>
+    <string name="sheet_confirm">Select</string>
 </resources>
