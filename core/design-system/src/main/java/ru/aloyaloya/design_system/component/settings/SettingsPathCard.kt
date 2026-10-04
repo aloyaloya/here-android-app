@@ -14,10 +14,10 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.font.FontWeight
 import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
@@ -34,36 +34,32 @@ fun SettingsPathCard(
     modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
-    val sizes = HereSize.SettingsPathCard
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(sizes.spacing),
+        horizontalArrangement = Arrangement.spacedBy(HereSpacing.m),
         modifier = modifier
             .fillMaxWidth()
             .background(color = colors.surfaceMuted, shape = HereShape.tile)
-            .padding(vertical = sizes.verticalPadding, horizontal = sizes.horizontalPadding)
+            .padding(HereSpacing.l)
     ) {
         Icon(
             painter = painterResource(R.drawable.ic_settings),
             contentDescription = null,
             tint = colors.textPrimary,
-            modifier = Modifier.size(sizes.iconSize)
+            modifier = Modifier.size(HereSize.SettingsPathCard.iconSize)
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(sizes.textSpacing)) {
+        Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.xs)) {
             Text(
                 text = label,
-                style = MaterialTheme.typography.bodySmall.copy(fontSize = sizes.labelSize),
+                style = MaterialTheme.typography.labelSmall,
                 color = colors.textBody
             )
 
             Text(
                 text = path,
-                style = MaterialTheme.typography.titleMedium.copy(
-                    fontSize = sizes.pathSize,
-                    fontWeight = FontWeight.SemiBold
-                ),
+                style = MaterialTheme.typography.titleMedium,
                 color = colors.textPrimary
             )
         }

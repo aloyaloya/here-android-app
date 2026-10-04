@@ -14,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
@@ -31,7 +32,7 @@ fun HerePagerIndicator(
 ) {
     Row(
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(HereSize.PagerIndicator.spacing),
+        horizontalArrangement = Arrangement.spacedBy(HereSpacing.s),
         modifier = modifier
     ) {
         repeat(pageCount) { page ->

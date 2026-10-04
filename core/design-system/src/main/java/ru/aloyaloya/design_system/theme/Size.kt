@@ -276,38 +276,36 @@ object HereSize {
     object PagerIndicator {
         val dotSize = 8.dp
         val activeWidth = 24.dp
-        val spacing = 6.dp
     }
 
     /** Текстовая кнопка без фона. */
     object TextButton {
         val height = 48.dp
-        val horizontalPadding = 18.dp
-        val textSize = 16.sp
-        val compactTextSize = 15.sp
+        val horizontalPadding = 12.dp
     }
 
     /** Плашка с путем в системных настройках. */
     object SettingsPathCard {
-        val verticalPadding = 12.dp
-        val horizontalPadding = 14.dp
-        val spacing = 12.dp
-        val textSpacing = 2.dp
-        val iconSize = 20.dp
-        val labelSize = 12.sp
-        val pathSize = 14.sp
+        val iconSize = 24.dp
     }
 
     /** Отметка «Ты здесь» на карте. */
     object UserLocation {
-        val haloSize = 76.dp
-        val dotSize = 18.dp
-        val dotBorder = 3.dp
-        val labelSpacing = 4.dp
-        val labelCorner = 12.dp
+        val haloSize = 80.dp
+        val dotSize = 20.dp
+        val dotBorder = 4.dp
         val labelVerticalPadding = 4.dp
-        val labelHorizontalPadding = 10.dp
+        val labelHorizontalPadding = 12.dp
         val haloAlpha = 0.10f
         val darkHaloAlpha = 0.12f
+    }
+
+    /** Экран запроса разрешения и страница онбординга. */
+    object Permission {
+        val illustrationHeight = 264.dp
+        val compactIllustrationHeight = 200.dp
+        val illustrationBorder = 1.dp
+        val textTopSpacing = 24.dp
+        val largeFontScale = 1.15f
     }
 }

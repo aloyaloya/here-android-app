@@ -10,8 +10,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.unit.TextUnit
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -22,14 +20,12 @@ import ru.aloyaloya.design_system.theme.HereTheme
  * @param text Подпись кнопки.
  * @param onClick Колбэк нажатия.
  * @param modifier [Modifier], применяемый к кнопке.
- * @param fontSize Кегль подписи.
  */
 @Composable
 fun HereTextButton(
     text: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    fontSize: TextUnit = HereSize.TextButton.textSize
+    modifier: Modifier = Modifier
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -41,10 +37,7 @@ fun HereTextButton(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.titleMedium.copy(
-                fontSize = fontSize,
-                fontWeight = FontWeight.SemiBold
-            ),
+            style = MaterialTheme.typography.titleMedium,
             color = HereTheme.colors.textPrimary
         )
     }

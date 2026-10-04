@@ -8,14 +8,15 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import ru.aloyaloya.design_system.extension.overlayShadow
+import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
@@ -32,11 +33,10 @@ fun UserLocationMarker(
     val colors = HereTheme.colors
     val sizes = HereSize.UserLocation
     val haloAlpha = if (colors.isDark) sizes.darkHaloAlpha else sizes.haloAlpha
-    val labelShape = RoundedCornerShape(sizes.labelCorner)
 
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(sizes.labelSpacing),
+        verticalArrangement = Arrangement.spacedBy(HereSpacing.xs),
         modifier = modifier
     ) {
         Box(
@@ -59,8 +59,8 @@ fun UserLocationMarker(
             style = MaterialTheme.typography.labelSmall,
             color = colors.textPrimary,
             modifier = Modifier
-                .overlayShadow(labelShape)
-                .background(color = colors.surface, shape = labelShape)
+                .overlayShadow(HereShape.pill)
+                .background(color = colors.surface, shape = HereShape.pill)
                 .padding(
                     vertical = sizes.labelVerticalPadding,
                     horizontal = sizes.labelHorizontalPadding
