@@ -140,10 +140,12 @@ fun OnboardingScreen(
         }
     ) { contentPadding ->
         HorizontalPager(state = pagerState) { page ->
+            val active = pagerState.currentPage == page
+
             if (page == LOCATION_PAGE) {
-                LocationPage(step = locationStep, contentPadding = contentPadding)
+                LocationPage(step = locationStep, active = active, contentPadding = contentPadding)
             } else {
-                FeaturePage(page = page, contentPadding = contentPadding)
+                FeaturePage(page = page, active = active, contentPadding = contentPadding)
             }
         }
     }
@@ -153,10 +155,11 @@ fun OnboardingScreen(
  * Страница о возможности приложения.
  *
  * @param page Номер страницы до [LOCATION_PAGE].
+ * @param active Текущая ли страница.
  * @param contentPadding Отступы от [PermissionScreen].
  */
 @Composable
-private fun FeaturePage(page: Int, contentPadding: PaddingValues) {
+private fun FeaturePage(page: Int, active: Boolean, contentPadding: PaddingValues) {
     val emotions = HereTheme.colors.emotions
 
     val (background, title, body) = when (page) {
@@ -170,9 +173,9 @@ private fun FeaturePage(page: Int, contentPadding: PaddingValues) {
         illustrationBackground = background,
         illustration = {
             when (page) {
-                0 -> WelcomeIllustration()
-                1 -> MemoryIllustration()
-                else -> CalendarIllustration()
+                0 -> WelcomeIllustration(active = active)
+                1 -> MemoryIllustration(active = active)
+                else -> CalendarIllustration(active = active)
             }
         },
         title = stringResource(title),
@@ -187,10 +190,11 @@ private fun FeaturePage(page: Int, contentPadding: PaddingValues) {
  * Страница запроса геолокации.
  *
  * @param step Шаг запроса.
+ * @param active Текущая ли страница.
  * @param contentPadding Отступы от [PermissionScreen].
  */
 @Composable
-private fun LocationPage(step: LocationStep, contentPadding: PaddingValues) {
+private fun LocationPage(step: LocationStep, active: Boolean, contentPadding: PaddingValues) {
     val (title, body) = when (step) {
         LocationStep.REQUEST -> R.string.onboarding_location_title to R.string.onboarding_location_body
         LocationStep.DENIED -> R.string.onboarding_location_denied_title to R.string.onboarding_location_denied_body
@@ -200,7 +204,7 @@ private fun LocationPage(step: LocationStep, contentPadding: PaddingValues) {
     PermissionPage(
         contentPadding = contentPadding,
         illustrationBackground = colorResource(R.color.onboarding_map_land),
-        illustration = { LocationIllustration(step = step) },
+        illustration = { LocationIllustration(step = step, active = active) },
         title = stringResource(title),
         body = stringResource(body),
         pageIndicator = {

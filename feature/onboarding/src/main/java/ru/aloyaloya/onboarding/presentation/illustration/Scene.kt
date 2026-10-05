@@ -1,5 +1,7 @@
 package ru.aloyaloya.onboarding.presentation.illustration
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -16,6 +18,7 @@ import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.layout.ContentScale
@@ -35,6 +38,12 @@ const val LOOK_LEFT = -1f
 
 /** Взгляд персонажа вправо. */
 const val LOOK_RIGHT = 1f
+
+/** Шаг между падениями персонажей. */
+const val DROP_STEP_MILLIS = 120
+
+/** Переход персонажа в новую точку. */
+private const val MOVE_MILLIS = 300
 
 /**
  * Персонаж на сцене иллюстрации.
@@ -122,22 +131,35 @@ fun MapBackground(modifier: Modifier = Modifier) {
 }
 
 /**
- * Персонаж в своей точке сцены.
+ * Персонаж в своей точке сцены: падает при показе страницы, плавно переходит в новую точку.
  *
  * @param spot Эмоция, место и взгляд персонажа.
+ * @param active Текущая ли страница.
+ * @param delayMillis Задержка падения.
  */
 @Composable
-fun SceneScope.CharacterAt(spot: CharacterSpot) {
+fun SceneScope.CharacterAt(
+    spot: CharacterSpot,
+    active: Boolean,
+    delayMillis: Int
+) {
+    val x by animateDpAsState(spot.x, tween(MOVE_MILLIS), label = "x")
+    val y by animateDpAsState(spot.y, tween(MOVE_MILLIS), label = "y")
+    val size by animateDpAsState(spot.size, tween(MOVE_MILLIS), label = "size")
+    val moving = spot.copy(x = x, y = y, size = size)
+
     EmotionCharacter(
         emotion = spot.emotion,
-        size = spot.size,
+        size = size,
         look = spot.look,
-        modifier = Modifier.sceneOffset(
-            x = spot.x,
-            y = spot.y,
-            anchorX = spot.centerX,
-            anchorY = spot.centerY
-        )
+        modifier = Modifier
+            .sceneOffset(
+                x = x,
+                y = y,
+                anchorX = moving.centerX,
+                anchorY = moving.centerY
+            )
+            .entrance(active = active, kind = Entrance.DROP, delayMillis = delayMillis)
     )
 }
 

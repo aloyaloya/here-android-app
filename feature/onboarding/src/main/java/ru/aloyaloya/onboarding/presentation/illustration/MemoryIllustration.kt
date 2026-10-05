@@ -42,19 +42,38 @@ import java.time.LocalDateTime
 /** Момент воспоминания на иллюстрации. */
 private val MemoryMoment = LocalDateTime.of(2026, 7, 15, 18, 40)
 
-/** Карточка воспоминания между двумя персонажами. */
+/** Проявление карточки. */
+private const val CARD_MILLIS = 120
+
+/** Падение «Нежности». */
+private const val TENDER_DROP_MILLIS = 300
+
+/** Падение «Покоя». */
+private const val CALM_DROP_MILLIS = 600
+
+/**
+ * Карточка воспоминания между двумя персонажами.
+ *
+ * @param active Текущая ли страница.
+ */
 @Composable
-fun MemoryIllustration(modifier: Modifier = Modifier) {
-    // TODO: сделать анимацию падения персонажей
+fun MemoryIllustration(
+    active: Boolean,
+    modifier: Modifier = Modifier
+) {
     IllustrationGroup(modifier = modifier) {
         EmotionCharacter(
             emotion = CharacterEmotion.TENDER,
             size = 64.dp,
             look = LOOK_RIGHT,
-            modifier = Modifier.padding(start = HereSpacing.s)
+            modifier = Modifier
+                .padding(start = HereSpacing.s)
+                .entrance(active = active, kind = Entrance.DROP, delayMillis = TENDER_DROP_MILLIS)
         )
 
-        MemoryCard()
+        MemoryCard(
+            modifier = Modifier.entrance(active = active, kind = Entrance.FADE, delayMillis = CARD_MILLIS)
+        )
 
         EmotionCharacter(
             emotion = CharacterEmotion.CALM,
@@ -63,13 +82,18 @@ fun MemoryIllustration(modifier: Modifier = Modifier) {
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(end = HereSpacing.m)
+                .entrance(active = active, kind = Entrance.DROP, delayMillis = CALM_DROP_MILLIS)
         )
     }
 }
 
-/** Карточка воспоминания: эмоция, название, время, заметка и превью снимков. */
+/**
+ * Карточка воспоминания: эмоция, название, время, заметка и превью снимков.
+ *
+ * @param modifier [Modifier], применяемый к карточке.
+ */
 @Composable
-private fun MemoryCard() {
+private fun MemoryCard(modifier: Modifier = Modifier) {
     val colors = HereTheme.colors
     val emotion = Emotion.TENDER
     val dateFormat = DayMonthFormat.withLocale(currentLocale())
@@ -77,7 +101,7 @@ private fun MemoryCard() {
 
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .illustrationCard()
             .padding(HereSpacing.l)

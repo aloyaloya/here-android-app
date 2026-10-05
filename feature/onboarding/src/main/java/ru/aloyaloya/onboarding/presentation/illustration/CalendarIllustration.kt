@@ -70,25 +70,45 @@ private val EmotionShares = DayEmotions.values
     .entries
     .sortedByDescending { it.value }
 
-/** Персонаж над карточкой месяца. */
+/** Проявление карточки. */
+private const val CARD_MILLIS = 120
+
+/** Падение персонажа. */
+private const val DROP_MILLIS = 300
+
+/**
+ * Персонаж над карточкой месяца.
+ *
+ * @param active Текущая ли страница.
+ */
 @Composable
-fun CalendarIllustration(modifier: Modifier = Modifier) {
-    // TODO: сделать анимацию падения персонажа
+fun CalendarIllustration(
+    active: Boolean,
+    modifier: Modifier = Modifier
+) {
     IllustrationGroup(modifier = modifier) {
         EmotionCharacter(
             emotion = CharacterEmotion.HAPPY,
             size = 64.dp,
             look = LOOK_RIGHT,
-            modifier = Modifier.padding(start = HereSpacing.s)
+            modifier = Modifier
+                .padding(start = HereSpacing.s)
+                .entrance(active = active, kind = Entrance.DROP, delayMillis = DROP_MILLIS)
         )
 
-        CalendarCard()
+        CalendarCard(
+            modifier = Modifier.entrance(active = active, kind = Entrance.FADE, delayMillis = CARD_MILLIS)
+        )
     }
 }
 
-/** Месяц с эмоциями по дням и полоса итогов под ним. */
+/**
+ * Месяц с эмоциями по дням и полоса итогов под ним.
+ *
+ * @param modifier [Modifier], применяемый к карточке.
+ */
 @Composable
-private fun CalendarCard() {
+private fun CalendarCard(modifier: Modifier = Modifier) {
     val colors = HereTheme.colors
     val locale = currentLocale()
     val days = remember { monthGrid(IllustrationMonth).take(ILLUSTRATION_WEEKS * DAYS_IN_WEEK) }
@@ -107,7 +127,7 @@ private fun CalendarCard() {
 
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .illustrationCard()
             .padding(HereSpacing.l)

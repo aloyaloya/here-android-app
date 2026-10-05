@@ -2,6 +2,7 @@ package ru.aloyaloya.onboarding.presentation.illustration
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.character.BubbleTail
@@ -29,19 +30,40 @@ private val WelcomeCharacters = listOf(
 /** Высота кадра макета: до верха панели и чуть под нее. */
 private val FrameHeight = 508.dp
 
-/** Карта с персонажами-эмоциями, двое из них говорят. */
+/** Начало падений. */
+private const val DROP_START_MILLIS = 100
+
+/** Появление реплики о море. */
+private const val SEA_BUBBLE_MILLIS = 1000
+
+/** Появление реплики о свидании. */
+private const val DATE_BUBBLE_MILLIS = 1150
+
+/**
+ * Карта с персонажами-эмоциями, двое из них говорят.
+ *
+ * @param active Текущая ли страница.
+ */
 @Composable
-fun WelcomeIllustration(modifier: Modifier = Modifier) {
+fun WelcomeIllustration(
+    active: Boolean,
+    modifier: Modifier = Modifier
+) {
     val colors = HereTheme.colors
     val emotions = colors.emotions
 
-    // TODO: сделать анимацию падения персонажей и появления реплик
     IllustrationScene(
         frameHeight = FrameHeight,
         modifier = modifier,
         backdrop = { MapBackground() }
     ) {
-        WelcomeCharacters.forEach { CharacterAt(it) }
+        WelcomeCharacters.forEachIndexed { index, spot ->
+            CharacterAt(
+                spot = spot,
+                active = active,
+                delayMillis = DROP_START_MILLIS + index * DROP_STEP_MILLIS
+            )
+        }
 
         CharacterBubble(
             text = stringResource(R.string.onboarding_bubble_sea),
@@ -53,6 +75,11 @@ fun WelcomeIllustration(modifier: Modifier = Modifier) {
                 y = 96.dp,
                 anchorX = SeaSpeaker.centerX,
                 anchorY = SeaSpeaker.centerY
+            ).entrance(
+                active = active,
+                kind = Entrance.BUBBLE,
+                delayMillis = SEA_BUBBLE_MILLIS,
+                origin = TransformOrigin(0f, 0.5f)
             )
         )
 
@@ -67,6 +94,11 @@ fun WelcomeIllustration(modifier: Modifier = Modifier) {
                 y = 171.dp,
                 anchorX = DateSpeaker.centerX,
                 anchorY = DateSpeaker.centerY
+            ).entrance(
+                active = active,
+                kind = Entrance.BUBBLE,
+                delayMillis = DATE_BUBBLE_MILLIS,
+                origin = TransformOrigin(0.25f, 0f)
             )
         )
     }
