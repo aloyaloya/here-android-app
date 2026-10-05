@@ -17,6 +17,12 @@ private val SeaSpeaker = CharacterSpot(CharacterEmotion.HAPPY, 24.dp, 74.dp, 72.
 /** Говорящий о свидании. */
 private val DateSpeaker = CharacterSpot(CharacterEmotion.TENDER, 196.dp, 96.dp, 64.dp)
 
+/** Говорящий о море на экране. */
+private val SeaShown = SeaSpeaker.scaled()
+
+/** Говорящий о свидании на экране. */
+private val DateShown = DateSpeaker.scaled()
+
 /** Персонажи первой страницы. */
 private val WelcomeCharacters = listOf(
     SeaSpeaker,
@@ -71,10 +77,10 @@ fun WelcomeIllustration(
             contentColor = colors.textPrimary,
             tail = BubbleTail.START,
             modifier = Modifier.sceneOffset(
-                x = 97.dp,
+                x = SeaShown.right,
                 y = 96.dp,
-                anchorX = SeaSpeaker.centerX,
-                anchorY = SeaSpeaker.centerY
+                anchorX = SeaShown.centerX,
+                anchorY = SeaShown.centerY
             ).entrance(
                 active = active,
                 kind = Entrance.BUBBLE,
@@ -91,9 +97,9 @@ fun WelcomeIllustration(
             tailInset = 25.dp,
             modifier = Modifier.sceneOffset(
                 x = 204.dp,
-                y = 171.dp,
-                anchorX = DateSpeaker.centerX,
-                anchorY = DateSpeaker.centerY
+                y = DateShown.bottom - 2.dp,
+                anchorX = DateShown.centerX,
+                anchorY = DateShown.centerY
             ).entrance(
                 active = active,
                 kind = Entrance.BUBBLE,

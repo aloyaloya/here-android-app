@@ -77,7 +77,7 @@ fun CharacterBubble(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = contentColor,
             modifier = Modifier

@@ -64,7 +64,7 @@ fun MemoryIllustration(
     IllustrationGroup(modifier = modifier) {
         EmotionCharacter(
             emotion = CharacterEmotion.TENDER,
-            size = 64.dp,
+            size = 80.dp,
             look = LOOK_RIGHT,
             modifier = Modifier
                 .padding(start = HereSpacing.s)
@@ -77,7 +77,7 @@ fun MemoryIllustration(
 
         EmotionCharacter(
             emotion = CharacterEmotion.CALM,
-            size = 46.dp,
+            size = 56.dp,
             look = LOOK_LEFT,
             modifier = Modifier
                 .align(Alignment.End)
@@ -100,11 +100,11 @@ private fun MemoryCard(modifier: Modifier = Modifier) {
     val timeFormat = TimeFormat.withLocale(currentLocale())
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
+        verticalArrangement = Arrangement.spacedBy(HereSpacing.m),
         modifier = modifier
             .fillMaxWidth()
             .illustrationCard()
-            .padding(HereSpacing.l)
+            .padding(HereSpacing.xl)
     ) {
         EmotionTag(
             emoji = emotion.emoji,
@@ -115,7 +115,7 @@ private fun MemoryCard(modifier: Modifier = Modifier) {
         Column(verticalArrangement = Arrangement.spacedBy(HereSize.OnboardingIllustration.titleGap)) {
             Text(
                 text = stringResource(R.string.onboarding_card_title),
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 color = colors.textPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -123,14 +123,14 @@ private fun MemoryCard(modifier: Modifier = Modifier) {
 
             Text(
                 text = "${MemoryMoment.format(dateFormat)} · ${MemoryMoment.format(timeFormat)}",
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 color = colors.textSecondary
             )
         }
 
         Text(
             text = stringResource(R.string.onboarding_card_note),
-            style = MaterialTheme.typography.bodyMedium,
+            style = MaterialTheme.typography.bodyLarge,
             color = colors.textBody,
             maxLines = 2,
             overflow = TextOverflow.Ellipsis

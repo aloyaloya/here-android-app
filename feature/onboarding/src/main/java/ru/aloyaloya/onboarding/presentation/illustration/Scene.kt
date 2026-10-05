@@ -51,7 +51,7 @@ private const val MOVE_MILLIS = 300
  * @property emotion Эмоция персонажа.
  * @property x Левый край от левого края сцены.
  * @property y Верхний край от верха экрана.
- * @property size Ширина персонажа.
+ * @property size Ширина персонажа в макете.
  * @property look Взгляд: −1 влево, 0 прямо, 1 вправо.
  */
 @Immutable
@@ -67,6 +67,22 @@ data class CharacterSpot(
 
     /** Центр персонажа по Y. */
     val centerY: Dp get() = y + size * HereSize.EmotionCharacter.heightRatio / 2
+
+    /** Правый край персонажа. */
+    val right: Dp get() = x + size
+
+    /** Нижний край персонажа. */
+    val bottom: Dp get() = y + size * HereSize.EmotionCharacter.heightRatio
+
+    /** Тот же персонаж, увеличенный до размера на экране вокруг своего центра. */
+    fun scaled(): CharacterSpot {
+        val grown = size * HereSize.OnboardingIllustration.characterScale
+        return copy(
+            x = centerX - grown / 2,
+            y = centerY - grown * HereSize.EmotionCharacter.heightRatio / 2,
+            size = grown
+        )
+    }
 }
 
 /**
@@ -143,9 +159,10 @@ fun SceneScope.CharacterAt(
     active: Boolean,
     delayMillis: Int
 ) {
-    val x by animateDpAsState(spot.x, tween(MOVE_MILLIS), label = "x")
-    val y by animateDpAsState(spot.y, tween(MOVE_MILLIS), label = "y")
-    val size by animateDpAsState(spot.size, tween(MOVE_MILLIS), label = "size")
+    val target = spot.scaled()
+    val x by animateDpAsState(target.x, tween(MOVE_MILLIS), label = "x")
+    val y by animateDpAsState(target.y, tween(MOVE_MILLIS), label = "y")
+    val size by animateDpAsState(target.size, tween(MOVE_MILLIS), label = "size")
     val moving = spot.copy(x = x, y = y, size = size)
 
     EmotionCharacter(

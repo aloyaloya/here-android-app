@@ -89,7 +89,7 @@ fun CalendarIllustration(
     IllustrationGroup(modifier = modifier) {
         EmotionCharacter(
             emotion = CharacterEmotion.HAPPY,
-            size = 64.dp,
+            size = 80.dp,
             look = LOOK_RIGHT,
             modifier = Modifier
                 .padding(start = HereSpacing.s)
@@ -126,11 +126,11 @@ private fun CalendarCard(modifier: Modifier = Modifier) {
     }
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
+        verticalArrangement = Arrangement.spacedBy(HereSpacing.m),
         modifier = modifier
             .fillMaxWidth()
             .illustrationCard()
-            .padding(HereSpacing.l)
+            .padding(HereSpacing.xl)
     ) {
         Row(
             verticalAlignment = Alignment.Bottom,
@@ -138,13 +138,13 @@ private fun CalendarCard(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = monthName,
-                style = MaterialTheme.typography.titleMedium,
+                style = MaterialTheme.typography.titleLarge,
                 color = colors.textPrimary
             )
 
             Text(
                 text = IllustrationMonth.year.toString(),
-                style = MaterialTheme.typography.bodyMedium,
+                style = MaterialTheme.typography.bodyLarge,
                 color = colors.textSecondary
             )
         }
@@ -154,9 +154,7 @@ private fun CalendarCard(modifier: Modifier = Modifier) {
                 weekdays.forEach { weekday ->
                     Text(
                         text = weekday,
-                        style = MaterialTheme.typography.labelSmall.copy(
-                            fontSize = HereSize.Calendar.weekdaySize
-                        ),
+                        style = MaterialTheme.typography.labelMedium,
                         color = colors.textTertiary,
                         textAlign = TextAlign.Center,
                         modifier = Modifier.weight(1f)
@@ -182,7 +180,7 @@ private fun CalendarCard(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = stringResource(R.string.onboarding_calendar_summary),
-                style = MaterialTheme.typography.labelSmall,
+                style = MaterialTheme.typography.labelMedium,
                 color = colors.textSecondary
             )
 
@@ -245,7 +243,7 @@ private fun DayCell(
             } else {
                 Text(
                     text = day.dayOfMonth.toString(),
-                    style = MaterialTheme.typography.labelSmall,
+                    style = MaterialTheme.typography.labelMedium,
                     color = colors.textPrimary
                 )
             }
