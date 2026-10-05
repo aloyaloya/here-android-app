@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Цвета персонажей-эмоций, тёмная тема. Совпадают с HereColors — менять вместе. -->
+<resources>
+    <color name="character_ring">#241F1B</color>
+    <color name="character_ink">#F6F0EA</color>
+    <color name="character_ink_you">#1B1714</color>
+    <color name="character_highlight">#241F1B</color>
+    <color name="character_shadow">#59000000</color>
+    <color name="character_cheek">#E86E6E</color>
+    <color name="character_tear">#8FB8E0</color>
+    <color name="character_happy">#7A5A2E</color>
+    <color name="character_tender">#8E4E52</color>
+    <color name="character_surprised">#5A4E86</color>
+    <color name="character_calm">#3B6B5A</color>
+    <color name="character_sad">#3F5C7D</color>
+    <color name="character_angry">#8A4B3A</color>
+    <color name="character_you">#FF7A5A</color>
+</resources>

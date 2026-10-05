@@ -322,4 +322,17 @@ object HereSize {
         val dayCellSize = 24.dp
         val dayEmojiSize = 12.sp
     }
+
+    /** Персонаж-эмоция. */
+    object EmotionCharacter {
+        val heightRatio = 1.2f
+        val lookShift = 0.025f
+    }
+
+    /** Реплика персонажа. */
+    object CharacterBubble {
+        val verticalPadding = 5.dp
+        val horizontalPadding = 10.dp
+        val tailSize = 10.dp
+    }
 }

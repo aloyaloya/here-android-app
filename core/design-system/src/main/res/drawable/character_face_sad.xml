@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Брови, рот, румянец, слеза. Слой 3 из 3. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="48dp"
+    android:viewportWidth="100"
+    android:viewportHeight="120">
+    <path
+        android:pathData="M23,57 a6,3.6 0 1,0 12,0 a6,3.6 0 1,0 -12,0 M65,57 a6,3.6 0 1,0 12,0 a6,3.6 0 1,0 -12,0"
+        android:fillColor="@color/character_cheek"
+        android:fillAlpha="0.076" />
+    <path
+        android:pathData="M32,37 L43,33 M57,33 L68,37"
+        android:strokeColor="@color/character_ink"
+        android:strokeWidth="3"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M42,62 Q50,55 58,62"
+        android:strokeColor="@color/character_ink"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <path
+        android:pathData="M70,52 Q66.5,58 70,61 Q73.5,58 70,52 Z"
+        android:fillColor="@color/character_tear" />
+</vector>

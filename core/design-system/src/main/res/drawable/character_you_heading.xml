@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- «Ты» на карте, когда известен курс: носик смотрит вверх, MapKit поворачивает иконку. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="52.8dp"
+    android:viewportWidth="100"
+    android:viewportHeight="132">
+    <group android:translateY="12">
+        <path
+            android:pathData="M50,-7 L60,10 L40,10 Z"
+            android:fillColor="@color/character_you"
+            android:strokeColor="@color/character_ring"
+            android:strokeWidth="5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M8,50 A42,42 0 1,0 92,50 A42,42 0 1,0 8,50 Z"
+            android:fillColor="@color/character_you"
+            android:strokeColor="@color/character_ring"
+            android:strokeWidth="5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+        <path
+            android:pathData="M33.5,44 a4.5,6 0 1,0 9.0,0 a4.5,6 0 1,0 -9.0,0 M57.5,44 a4.5,6 0 1,0 9.0,0 a4.5,6 0 1,0 -9.0,0"
+            android:fillColor="@color/character_ink_you" />
+        <path
+            android:pathData="M43,56 Q50,63 57,56"
+            android:strokeColor="@color/character_ink_you"
+            android:strokeWidth="3.5"
+            android:strokeLineCap="round"
+            android:strokeLineJoin="round" />
+    </group>
+</vector>

@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Брови, рот, румянец, слеза. Слой 3 из 3. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="48dp"
+    android:viewportWidth="100"
+    android:viewportHeight="120">
+    <path
+        android:pathData="M43,56 Q50,63 57,56"
+        android:strokeColor="@color/character_ink_you"
+        android:strokeWidth="3.5"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
