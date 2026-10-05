@@ -12,16 +12,14 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import ru.aloyaloya.design_system.theme.HereTheme
-import ru.aloyaloya.design_system.theme.ThemeMode
 import ru.aloyaloya.here.ui.HereApp
 import ru.aloyaloya.onboarding.presentation.OnboardingScreen
 
 /**
  * Главная Activity приложения.
  *
- * Подписывается на режим темы из [MainViewModel] и передает его в [HereTheme],
- * чтобы переключение применялось ко всему UI. Разрешенное значение темы нужно
- * и самой Activity: по нему подбирается вид системных баров.
+ * Тему берет из конфигурации: выбор в настройках применяется через `AppCompatDelegate`.
+ * По ней же подбирается вид системных баров.
  * Пока онбординг не пройден, вместо приложения показывается он.
  */
 class MainActivity : AppCompatActivity() {
@@ -36,13 +34,8 @@ class MainActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val themeMode by viewModel.themeMode.collectAsState()
             val onboardingCompleted by viewModel.onboardingCompleted.collectAsState()
-            val darkTheme = when (themeMode) {
-                ThemeMode.AUTO -> isSystemInDarkTheme()
-                ThemeMode.LIGHT -> false
-                ThemeMode.DARK -> true
-            }
+            val darkTheme = isSystemInDarkTheme()
 
             LaunchedEffect(darkTheme) {
                 enableEdgeToEdge(
@@ -59,7 +52,7 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-            HereTheme(themeMode = themeMode) {
+            HereTheme(darkTheme = darkTheme) {
                 Crossfade(targetState = onboardingCompleted, label = "onboarding") { completed ->
                     if (completed) {
                         HereApp(darkTheme = darkTheme)

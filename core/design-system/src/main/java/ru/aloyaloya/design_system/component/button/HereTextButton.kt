@@ -37,7 +37,7 @@ fun HereTextButton(
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.titleMedium,
+            style = MaterialTheme.typography.labelLarge,
             color = HereTheme.colors.textPrimary
         )
     }
