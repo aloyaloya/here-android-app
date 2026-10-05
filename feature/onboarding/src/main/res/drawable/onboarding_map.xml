@@ -9,27 +9,44 @@
         android:pathData="M0,0 H360 V520 H0 Z"
         android:fillColor="@color/onboarding_map_land" />
     <path
-        android:pathData="M20,250 H100 A60,60 0 0,1 160,310 V350 A60,60 0 0,1 100,410 H20 A60,60 0 0,1 -40,350 V310 A60,60 0 0,1 20,250 Z"
+        android:pathData="M44,191 L127,179 L141,340 L54,346 Z"
         android:fillColor="@color/onboarding_map_green" />
     <path
-        android:pathData="M330,310 H350 A100,100 0 0,1 450,410 V410 A100,100 0 0,1 350,510 H330 A100,100 0 0,1 230,410 V410 A100,100 0 0,1 330,310 Z"
-        android:fillColor="@color/onboarding_map_water" />
-    <path
-        android:pathData="M245.0,-40 H335.0 A65.0,65.0 0 0,1 400,25.0 V25.0 A65.0,65.0 0 0,1 335.0,90 H245.0 A65.0,65.0 0 0,1 180,25.0 V25.0 A65.0,65.0 0 0,1 245.0,-40 Z"
+        android:pathData="M148,52 L286,37 L286,133 L150,153 Z"
         android:fillColor="@color/onboarding_map_green" />
     <path
-        android:pathData="M-28.7,197.9 L386.2,132.2 L388.7,148.1 L-26.2,213.8 Z"
-        android:fillColor="@color/onboarding_map_road" />
+        android:pathData="M215,540 C255,450 320,415 380,330"
+        android:strokeColor="@color/onboarding_map_water"
+        android:strokeWidth="46"
+        android:strokeLineCap="butt" />
     <path
-        android:pathData="M-28.3,323.1 L389.4,367.0 L388.3,377.9 L-29.4,334.0 Z"
-        android:fillColor="@color/onboarding_map_road" />
+        android:pathData="M-20,60 L380,20"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="7"
+        android:strokeLineCap="butt" />
     <path
-        android:pathData="M207.7,-34.0 L222.3,-30.6 L87.3,554.0 L72.7,550.6 Z"
-        android:fillColor="@color/onboarding_map_road" />
+        android:pathData="M20,-20 L55,540"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="7"
+        android:strokeLineCap="butt" />
     <path
-        android:pathData="M273.9,-38.5 L282.8,-39.3 L335.1,558.5 L326.2,559.3 Z"
-        android:fillColor="@color/onboarding_map_road" />
+        android:pathData="M-20,190 L380,130"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="14"
+        android:strokeLineCap="butt" />
     <path
-        android:pathData="M-5.9,-27.6 L1.5,-30.6 L113.9,247.6 L106.5,250.6 Z"
-        android:fillColor="@color/onboarding_map_road" />
+        android:pathData="M-20,360 L380,400"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="14"
+        android:strokeLineCap="butt" />
+    <path
+        android:pathData="M120,-20 L175,540"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="14"
+        android:strokeLineCap="butt" />
+    <path
+        android:pathData="M300,-20 L285,540"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="11"
+        android:strokeLineCap="butt" />
 </vector>
