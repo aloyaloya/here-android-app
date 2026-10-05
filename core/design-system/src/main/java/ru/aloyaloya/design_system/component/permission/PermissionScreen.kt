@@ -24,6 +24,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.unit.Constraints
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.button.HereTextButton
 import ru.aloyaloya.design_system.extension.overlayShadow
@@ -120,19 +122,10 @@ fun PermissionPage(
     val colors = HereTheme.colors
     val sizes = HereSize.PermissionSheet
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(illustrationBackground)
-    ) {
-        Box(modifier = Modifier.fillMaxSize(), content = illustration)
+    Layout(
+        content = {
+            Box(content = illustration)
 
-        Box(
-            contentAlignment = Alignment.BottomCenter,
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(top = contentPadding.calculateTopPadding())
-        ) {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
@@ -177,6 +170,24 @@ fun PermissionPage(
                     path()
                 }
             }
+        },
+        modifier = modifier
+            .fillMaxSize()
+            .background(illustrationBackground)
+    ) { measurables, constraints ->
+        val width = constraints.maxWidth
+        val height = constraints.maxHeight
+        val sheetMaxHeight = (height - contentPadding.calculateTopPadding().roundToPx()).coerceAtLeast(0)
+        val sheet = measurables[1].measure(
+            Constraints(minWidth = width, maxWidth = width, maxHeight = sheetMaxHeight)
+        )
+        val illustrationHeight = (height - sheet.height + sizes.illustrationOverlap.roundToPx())
+            .coerceIn(0, height)
+        val illustration = measurables[0].measure(Constraints.fixed(width, illustrationHeight))
+
+        layout(width, height) {
+            illustration.place(0, 0)
+            sheet.place(0, height - sheet.height)
         }
     }
 }

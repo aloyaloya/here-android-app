@@ -2,10 +2,14 @@ package ru.aloyaloya.map.presentation
 
 import android.Manifest
 import android.content.Context
+import android.content.Intent
 import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
 import android.view.animation.AccelerateInterpolator
 import android.view.animation.OvershootInterpolator
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
@@ -39,6 +43,7 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import ru.aloyaloya.design_system.component.button.HereFab
 import ru.aloyaloya.design_system.component.picker.PlacePin
 import ru.aloyaloya.design_system.theme.HereSize
@@ -114,19 +119,31 @@ fun MapScreen(
 ) {
     val isDarkTheme = LocalAppDarkTheme.current
     val context = LocalContext.current
+    val activity = LocalActivity.current
     var locationGranted by remember {
         mutableStateOf(context.hasLocationPermission())
     }
+    var rationaleBeforeRequest by remember { mutableStateOf(false) }
     val launcher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions(),
     ) { result ->
         locationGranted = result.values.any { it }
+
+        val blocked = !locationGranted && !rationaleBeforeRequest &&
+            activity?.shouldShowRequestPermissionRationale(locationPermissions.first()) == false
+        if (blocked) {
+            context.startActivity(
+                Intent(
+                    Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                    Uri.fromParts("package", context.packageName, null)
+                )
+            )
+        }
     }
 
-    LaunchedEffect(Unit) {
-        if (!locationGranted) {
-            launcher.launch(locationPermissions)
-        }
+    LifecycleResumeEffect(Unit) {
+        locationGranted = context.hasLocationPermission()
+        onPauseOrDispose {}
     }
 
     when (uiState) {
@@ -160,6 +177,8 @@ fun MapScreen(
                 if (locationGranted) {
                     mapState.moveToUserLocation()
                 } else {
+                    rationaleBeforeRequest = activity
+                        ?.shouldShowRequestPermissionRationale(locationPermissions.first()) == true
                     launcher.launch(locationPermissions)
                 }
             }
@@ -205,7 +224,7 @@ fun MapScreen(
                         .padding(bottom = HereSize.Fab.barSpacing)
                 ) {
                     AnimatedVisibility(
-                        visible = locationGranted && mapState.awayFromUser,
+                        visible = !locationGranted || mapState.awayFromUser,
                         enter = scaleIn(tween(RESIZE_MILLIS, easing = GrowEasing)),
                         exit = scaleOut(tween(RESIZE_MILLIS, easing = ShrinkEasing))
                     ) {

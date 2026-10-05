@@ -6,10 +6,11 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -19,9 +20,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.calendar.DAYS_IN_WEEK
 import ru.aloyaloya.design_system.component.calendar.monthGrid
-import ru.aloyaloya.design_system.component.emotion.EmotionPin
+import ru.aloyaloya.design_system.component.character.CharacterEmotion
+import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
@@ -67,14 +70,34 @@ private val EmotionShares = DayEmotions.values
     .entries
     .sortedByDescending { it.value }
 
-/** Месяц с эмоциями по дням и полоса итогов под ним. */
+/** Персонаж над карточкой месяца. */
 @Composable
 fun CalendarIllustration(modifier: Modifier = Modifier) {
+    // TODO: сделать анимацию падения персонажа
+    IllustrationGroup(modifier = modifier) {
+        EmotionCharacter(
+            emotion = CharacterEmotion.HAPPY,
+            size = 64.dp,
+            look = LOOK_RIGHT,
+            modifier = Modifier.padding(start = HereSpacing.s)
+        )
+
+        CalendarCard()
+    }
+}
+
+/** Месяц с эмоциями по дням и полоса итогов под ним. */
+@Composable
+private fun CalendarCard() {
     val colors = HereTheme.colors
     val locale = currentLocale()
     val days = remember { monthGrid(IllustrationMonth).take(ILLUSTRATION_WEEKS * DAYS_IN_WEEK) }
     val weekdays = remember(locale) {
-        days.take(DAYS_IN_WEEK).map { it.dayOfWeek.getDisplayName(TextStyle.SHORT_STANDALONE, locale) }
+        days.take(DAYS_IN_WEEK).map { day ->
+            day.dayOfWeek
+                .getDisplayName(TextStyle.SHORT_STANDALONE, locale)
+                .replaceFirstChar { it.titlecase(locale) }
+        }
     }
     val monthName = remember(locale) {
         IllustrationMonth.month
@@ -84,9 +107,9 @@ fun CalendarIllustration(modifier: Modifier = Modifier) {
 
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
-        modifier = modifier
-            .fillMaxSize()
-            .background(colors.surface)
+        modifier = Modifier
+            .fillMaxWidth()
+            .illustrationCard()
             .padding(HereSpacing.l)
     ) {
         Row(
@@ -95,7 +118,7 @@ fun CalendarIllustration(modifier: Modifier = Modifier) {
         ) {
             Text(
                 text = monthName,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 color = colors.textPrimary
             )
 
@@ -106,7 +129,7 @@ fun CalendarIllustration(modifier: Modifier = Modifier) {
             )
         }
 
-        Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.xs)) {
+        Column(verticalArrangement = Arrangement.spacedBy(HereSize.OnboardingIllustration.dayRowGap)) {
             Row {
                 weekdays.forEach { weekday ->
                     Text(
@@ -133,26 +156,31 @@ fun CalendarIllustration(modifier: Modifier = Modifier) {
             }
         }
 
-        Text(
-            text = stringResource(R.string.onboarding_calendar_summary),
-            style = MaterialTheme.typography.labelSmall,
-            color = colors.textSecondary
-        )
-
         Row(
-            horizontalArrangement = Arrangement.spacedBy(HereSize.Summary.barGap),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(HereSize.Summary.barHeight)
-                .clip(HereShape.pill)
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(HereSpacing.m)
         ) {
-            EmotionShares.forEach { (emotion, count) ->
-                Box(
-                    modifier = Modifier
-                        .weight(count.toFloat())
-                        .fillMaxHeight()
-                        .background(emotion.color.solid)
-                )
+            Text(
+                text = stringResource(R.string.onboarding_calendar_summary),
+                style = MaterialTheme.typography.labelSmall,
+                color = colors.textSecondary
+            )
+
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(HereSize.Summary.barGap),
+                modifier = Modifier
+                    .weight(1f)
+                    .height(HereSize.Summary.barHeight)
+                    .clip(HereShape.pill)
+            ) {
+                EmotionShares.forEach { (emotion, count) ->
+                    Box(
+                        modifier = Modifier
+                            .weight(count.toFloat())
+                            .fillMaxHeight()
+                            .background(emotion.color.solid)
+                    )
+                }
             }
         }
     }
@@ -178,20 +206,29 @@ private fun DayCell(
         contentAlignment = Alignment.Center,
         modifier = modifier.height(sizes.dayCellSize)
     ) {
-        if (emotion != null) {
-            EmotionPin(
-                emoji = emotion.emoji,
-                color = emotion.color.solid,
-                size = sizes.dayCellSize,
-                border = HereSize.Calendar.pinBorder,
-                emojiSize = sizes.dayEmojiSize
-            )
-        } else {
-            Text(
-                text = day.dayOfMonth.toString(),
-                style = MaterialTheme.typography.labelSmall,
-                color = if (inMonth) colors.textPrimary else colors.textQuaternary
-            )
+        if (!inMonth) return@Box
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .size(sizes.dayCellSize)
+                .background(
+                    color = emotion?.color?.soft ?: colors.surfaceMuted,
+                    shape = CircleShape
+                )
+        ) {
+            if (emotion != null) {
+                Text(
+                    text = emotion.emoji,
+                    fontSize = sizes.dayEmojiSize
+                )
+            } else {
+                Text(
+                    text = day.dayOfMonth.toString(),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = colors.textPrimary
+                )
+            }
         }
     }
 }

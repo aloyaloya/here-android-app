@@ -289,29 +289,32 @@ object HereSize {
         val iconSize = 24.dp
     }
 
-    /** Отметка «Ты здесь» на карте. */
-    object UserLocation {
-        val haloSize = 80.dp
-        val dotSize = 20.dp
-        val dotBorder = 4.dp
-        val labelVerticalPadding = 4.dp
-        val labelHorizontalPadding = 12.dp
-        val haloAlpha = 0.10f
-        val darkHaloAlpha = 0.12f
-    }
-
     /** Иллюстрации онбординга. */
     object OnboardingIllustration {
-        val canvasWidth = 316.dp
-        val canvasHeight = 264.dp
-        val pinBorder = 3.dp
-        val pinEmojiRatio = 0.47f
-        val hintIconSize = 18.dp
+        val sceneWidth = 360.dp
+        val cardMargin = 32.dp
         val previewSize = 56.dp
         val previewBadgeSize = 24.dp
         val previewBadgeIconSize = 12.dp
-        val dayCellSize = 24.dp
-        val dayEmojiSize = 12.sp
+        val titleGap = 2.dp
+        val dayRowGap = 5.dp
+        val dayCellSize = 28.dp
+        val dayEmojiSize = 15.sp
+    }
+
+    /** Иллюстрация страницы геолокации. */
+    object LocationIllustration {
+        val youSize = 72.dp
+        val youHaloSize = 100.dp
+        val youHaloAlpha = 0.22f
+        val pickerHeadSize = 40.dp
+        val pickerBorder = 4.dp
+        val pickerStemWidth = 4.dp
+        val pickerStemHeight = 18.dp
+        val pickerShadowWidth = 16.dp
+        val pickerShadowHeight = 6.dp
+        val pickerShadowAlpha = 0.14f
+        val darkPickerShadowAlpha = 0.35f
     }
 
     /** Персонаж-эмоция. */
@@ -332,6 +335,7 @@ object HereSize {
         val topPadding = 24.dp
         val indicatorSpacing = 20.dp
         val darkBorder = 1.dp
+        val illustrationOverlap = 28.dp
     }
 
     /** Пилюля «Пропустить». */

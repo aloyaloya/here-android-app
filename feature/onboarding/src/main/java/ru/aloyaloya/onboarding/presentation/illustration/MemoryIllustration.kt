@@ -5,9 +5,10 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
@@ -16,8 +17,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.dp
+import ru.aloyaloya.design_system.component.character.CharacterEmotion
+import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
 import ru.aloyaloya.design_system.format.DayMonthFormat
@@ -37,39 +42,56 @@ import java.time.LocalDateTime
 /** Момент воспоминания на иллюстрации. */
 private val MemoryMoment = LocalDateTime.of(2026, 7, 15, 18, 40)
 
-/** Эмоции превью снимков на иллюстрации. */
-private val PreviewEmotions = listOf(Emotion.HAPPY, Emotion.CALM, Emotion.SAD)
+/** Карточка воспоминания между двумя персонажами. */
+@Composable
+fun MemoryIllustration(modifier: Modifier = Modifier) {
+    // TODO: сделать анимацию падения персонажей
+    IllustrationGroup(modifier = modifier) {
+        EmotionCharacter(
+            emotion = CharacterEmotion.TENDER,
+            size = 64.dp,
+            look = LOOK_RIGHT,
+            modifier = Modifier.padding(start = HereSpacing.s)
+        )
+
+        MemoryCard()
+
+        EmotionCharacter(
+            emotion = CharacterEmotion.CALM,
+            size = 46.dp,
+            look = LOOK_LEFT,
+            modifier = Modifier
+                .align(Alignment.End)
+                .padding(end = HereSpacing.m)
+        )
+    }
+}
 
 /** Карточка воспоминания: эмоция, название, время, заметка и превью снимков. */
 @Composable
-fun MemoryIllustration(modifier: Modifier = Modifier) {
+private fun MemoryCard() {
     val colors = HereTheme.colors
     val emotion = Emotion.TENDER
     val dateFormat = DayMonthFormat.withLocale(currentLocale())
     val timeFormat = TimeFormat.withLocale(currentLocale())
 
-    Box(
-        modifier = modifier
-            .fillMaxSize()
-            .background(emotion.color.soft)
+    Column(
+        verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
+        modifier = Modifier
+            .fillMaxWidth()
+            .illustrationCard()
             .padding(HereSpacing.l)
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
-            modifier = Modifier
-                .fillMaxWidth()
-                .background(color = colors.surface, shape = HereShape.tile)
-                .padding(HereSpacing.l)
-        ) {
-            EmotionTag(
-                emoji = emotion.emoji,
-                label = stringResource(emotion.labelResId),
-                color = emotion.color.soft
-            )
+        EmotionTag(
+            emoji = emotion.emoji,
+            label = stringResource(emotion.labelResId),
+            color = emotion.color.soft
+        )
 
+        Column(verticalArrangement = Arrangement.spacedBy(HereSize.OnboardingIllustration.titleGap)) {
             Text(
                 text = stringResource(R.string.onboarding_card_title),
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 color = colors.textPrimary,
                 maxLines = 1,
                 overflow = TextOverflow.Ellipsis
@@ -80,59 +102,85 @@ fun MemoryIllustration(modifier: Modifier = Modifier) {
                 style = MaterialTheme.typography.bodyMedium,
                 color = colors.textSecondary
             )
+        }
 
-            Text(
-                text = stringResource(R.string.onboarding_card_note),
-                style = MaterialTheme.typography.bodyMedium,
-                color = colors.textBody,
-                maxLines = 2,
-                overflow = TextOverflow.Ellipsis
-            )
+        Text(
+            text = stringResource(R.string.onboarding_card_note),
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.textBody,
+            maxLines = 2,
+            overflow = TextOverflow.Ellipsis
+        )
 
-            Row(horizontalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
-                PreviewEmotions.forEachIndexed { index, previewEmotion ->
-                    MediaPreview(
-                        emotion = previewEmotion,
-                        video = index == PreviewEmotions.lastIndex
-                    )
-                }
-            }
+        Row(horizontalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
+            LandscapePreview()
+            PortraitPreview()
+            VideoPreview()
         }
     }
 }
 
-/**
- * Превью снимка из фигур в цветах эмоции.
- *
- * @param emotion Эмоция, задающая цвета.
- * @param video Показывать ли значок видео.
- */
+/** Превью-пейзаж: холм и солнце. */
 @Composable
-private fun MediaPreview(
-    emotion: Emotion,
-    video: Boolean
-) {
+private fun LandscapePreview() {
+    val emotions = HereTheme.colors.emotions
+    val sizes = HereSize.OnboardingIllustration
+
+    Box(modifier = Modifier.preview(emotions.sad.soft)) {
+        Box(
+            modifier = Modifier
+                .offset(x = -HereSpacing.m, y = sizes.previewSize * 0.6f)
+                .requiredSize(sizes.previewSize * 1.4f, sizes.previewSize * 0.77f)
+                .background(color = emotions.calm.solid, shape = CircleShape)
+        )
+
+        Box(
+            modifier = Modifier
+                .offset(x = sizes.previewSize * 0.6f, y = sizes.previewSize / 6)
+                .size(sizes.previewSize * 0.22f)
+                .background(color = emotions.happy.solid, shape = CircleShape)
+        )
+    }
+}
+
+/** Превью-портрет: круг у нижнего края. */
+@Composable
+private fun PortraitPreview() {
+    val emotions = HereTheme.colors.emotions
+    val sizes = HereSize.OnboardingIllustration
+
+    Box(modifier = Modifier.preview(emotions.tender.solid)) {
+        Box(
+            modifier = Modifier
+                .offset(x = -HereSpacing.s, y = sizes.previewSize / 2)
+                .requiredSize(sizes.previewSize * 0.77f)
+                .background(color = emotions.happy.soft, shape = CircleShape)
+        )
+    }
+}
+
+/** Превью видео со значком воспроизведения. */
+@Composable
+private fun VideoPreview() {
     val sizes = HereSize.OnboardingIllustration
 
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
-            .size(sizes.previewSize)
-            .clip(HereShape.tile)
-            .background(emotion.color.soft)
+        modifier = Modifier.preview(HereTheme.colors.emotions.surprised.solid)
     ) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.BottomEnd)
-                .size(sizes.previewSize / 2)
-                .background(color = emotion.color.solid, shape = CircleShape)
+        MediaPlayBadge(
+            size = sizes.previewBadgeSize,
+            iconSize = sizes.previewBadgeIconSize
         )
-
-        if (video) {
-            MediaPlayBadge(
-                size = sizes.previewBadgeSize,
-                iconSize = sizes.previewBadgeIconSize
-            )
-        }
     }
 }
+
+/**
+ * Квадрат превью с обрезкой по форме плитки.
+ *
+ * @param color Фон превью.
+ */
+private fun Modifier.preview(color: Color): Modifier = this
+    .size(HereSize.OnboardingIllustration.previewSize)
+    .clip(HereShape.tile)
+    .background(color)

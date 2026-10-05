@@ -1,0 +1,35 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Фон-карта онбординга (A1, B1–B3). Рисуется во всю ширину с ContentScale.Crop от верха. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="520dp"
+    android:viewportWidth="360"
+    android:viewportHeight="520">
+    <path
+        android:pathData="M0,0 H360 V520 H0 Z"
+        android:fillColor="@color/onboarding_map_land" />
+    <path
+        android:pathData="M20,250 H100 A60,60 0 0,1 160,310 V350 A60,60 0 0,1 100,410 H20 A60,60 0 0,1 -40,350 V310 A60,60 0 0,1 20,250 Z"
+        android:fillColor="@color/onboarding_map_green" />
+    <path
+        android:pathData="M330,310 H350 A100,100 0 0,1 450,410 V410 A100,100 0 0,1 350,510 H330 A100,100 0 0,1 230,410 V410 A100,100 0 0,1 330,310 Z"
+        android:fillColor="@color/onboarding_map_water" />
+    <path
+        android:pathData="M245.0,-40 H335.0 A65.0,65.0 0 0,1 400,25.0 V25.0 A65.0,65.0 0 0,1 335.0,90 H245.0 A65.0,65.0 0 0,1 180,25.0 V25.0 A65.0,65.0 0 0,1 245.0,-40 Z"
+        android:fillColor="@color/onboarding_map_green" />
+    <path
+        android:pathData="M-28.7,197.9 L386.2,132.2 L388.7,148.1 L-26.2,213.8 Z"
+        android:fillColor="@color/onboarding_map_road" />
+    <path
+        android:pathData="M-28.3,323.1 L389.4,367.0 L388.3,377.9 L-29.4,334.0 Z"
+        android:fillColor="@color/onboarding_map_road" />
+    <path
+        android:pathData="M207.7,-34.0 L222.3,-30.6 L87.3,554.0 L72.7,550.6 Z"
+        android:fillColor="@color/onboarding_map_road" />
+    <path
+        android:pathData="M273.9,-38.5 L282.8,-39.3 L335.1,558.5 L326.2,559.3 Z"
+        android:fillColor="@color/onboarding_map_road" />
+    <path
+        android:pathData="M-5.9,-27.6 L1.5,-30.6 L113.9,247.6 L106.5,250.6 Z"
+        android:fillColor="@color/onboarding_map_road" />
+</vector>

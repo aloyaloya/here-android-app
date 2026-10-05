@@ -13,6 +13,7 @@ import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.drawscope.rotate
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.theme.HereShape
@@ -29,6 +30,7 @@ enum class BubbleTail { TOP, BOTTOM, START, END }
  * @param containerColor Фон пузыря и хвостика.
  * @param contentColor Цвет текста.
  * @param tail Сторона хвостика.
+ * @param tailInset Центр хвостика от начала стороны или `null` — по центру.
  */
 @Composable
 fun CharacterBubble(
@@ -36,7 +38,8 @@ fun CharacterBubble(
     containerColor: Color,
     contentColor: Color,
     tail: BubbleTail,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    tailInset: Dp? = null
 ) {
     val tailSize = HereSize.CharacterBubble.tailSize
     val protrusion = tailSize / sqrt(2f)
@@ -45,13 +48,16 @@ fun CharacterBubble(
         modifier = modifier
             .drawBehind {
                 val half = protrusion.toPx()
-                val start = if (layoutDirection == LayoutDirection.Ltr) half else size.width - half
-                val end = if (layoutDirection == LayoutDirection.Ltr) size.width - half else half
+                val ltr = layoutDirection == LayoutDirection.Ltr
+                val start = if (ltr) half else size.width - half
+                val end = if (ltr) size.width - half else half
+                val alongX = tailInset?.toPx()?.let { if (ltr) it else size.width - it } ?: (size.width / 2)
+                val alongY = tailInset?.toPx() ?: (size.height / 2)
                 val center = when (tail) {
-                    BubbleTail.TOP -> Offset(size.width / 2, half)
-                    BubbleTail.BOTTOM -> Offset(size.width / 2, size.height - half)
-                    BubbleTail.START -> Offset(start, size.height / 2)
-                    BubbleTail.END -> Offset(end, size.height / 2)
+                    BubbleTail.TOP -> Offset(alongX, half)
+                    BubbleTail.BOTTOM -> Offset(alongX, size.height - half)
+                    BubbleTail.START -> Offset(start, alongY)
+                    BubbleTail.END -> Offset(end, alongY)
                 }
                 val side = tailSize.toPx()
                 rotate(degrees = 45f, pivot = center) {

@@ -1,33 +1,42 @@
 package ru.aloyaloya.onboarding.presentation
 
 import android.Manifest
+import android.content.Context
+import android.content.Intent
+import android.content.pm.PackageManager
+import android.net.Uri
+import android.provider.Settings
 import androidx.activity.compose.BackHandler
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
+import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import kotlinx.coroutines.launch
 import ru.aloyaloya.design_system.component.pager.HerePagerIndicator
 import ru.aloyaloya.design_system.component.permission.PermissionPage
 import ru.aloyaloya.design_system.component.permission.PermissionScreen
 import ru.aloyaloya.design_system.component.permission.PermissionSkipButton
-import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.component.settings.SettingsPathCard
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.onboarding.R
 import ru.aloyaloya.onboarding.presentation.illustration.CalendarIllustration
-import ru.aloyaloya.onboarding.presentation.illustration.FeaturePins
-import ru.aloyaloya.onboarding.presentation.illustration.MapIllustration
+import ru.aloyaloya.onboarding.presentation.illustration.LocationIllustration
 import ru.aloyaloya.onboarding.presentation.illustration.MemoryIllustration
-import ru.aloyaloya.onboarding.presentation.illustration.NearbyPins
-import ru.aloyaloya.onboarding.presentation.illustration.UserLocationOverlay
+import ru.aloyaloya.onboarding.presentation.illustration.WelcomeIllustration
 
 private const val PAGE_COUNT = 4
 private const val LOCATION_PAGE = PAGE_COUNT - 1
@@ -36,6 +45,11 @@ private val locationPermissions = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
     Manifest.permission.ACCESS_COARSE_LOCATION
 )
+
+private fun Context.hasLocationPermission(): Boolean =
+    locationPermissions.any { permission ->
+        ContextCompat.checkSelfPermission(this, permission) == PackageManager.PERMISSION_GRANTED
+    }
 
 /**
  * Онбординг: три страницы о возможностях и страница запроса геолокации.
@@ -47,13 +61,38 @@ fun OnboardingScreen(
     onFinished: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val context = LocalContext.current
+    val activity = LocalActivity.current
     val pagerState = rememberPagerState { PAGE_COUNT }
     val scope = rememberCoroutineScope()
     val isLocationPage = pagerState.currentPage == LOCATION_PAGE
+    var locationStep by rememberSaveable { mutableStateOf(LocationStep.REQUEST) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
-    ) { onFinished() }
+    ) { result ->
+        if (result.values.any { it }) {
+            onFinished()
+            return@rememberLauncherForActivityResult
+        }
+
+        val rationale = activity?.shouldShowRequestPermissionRationale(
+            Manifest.permission.ACCESS_FINE_LOCATION
+        ) == true
+
+        locationStep = if (locationStep == LocationStep.REQUEST && rationale) {
+            LocationStep.DENIED
+        } else {
+            LocationStep.BLOCKED
+        }
+    }
+
+    LifecycleResumeEffect(locationStep) {
+        if (locationStep == LocationStep.BLOCKED && context.hasLocationPermission()) {
+            onFinished()
+        }
+        onPauseOrDispose {}
+    }
 
     BackHandler(enabled = pagerState.currentPage > 0) {
         scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }
@@ -61,17 +100,35 @@ fun OnboardingScreen(
 
     PermissionScreen(
         primaryText = stringResource(
-            if (isLocationPage) R.string.permission_allow else R.string.onboarding_next
+            when {
+                !isLocationPage -> R.string.onboarding_next
+                locationStep == LocationStep.REQUEST -> R.string.permission_allow
+                locationStep == LocationStep.DENIED -> R.string.permission_try_again
+                else -> R.string.permission_open_settings
+            }
         ),
         onPrimaryClick = {
-            if (isLocationPage) {
-                permissionLauncher.launch(locationPermissions)
-            } else {
-                scope.launch { pagerState.animateScrollToPage(pagerState.currentPage + 1) }
+            when {
+                !isLocationPage -> scope.launch {
+                    pagerState.animateScrollToPage(pagerState.currentPage + 1)
+                }
+
+                locationStep == LocationStep.BLOCKED -> context.startActivity(
+                    Intent(
+                        Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
+                        Uri.fromParts("package", context.packageName, null)
+                    )
+                )
+
+                else -> permissionLauncher.launch(locationPermissions)
             }
         },
         modifier = modifier,
-        secondaryText = if (isLocationPage) stringResource(R.string.permission_not_now) else null,
+        secondaryText = when {
+            !isLocationPage -> null
+            locationStep == LocationStep.REQUEST -> stringResource(R.string.permission_not_now)
+            else -> stringResource(R.string.permission_continue_without)
+        },
         onSecondaryClick = onFinished,
         topAction = {
             if (!isLocationPage) {
@@ -83,32 +140,29 @@ fun OnboardingScreen(
         }
     ) { contentPadding ->
         HorizontalPager(state = pagerState) { page ->
-            OnboardingPage(page = page, contentPadding = contentPadding)
+            if (page == LOCATION_PAGE) {
+                LocationPage(step = locationStep, contentPadding = contentPadding)
+            } else {
+                FeaturePage(page = page, contentPadding = contentPadding)
+            }
         }
     }
 }
 
 /**
- * Страница онбординга.
+ * Страница о возможности приложения.
  *
- * @param page Номер страницы от 0 до [LOCATION_PAGE].
+ * @param page Номер страницы до [LOCATION_PAGE].
  * @param contentPadding Отступы от [PermissionScreen].
  */
 @Composable
-private fun OnboardingPage(page: Int, contentPadding: PaddingValues) {
+private fun FeaturePage(page: Int, contentPadding: PaddingValues) {
     val emotions = HereTheme.colors.emotions
-    val mapLand = colorResource(R.color.onboarding_map_land)
-
-    // TODO: заменить временные иллюстрации на персонажей
-    val illustrationModifier = Modifier
-        .padding(top = contentPadding.calculateTopPadding())
-        .height(HereSize.OnboardingIllustration.canvasHeight)
 
     val (background, title, body) = when (page) {
-        0 -> Triple(mapLand, R.string.onboarding_map_title, R.string.onboarding_map_body)
+        0 -> Triple(colorResource(R.color.onboarding_map_land), R.string.onboarding_map_title, R.string.onboarding_map_body)
         1 -> Triple(emotions.tender.soft, R.string.onboarding_memory_title, R.string.onboarding_memory_body)
-        2 -> Triple(emotions.calm.soft, R.string.onboarding_calendar_title, R.string.onboarding_calendar_body)
-        else -> Triple(mapLand, R.string.onboarding_location_title, R.string.onboarding_location_body)
+        else -> Triple(emotions.calm.soft, R.string.onboarding_calendar_title, R.string.onboarding_calendar_body)
     }
 
     PermissionPage(
@@ -116,18 +170,51 @@ private fun OnboardingPage(page: Int, contentPadding: PaddingValues) {
         illustrationBackground = background,
         illustration = {
             when (page) {
-                0 -> MapIllustration(pins = FeaturePins, modifier = illustrationModifier)
-                1 -> MemoryIllustration(modifier = illustrationModifier)
-                2 -> CalendarIllustration(modifier = illustrationModifier)
-                else -> MapIllustration(pins = NearbyPins, modifier = illustrationModifier) {
-                    UserLocationOverlay()
-                }
+                0 -> WelcomeIllustration()
+                1 -> MemoryIllustration()
+                else -> CalendarIllustration()
             }
         },
         title = stringResource(title),
         body = stringResource(body),
         pageIndicator = {
             HerePagerIndicator(pageCount = PAGE_COUNT, currentPage = page)
+        }
+    )
+}
+
+/**
+ * Страница запроса геолокации.
+ *
+ * @param step Шаг запроса.
+ * @param contentPadding Отступы от [PermissionScreen].
+ */
+@Composable
+private fun LocationPage(step: LocationStep, contentPadding: PaddingValues) {
+    val (title, body) = when (step) {
+        LocationStep.REQUEST -> R.string.onboarding_location_title to R.string.onboarding_location_body
+        LocationStep.DENIED -> R.string.onboarding_location_denied_title to R.string.onboarding_location_denied_body
+        LocationStep.BLOCKED -> R.string.onboarding_location_blocked_title to R.string.onboarding_location_blocked_body
+    }
+
+    PermissionPage(
+        contentPadding = contentPadding,
+        illustrationBackground = colorResource(R.color.onboarding_map_land),
+        illustration = { LocationIllustration(step = step) },
+        title = stringResource(title),
+        body = stringResource(body),
+        pageIndicator = {
+            HerePagerIndicator(pageCount = PAGE_COUNT, currentPage = LOCATION_PAGE)
+        },
+        settingsPath = if (step == LocationStep.BLOCKED) {
+            {
+                SettingsPathCard(
+                    label = stringResource(R.string.onboarding_location_settings_label),
+                    path = stringResource(R.string.onboarding_location_settings_path)
+                )
+            }
+        } else {
+            null
         }
     )
 }
