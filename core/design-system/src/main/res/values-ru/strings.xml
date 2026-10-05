@@ -12,4 +12,5 @@
     <string name="calendar_next_month">Следующий месяц</string>
     <string name="sheet_cancel">Отмена</string>
     <string name="sheet_confirm">Выбрать</string>
+    <string name="permission_back_content_description">Назад</string>
 </resources>

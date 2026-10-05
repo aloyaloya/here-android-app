@@ -7,6 +7,8 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -18,17 +20,18 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Scaffold
-import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Constraints
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
+import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.component.button.HereTextButton
-import ru.aloyaloya.design_system.extension.overlayShadow
+import ru.aloyaloya.design_system.component.topbar.TopAppBarAction
 import ru.aloyaloya.design_system.extension.sheetShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
@@ -42,7 +45,8 @@ import ru.aloyaloya.design_system.theme.HereTheme
  * @param onPrimaryClick Колбэк основной кнопки.
  * @param secondaryText Подпись вторичной кнопки или `null`, если ее нет.
  * @param onSecondaryClick Колбэк вторичной кнопки.
- * @param topAction Действие в правом верхнем углу, например [PermissionSkipButton].
+ * @param onNavigateBack Колбэк кнопки «Назад» или `null`, если ее нет.
+ * @param topAction Действие в правом верхнем углу, например [HereTextButton].
  * @param content Контент под кнопками, обычно [PermissionPage]; получает отступы верха и кнопок.
  */
 @Composable
@@ -52,22 +56,34 @@ fun PermissionScreen(
     modifier: Modifier = Modifier,
     secondaryText: String? = null,
     onSecondaryClick: () -> Unit = {},
-    topAction: @Composable BoxScope.() -> Unit = {},
+    onNavigateBack: (() -> Unit)? = null,
+    topAction: @Composable RowScope.() -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
     Scaffold(
         modifier = modifier,
         containerColor = HereTheme.colors.background,
         topBar = {
-            Box(
-                contentAlignment = Alignment.CenterEnd,
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
                 modifier = Modifier
                     .fillMaxWidth()
                     .statusBarsPadding()
                     .height(HereSize.TopAppBar.height)
-                    .padding(end = HereSpacing.m),
-                content = topAction
-            )
+                    .padding(horizontal = HereSize.TopAppBar.contentPadding)
+            ) {
+                // TODO: проявлять кнопку «Назад» плавно
+                onNavigateBack?.let { onClick ->
+                    TopAppBarAction(
+                        icon = R.drawable.ic_arrow_back,
+                        contentDescription = stringResource(R.string.permission_back_content_description),
+                        onClick = onClick
+                    )
+                }
+
+                Spacer(modifier = Modifier.weight(1f))
+                topAction()
+            }
         },
         bottomBar = {
             Column(
@@ -188,42 +204,6 @@ fun PermissionPage(
         layout(width, height) {
             illustration.place(0, 0)
             sheet.place(0, height - sheet.height)
-        }
-    }
-}
-
-/**
- * Плавающая пилюля «Пропустить» поверх иллюстрации.
- *
- * @param text Подпись.
- * @param onClick Колбэк нажатия.
- */
-@Composable
-fun PermissionSkipButton(
-    text: String,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
-) {
-    val colors = HereTheme.colors
-    val sizes = HereSize.PermissionSkip
-
-    Surface(
-        onClick = onClick,
-        shape = HereShape.pill,
-        color = colors.surface.copy(alpha = sizes.surfaceAlpha),
-        modifier = modifier.overlayShadow(HereShape.pill)
-    ) {
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .height(sizes.height)
-                .padding(horizontal = HereSpacing.l)
-        ) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.titleMedium,
-                color = colors.textPrimary
-            )
         }
     }
 }

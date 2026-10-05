@@ -337,10 +337,4 @@ object HereSize {
         val darkBorder = 1.dp
         val illustrationOverlap = 28.dp
     }
-
-    /** Пилюля «Пропустить». */
-    object PermissionSkip {
-        val height = 40.dp
-        val surfaceAlpha = 0.94f
-    }
 }

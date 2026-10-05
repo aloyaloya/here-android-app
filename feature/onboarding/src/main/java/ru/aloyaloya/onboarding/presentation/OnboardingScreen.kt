@@ -26,10 +26,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import kotlinx.coroutines.launch
+import ru.aloyaloya.design_system.component.button.HereTextButton
 import ru.aloyaloya.design_system.component.pager.HerePagerIndicator
 import ru.aloyaloya.design_system.component.permission.PermissionPage
 import ru.aloyaloya.design_system.component.permission.PermissionScreen
-import ru.aloyaloya.design_system.component.permission.PermissionSkipButton
 import ru.aloyaloya.design_system.component.settings.SettingsPathCard
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.onboarding.R
@@ -94,9 +94,12 @@ fun OnboardingScreen(
         onPauseOrDispose {}
     }
 
-    BackHandler(enabled = pagerState.currentPage > 0) {
+    val canGoBack = pagerState.currentPage > 0
+    val goBack: () -> Unit = {
         scope.launch { pagerState.animateScrollToPage(pagerState.currentPage - 1) }
     }
+
+    BackHandler(enabled = canGoBack, onBack = goBack)
 
     PermissionScreen(
         primaryText = stringResource(
@@ -130,9 +133,10 @@ fun OnboardingScreen(
             else -> stringResource(R.string.permission_continue_without)
         },
         onSecondaryClick = onFinished,
+        onNavigateBack = goBack.takeIf { canGoBack },
         topAction = {
             if (!isLocationPage) {
-                PermissionSkipButton(
+                HereTextButton(
                     text = stringResource(R.string.onboarding_skip),
                     onClick = { scope.launch { pagerState.animateScrollToPage(LOCATION_PAGE) } }
                 )

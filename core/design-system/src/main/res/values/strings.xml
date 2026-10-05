@@ -12,4 +12,5 @@
     <string name="calendar_next_month">Next month</string>
     <string name="sheet_cancel">Cancel</string>
     <string name="sheet_confirm">Select</string>
+    <string name="permission_back_content_description">Back</string>
 </resources>
