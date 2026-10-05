@@ -20,7 +20,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.calendar.DAYS_IN_WEEK
 import ru.aloyaloya.design_system.component.calendar.monthGrid
 import ru.aloyaloya.design_system.component.character.CharacterEmotion
@@ -89,7 +88,7 @@ fun CalendarIllustration(
     IllustrationGroup(modifier = modifier) {
         EmotionCharacter(
             emotion = CharacterEmotion.HAPPY,
-            size = 80.dp,
+            size = HereSize.EmotionCharacter.medium,
             look = LOOK_RIGHT,
             modifier = Modifier
                 .padding(start = HereSpacing.s)
@@ -149,7 +148,7 @@ private fun CalendarCard(modifier: Modifier = Modifier) {
             )
         }
 
-        Column(verticalArrangement = Arrangement.spacedBy(HereSize.OnboardingIllustration.dayRowGap)) {
+        Column(verticalArrangement = Arrangement.spacedBy(HereSize.Calendar.gridSpacing)) {
             Row {
                 weekdays.forEach { weekday ->
                     Text(

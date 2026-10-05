@@ -27,6 +27,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.compose.ui.unit.Constraints
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.R
@@ -114,7 +115,7 @@ fun PermissionScreen(
 /**
  * Страница экрана разрешения: иллюстрация во весь экран и нижняя панель с текстом.
  *
- * При крупном шрифте панель прокручивается, иллюстрация не сжимается.
+ * При крупном шрифте панель прокручивается, иллюстрация не сжимается и скрыта от TalkBack.
  *
  * @param contentPadding Отступы от [PermissionScreen]: панель не заходит под верх и кнопки.
  * @param illustrationBackground Фон иллюстрации.
@@ -140,7 +141,7 @@ fun PermissionPage(
 
     Layout(
         content = {
-            Box(content = illustration)
+            Box(modifier = Modifier.clearAndSetSemantics {}, content = illustration)
 
             Column(
                 modifier = Modifier

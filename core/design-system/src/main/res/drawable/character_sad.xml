@@ -1,7 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<!-- Персонаж «sad» целиком: для статичных мест (иконка MapKit, плашка в настройках). -->
-<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/character_body_sad" />
-    <item android:drawable="@drawable/character_eyes_sad" />
-    <item android:drawable="@drawable/character_face_sad" />
-</layer-list>

@@ -4,37 +4,29 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.character.BubbleTail
 import ru.aloyaloya.design_system.component.character.CharacterBubble
 import ru.aloyaloya.design_system.component.character.CharacterEmotion
+import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.onboarding.R
 
 /** Говорящий о море. */
-private val SeaSpeaker = CharacterSpot(CharacterEmotion.HAPPY, 24.dp, 74.dp, 72.dp, LOOK_RIGHT)
+private val SeaSpeaker = CharacterSpot(CharacterEmotion.HAPPY, 0.17f, 0.23f, HereSize.EmotionCharacter.large, LOOK_RIGHT)
 
 /** Говорящий о свидании. */
-private val DateSpeaker = CharacterSpot(CharacterEmotion.TENDER, 196.dp, 96.dp, 64.dp)
-
-/** Говорящий о море на экране. */
-private val SeaShown = SeaSpeaker.scaled()
-
-/** Говорящий о свидании на экране. */
-private val DateShown = DateSpeaker.scaled()
+private val DateSpeaker = CharacterSpot(CharacterEmotion.TENDER, 0.63f, 0.26f, HereSize.EmotionCharacter.medium)
 
 /** Персонажи первой страницы. */
 private val WelcomeCharacters = listOf(
     SeaSpeaker,
     DateSpeaker,
-    CharacterSpot(CharacterEmotion.SURPRISED, 120.dp, 196.dp, 58.dp),
-    CharacterSpot(CharacterEmotion.CALM, 30.dp, 286.dp, 66.dp, LOOK_RIGHT),
-    CharacterSpot(CharacterEmotion.SAD, 252.dp, 236.dp, 58.dp, LOOK_LEFT),
-    CharacterSpot(CharacterEmotion.ANGRY, 160.dp, 330.dp, 52.dp)
+    CharacterSpot(CharacterEmotion.SURPRISED, 0.41f, 0.45f, HereSize.EmotionCharacter.small),
+    CharacterSpot(CharacterEmotion.CALM, 0.18f, 0.64f, HereSize.EmotionCharacter.medium, LOOK_RIGHT),
+    CharacterSpot(CharacterEmotion.SAD, 0.8f, 0.53f, HereSize.EmotionCharacter.small, LOOK_LEFT),
+    CharacterSpot(CharacterEmotion.ANGRY, 0.52f, 0.71f, HereSize.EmotionCharacter.small)
 )
-
-/** Высота кадра макета: до верха панели и чуть под нее. */
-private val FrameHeight = 508.dp
 
 /** Начало падений. */
 private const val DROP_START_MILLIS = 100
@@ -44,6 +36,9 @@ private const val SEA_BUBBLE_MILLIS = 1000
 
 /** Появление реплики о свидании. */
 private const val DATE_BUBBLE_MILLIS = 1150
+
+/** Хвостик реплики о свидании от ее левого края. */
+private val DateTailInset = HereSpacing.xl
 
 /**
  * Карта с персонажами-эмоциями, двое из них говорят.
@@ -59,7 +54,6 @@ fun WelcomeIllustration(
     val emotions = colors.emotions
 
     IllustrationScene(
-        frameHeight = FrameHeight,
         modifier = modifier,
         backdrop = { MapBackground() }
     ) {
@@ -71,41 +65,27 @@ fun WelcomeIllustration(
             )
         }
 
+        val seaPivot = TransformOrigin(0f, 0.5f)
         CharacterBubble(
             text = stringResource(R.string.onboarding_bubble_sea),
             containerColor = emotions.happy.solid,
             contentColor = colors.textPrimary,
             tail = BubbleTail.START,
-            modifier = Modifier.sceneOffset(
-                x = SeaShown.right,
-                y = 96.dp,
-                anchorX = SeaShown.centerX,
-                anchorY = SeaShown.centerY
-            ).entrance(
-                active = active,
-                kind = Entrance.BUBBLE,
-                delayMillis = SEA_BUBBLE_MILLIS,
-                origin = TransformOrigin(0f, 0.5f)
-            )
+            modifier = Modifier
+                .pinTo(x = SeaSpeaker.right, y = SeaSpeaker.centerY, pivot = seaPivot)
+                .entrance(active = active, kind = Entrance.BUBBLE, delayMillis = SEA_BUBBLE_MILLIS, origin = seaPivot)
         )
 
+        val datePivot = TransformOrigin(0f, 0f)
         CharacterBubble(
             text = stringResource(R.string.onboarding_bubble_date),
             containerColor = emotions.tender.solid,
             contentColor = colors.textPrimary,
             tail = BubbleTail.TOP,
-            tailInset = 25.dp,
-            modifier = Modifier.sceneOffset(
-                x = 204.dp,
-                y = DateShown.bottom - 2.dp,
-                anchorX = DateShown.centerX,
-                anchorY = DateShown.centerY
-            ).entrance(
-                active = active,
-                kind = Entrance.BUBBLE,
-                delayMillis = DATE_BUBBLE_MILLIS,
-                origin = TransformOrigin(0.25f, 0f)
-            )
+            tailInset = DateTailInset,
+            modifier = Modifier
+                .pinTo(x = DateSpeaker.centerX - DateTailInset, y = DateSpeaker.bottom, pivot = datePivot)
+                .entrance(active = active, kind = Entrance.BUBBLE, delayMillis = DATE_BUBBLE_MILLIS, origin = datePivot)
         )
     }
 }

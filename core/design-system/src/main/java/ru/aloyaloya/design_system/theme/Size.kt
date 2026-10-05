@@ -291,35 +291,31 @@ object HereSize {
 
     /** Иллюстрации онбординга. */
     object OnboardingIllustration {
-        val sceneWidth = 360.dp
-        val characterScale = 1.25f
         val cardMargin = 16.dp
         val previewSize = 72.dp
-        val previewBadgeSize = 28.dp
-        val previewBadgeIconSize = 14.dp
-        val titleGap = 2.dp
-        val dayRowGap = 6.dp
         val dayCellSize = 40.dp
         val dayEmojiSize = 22.sp
     }
 
     /** Иллюстрация страницы геолокации. */
     object LocationIllustration {
-        val youSize = 88.dp
-        val youHaloSize = 124.dp
+        val youHaloSize = 128.dp
         val youHaloAlpha = 0.22f
         val pickerHeadSize = 48.dp
         val pickerBorder = 4.dp
         val pickerStemWidth = 4.dp
-        val pickerStemHeight = 22.dp
-        val pickerShadowWidth = 20.dp
-        val pickerShadowHeight = 7.dp
+        val pickerStemHeight = 24.dp
+        val pickerShadowWidth = 24.dp
+        val pickerShadowHeight = 8.dp
         val pickerShadowAlpha = 0.14f
         val darkPickerShadowAlpha = 0.35f
     }
 
     /** Персонаж-эмоция. */
     object EmotionCharacter {
+        val small = 64.dp
+        val medium = 72.dp
+        val large = 88.dp
         val heightRatio = 1.2f
         val lookShift = 0.025f
     }

@@ -20,7 +20,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.character.CharacterEmotion
 import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
@@ -64,7 +63,7 @@ fun MemoryIllustration(
     IllustrationGroup(modifier = modifier) {
         EmotionCharacter(
             emotion = CharacterEmotion.TENDER,
-            size = 80.dp,
+            size = HereSize.EmotionCharacter.medium,
             look = LOOK_RIGHT,
             modifier = Modifier
                 .padding(start = HereSpacing.s)
@@ -77,7 +76,7 @@ fun MemoryIllustration(
 
         EmotionCharacter(
             emotion = CharacterEmotion.CALM,
-            size = 56.dp,
+            size = HereSize.EmotionCharacter.small,
             look = LOOK_LEFT,
             modifier = Modifier
                 .align(Alignment.End)
@@ -112,7 +111,7 @@ private fun MemoryCard(modifier: Modifier = Modifier) {
             color = emotion.color.soft
         )
 
-        Column(verticalArrangement = Arrangement.spacedBy(HereSize.OnboardingIllustration.titleGap)) {
+        Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.xs)) {
             Text(
                 text = stringResource(R.string.onboarding_card_title),
                 style = MaterialTheme.typography.titleLarge,
@@ -186,16 +185,11 @@ private fun PortraitPreview() {
 /** Превью видео со значком воспроизведения. */
 @Composable
 private fun VideoPreview() {
-    val sizes = HereSize.OnboardingIllustration
-
     Box(
         contentAlignment = Alignment.Center,
         modifier = Modifier.preview(HereTheme.colors.emotions.surprised.solid)
     ) {
-        MediaPlayBadge(
-            size = sizes.previewBadgeSize,
-            iconSize = sizes.previewBadgeIconSize
-        )
+        MediaPlayBadge()
     }
 }
 

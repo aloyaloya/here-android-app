@@ -26,7 +26,6 @@ import kotlinx.coroutines.delay
 import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.extension.rememberLoopsEnabled
 import ru.aloyaloya.design_system.theme.HereSize
-import kotlin.random.Random
 
 /** Персонаж: три слоя одной эмоции или «ты». */
 enum class CharacterEmotion(
@@ -115,7 +114,7 @@ fun EmotionCharacter(
     LaunchedEffect(loops) {
         blink.snapTo(1f)
         while (loops) {
-            delay(Random.nextLong(BlinkPause.first, BlinkPause.last))
+            delay(BlinkPause.random())
             blink.animateTo(
                 targetValue = 1f,
                 animationSpec = keyframes {
@@ -151,7 +150,7 @@ fun EmotionCharacter(
                     .matchParentSize()
                     .graphicsLayer {
                         transformOrigin = EyesOrigin
-                        translationX = lookShift * size.toPx() * HereSize.EmotionCharacter.lookShift
+                        translationX = lookShift * this.size.width * HereSize.EmotionCharacter.lookShift
                         scaleY = blink.value
                     }
             )

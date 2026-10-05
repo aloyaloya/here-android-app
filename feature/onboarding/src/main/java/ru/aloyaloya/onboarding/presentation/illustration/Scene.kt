@@ -1,7 +1,5 @@
 package ru.aloyaloya.onboarding.presentation.illustration
 
-import androidx.compose.animation.core.animateDpAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -12,16 +10,16 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.Immutable
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.layout.layout
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.Dp
 import ru.aloyaloya.design_system.component.character.CharacterEmotion
@@ -32,6 +30,7 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.onboarding.R
+import kotlin.math.roundToInt
 
 /** Взгляд персонажа влево. */
 const val LOOK_LEFT = -1f
@@ -42,95 +41,76 @@ const val LOOK_RIGHT = 1f
 /** Шаг между падениями персонажей. */
 const val DROP_STEP_MILLIS = 120
 
-/** Переход персонажа в новую точку. */
-private const val MOVE_MILLIS = 300
-
 /**
  * Персонаж на сцене иллюстрации.
  *
  * @property emotion Эмоция персонажа.
- * @property x Левый край от левого края сцены.
- * @property y Верхний край от верха экрана.
- * @property size Ширина персонажа в макете.
+ * @property x Центр по X в долях ширины сцены.
+ * @property y Центр по Y в долях высоты сцены.
+ * @property size Ширина персонажа.
  * @property look Взгляд: −1 влево, 0 прямо, 1 вправо.
  */
 @Immutable
 data class CharacterSpot(
     val emotion: CharacterEmotion,
-    val x: Dp,
-    val y: Dp,
+    val x: Float,
+    val y: Float,
     val size: Dp,
     val look: Float = 0f
-) {
-    /** Центр персонажа по X. */
-    val centerX: Dp get() = x + size / 2
-
-    /** Центр персонажа по Y. */
-    val centerY: Dp get() = y + size * HereSize.EmotionCharacter.heightRatio / 2
-
-    /** Правый край персонажа. */
-    val right: Dp get() = x + size
-
-    /** Нижний край персонажа. */
-    val bottom: Dp get() = y + size * HereSize.EmotionCharacter.heightRatio
-
-    /** Тот же персонаж, увеличенный до размера на экране вокруг своего центра. */
-    fun scaled(): CharacterSpot {
-        val grown = size * HereSize.OnboardingIllustration.characterScale
-        return copy(
-            x = centerX - grown / 2,
-            y = centerY - grown * HereSize.EmotionCharacter.heightRatio / 2,
-            size = grown
-        )
-    }
-}
+)
 
 /**
- * Координаты сцены, растянутой из кадра макета на доступное место.
+ * Координаты сцены: доли ее ширины и высоты переводятся в dp.
  *
- * @param scaleX Растяжение по ширине.
- * @param scaleY Растяжение по высоте.
+ * @param width Ширина сцены.
+ * @param height Высота сцены.
  */
 class SceneScope(
     boxScope: BoxScope,
-    private val scaleX: Float,
-    private val scaleY: Float
+    val width: Dp,
+    val height: Dp
 ) : BoxScope by boxScope {
 
-    /** Сдвиг по X точки [anchor] кадра макета при растяжении. */
-    fun shiftX(anchor: Dp): Dp = anchor * (scaleX - 1)
+    /** Центр персонажа по X. */
+    val CharacterSpot.centerX: Dp get() = width * x
 
-    /** Сдвиг по Y точки [anchor] кадра макета при растяжении. */
-    fun shiftY(anchor: Dp): Dp = anchor * (scaleY - 1)
+    /** Центр персонажа по Y. */
+    val CharacterSpot.centerY: Dp get() = height * y
 
-    /** Смещение элемента, привязанного к точке ([anchorX], [anchorY]) кадра макета. */
-    fun Modifier.sceneOffset(x: Dp, y: Dp, anchorX: Dp = x, anchorY: Dp = y): Modifier =
-        offset(x = x + shiftX(anchorX), y = y + shiftY(anchorY))
+    /** Правый край персонажа. */
+    val CharacterSpot.right: Dp get() = centerX + size / 2
+
+    /** Нижний край персонажа. */
+    val CharacterSpot.bottom: Dp get() = centerY + size * HereSize.EmotionCharacter.heightRatio / 2
+
+    /** Ставит элемент так, что его точка [pivot] попадает в ([x], [y]) сцены. */
+    fun Modifier.pinTo(x: Dp, y: Dp, pivot: TransformOrigin = TransformOrigin.Center): Modifier =
+        layout { measurable, constraints ->
+            val placeable = measurable.measure(constraints.copy(minWidth = 0, minHeight = 0))
+            layout(placeable.width, placeable.height) {
+                placeable.place(
+                    x = x.roundToPx() - (placeable.width * pivot.pivotFractionX).roundToInt(),
+                    y = y.roundToPx() - (placeable.height * pivot.pivotFractionY).roundToInt()
+                )
+            }
+        }
 }
 
 /**
- * Сцена иллюстрации: кадр макета, растянутый на доступное место без масштаба элементов.
+ * Сцена иллюстрации во все доступное место.
  *
- * @param frameHeight Высота кадра макета от верха экрана до низа иллюстрации.
  * @param backdrop Фон во всю сцену.
- * @param content Содержимое в координатах кадра макета.
+ * @param content Содержимое в координатах сцены.
  */
 @Composable
 fun IllustrationScene(
-    frameHeight: Dp,
     modifier: Modifier = Modifier,
     backdrop: @Composable BoxScope.() -> Unit = {},
     content: @Composable SceneScope.() -> Unit
 ) {
     BoxWithConstraints(modifier = modifier.fillMaxSize()) {
         backdrop()
-
-        val scope = SceneScope(
-            boxScope = this,
-            scaleX = maxWidth / HereSize.OnboardingIllustration.sceneWidth,
-            scaleY = maxHeight / frameHeight
-        )
-        scope.content()
+        SceneScope(boxScope = this, width = maxWidth, height = maxHeight).content()
     }
 }
 
@@ -147,7 +127,7 @@ fun MapBackground(modifier: Modifier = Modifier) {
 }
 
 /**
- * Персонаж в своей точке сцены: падает при показе страницы, плавно переходит в новую точку.
+ * Персонаж в своей точке сцены: падает при показе страницы.
  *
  * @param spot Эмоция, место и взгляд персонажа.
  * @param active Текущая ли страница.
@@ -159,23 +139,12 @@ fun SceneScope.CharacterAt(
     active: Boolean,
     delayMillis: Int
 ) {
-    val target = spot.scaled()
-    val x by animateDpAsState(target.x, tween(MOVE_MILLIS), label = "x")
-    val y by animateDpAsState(target.y, tween(MOVE_MILLIS), label = "y")
-    val size by animateDpAsState(target.size, tween(MOVE_MILLIS), label = "size")
-    val moving = spot.copy(x = x, y = y, size = size)
-
     EmotionCharacter(
         emotion = spot.emotion,
-        size = size,
+        size = spot.size,
         look = spot.look,
         modifier = Modifier
-            .sceneOffset(
-                x = x,
-                y = y,
-                anchorX = moving.centerX,
-                anchorY = moving.centerY
-            )
+            .pinTo(x = spot.centerX, y = spot.centerY)
             .entrance(active = active, kind = Entrance.DROP, delayMillis = delayMillis)
     )
 }

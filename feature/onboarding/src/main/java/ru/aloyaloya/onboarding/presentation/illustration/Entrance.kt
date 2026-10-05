@@ -1,6 +1,7 @@
 package ru.aloyaloya.onboarding.presentation.illustration
 
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.core.AnimationSpec
 import androidx.compose.animation.core.CubicBezierEasing
 import androidx.compose.animation.core.EaseOut
 import androidx.compose.animation.core.LinearEasing
@@ -14,31 +15,32 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.GraphicsLayerScope
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
-import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.delay
 import ru.aloyaloya.design_system.extension.rememberMotionEnabled
+import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.theme.HereSpacing
 
 /** Плавное торможение появлений. */
 private val EntranceEasing = CubicBezierEasing(0.2f, 0.8f, 0.2f, 1f)
 
 /** Высота, с которой падает персонаж. */
-private val DropHeight = 60.dp
+private val DropHeight = HereSize.EmotionCharacter.small
 
 /** Подъем проявляющегося элемента. */
-private val FadeRise = 6.dp
+private val FadeRise = HereSpacing.s
 
 /**
  * Появление элемента иллюстрации.
  *
- * @property durationMillis Длительность, у [BUBBLE] — пружина.
+ * @property spec Ход появления от 0 до 1.
  * @property origin Опора масштаба.
  */
-enum class Entrance(val durationMillis: Int, val origin: TransformOrigin) {
-    DROP(680, TransformOrigin(0.5f, 1f)),
-    POP(520, TransformOrigin(0.5f, 0.6f)),
-    FADE(360, TransformOrigin.Center),
-    BUBBLE(0, TransformOrigin.Center)
+enum class Entrance(val spec: AnimationSpec<Float>, val origin: TransformOrigin) {
+    DROP(tween(680, easing = LinearEasing), TransformOrigin(0.5f, 1f)),
+    POP(tween(520, easing = LinearEasing), TransformOrigin(0.5f, 0.6f)),
+    FADE(tween(360, easing = EaseOut), TransformOrigin.Center),
+    BUBBLE(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium), TransformOrigin.Center)
 }
 
 /**
@@ -66,14 +68,7 @@ fun Modifier.entrance(
             return@LaunchedEffect
         }
         delay(delayMillis.toLong())
-        progress.animateTo(
-            targetValue = 1f,
-            animationSpec = when (kind) {
-                Entrance.BUBBLE -> spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium)
-                Entrance.FADE -> tween(kind.durationMillis, easing = EaseOut)
-                else -> tween(kind.durationMillis, easing = LinearEasing)
-            }
-        )
+        progress.animateTo(targetValue = 1f, animationSpec = kind.spec)
     }
 
     return graphicsLayer {
