@@ -300,15 +300,6 @@ object HereSize {
         val darkHaloAlpha = 0.12f
     }
 
-    /** Экран запроса разрешения и страница онбординга. */
-    object Permission {
-        val illustrationHeight = 264.dp
-        val compactIllustrationHeight = 200.dp
-        val illustrationBorder = 1.dp
-        val textTopSpacing = 24.dp
-        val largeFontScale = 1.15f
-    }
-
     /** Иллюстрации онбординга. */
     object OnboardingIllustration {
         val canvasWidth = 316.dp
@@ -334,5 +325,18 @@ object HereSize {
         val verticalPadding = 5.dp
         val horizontalPadding = 10.dp
         val tailSize = 10.dp
+    }
+
+    /** Нижняя панель экрана разрешения. */
+    object PermissionSheet {
+        val topPadding = 24.dp
+        val indicatorSpacing = 20.dp
+        val darkBorder = 1.dp
+    }
+
+    /** Пилюля «Пропустить». */
+    object PermissionSkip {
+        val height = 40.dp
+        val surfaceAlpha = 0.94f
     }
 }

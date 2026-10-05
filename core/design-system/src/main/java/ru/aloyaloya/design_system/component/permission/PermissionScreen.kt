@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -16,151 +17,202 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.graphics.Color
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.button.HereTextButton
+import ru.aloyaloya.design_system.extension.overlayShadow
+import ru.aloyaloya.design_system.extension.sheetShadow
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
- * Каркас экрана запроса разрешения: верхний ряд, контент и кнопки, прижатые к низу.
+ * Каркас экрана запроса разрешения: контент во весь экран, действие сверху и кнопки внизу.
  *
- * @param topBar Верхний ряд: индикатор страниц или стрелка «назад».
  * @param primaryText Подпись основной кнопки.
  * @param onPrimaryClick Колбэк основной кнопки.
- * @param modifier [Modifier], применяемый к экрану.
  * @param secondaryText Подпись вторичной кнопки или `null`, если ее нет.
  * @param onSecondaryClick Колбэк вторичной кнопки.
- * @param content Контент между верхним рядом и кнопками, обычно [PermissionContent].
+ * @param topAction Действие в правом верхнем углу, например [PermissionSkipButton].
+ * @param content Контент под кнопками, обычно [PermissionPage]; получает отступы верха и кнопок.
  */
 @Composable
 fun PermissionScreen(
-    topBar: @Composable () -> Unit,
     primaryText: String,
     onPrimaryClick: () -> Unit,
     modifier: Modifier = Modifier,
     secondaryText: String? = null,
     onSecondaryClick: () -> Unit = {},
-    content: @Composable () -> Unit
+    topAction: @Composable BoxScope.() -> Unit = {},
+    content: @Composable (PaddingValues) -> Unit
 ) {
-    Column(
+    Scaffold(
+        modifier = modifier,
+        containerColor = HereTheme.colors.background,
+        topBar = {
+            Box(
+                contentAlignment = Alignment.CenterEnd,
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .statusBarsPadding()
+                    .height(HereSize.TopAppBar.height)
+                    .padding(end = HereSpacing.m),
+                content = topAction
+            )
+        },
+        bottomBar = {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
+                modifier = Modifier
+                    .padding(horizontal = HereSpacing.screenHorizontal)
+                    .navigationBarsPadding()
+                    .padding(bottom = HereSpacing.l)
+            ) {
+                HerePrimaryButton(
+                    text = primaryText,
+                    onClick = onPrimaryClick
+                )
+
+                secondaryText?.let { text ->
+                    HereTextButton(
+                        text = text,
+                        onClick = onSecondaryClick,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            }
+        },
+        content = content
+    )
+}
+
+/**
+ * Страница экрана разрешения: иллюстрация во весь экран и нижняя панель с текстом.
+ *
+ * При крупном шрифте панель прокручивается, иллюстрация не сжимается.
+ *
+ * @param contentPadding Отступы от [PermissionScreen]: панель не заходит под верх и кнопки.
+ * @param illustrationBackground Фон иллюстрации.
+ * @param illustration Иллюстрация во весь экран.
+ * @param title Заголовок.
+ * @param body Пояснение.
+ * @param pageIndicator Индикатор страниц над заголовком или `null`.
+ * @param settingsPath Плашка с путем в настройках или `null`.
+ */
+@Composable
+fun PermissionPage(
+    contentPadding: PaddingValues,
+    illustrationBackground: Color,
+    illustration: @Composable BoxScope.() -> Unit,
+    title: String,
+    body: String,
+    modifier: Modifier = Modifier,
+    pageIndicator: (@Composable () -> Unit)? = null,
+    settingsPath: (@Composable () -> Unit)? = null
+) {
+    val colors = HereTheme.colors
+    val sizes = HereSize.PermissionSheet
+
+    Box(
         modifier = modifier
             .fillMaxSize()
-            .background(HereTheme.colors.background)
-            .statusBarsPadding()
+            .background(illustrationBackground)
     ) {
+        Box(modifier = Modifier.fillMaxSize(), content = illustration)
+
         Box(
-            contentAlignment = Alignment.CenterStart,
+            contentAlignment = Alignment.BottomCenter,
             modifier = Modifier
-                .fillMaxWidth()
-                .height(HereSize.TopAppBar.height)
+                .fillMaxSize()
+                .padding(top = contentPadding.calculateTopPadding())
         ) {
-            topBar()
-        }
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .sheetShadow(HereShape.sheet)
+                    .background(color = colors.background, shape = HereShape.sheet)
+                    .then(
+                        if (colors.isDark) {
+                            Modifier.border(sizes.darkBorder, colors.outline, HereShape.sheet)
+                        } else {
+                            Modifier
+                        }
+                    )
+                    .verticalScroll(rememberScrollState())
+                    .padding(
+                        top = sizes.topPadding,
+                        start = HereSpacing.screenHorizontal,
+                        end = HereSpacing.screenHorizontal,
+                        bottom = contentPadding.calculateBottomPadding() + HereSpacing.l
+                    )
+            ) {
+                pageIndicator?.let { indicator ->
+                    indicator()
+                    Spacer(modifier = Modifier.height(sizes.indicatorSpacing))
+                }
 
-        Box(modifier = Modifier.weight(1f)) {
-            content()
-        }
-
-        Column(
-            verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
-            modifier = Modifier
-                .padding(horizontal = HereSpacing.screenHorizontal)
-                .navigationBarsPadding()
-                .padding(bottom = HereSpacing.l)
-        ) {
-            HerePrimaryButton(
-                text = primaryText,
-                onClick = onPrimaryClick
-            )
-
-            secondaryText?.let { text ->
-                HereTextButton(
-                    text = text,
-                    onClick = onSecondaryClick,
-                    modifier = Modifier.fillMaxWidth()
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.displaySmall,
+                    color = colors.textPrimary
                 )
+
+                Spacer(modifier = Modifier.height(HereSpacing.m))
+
+                Text(
+                    text = body,
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = colors.textBody
+                )
+
+                settingsPath?.let { path ->
+                    Spacer(modifier = Modifier.height(HereSpacing.l))
+                    path()
+                }
             }
         }
     }
 }
 
 /**
- * Контент экрана запроса разрешения: иллюстрация, заголовок, пояснение и путь в настройках.
+ * Плавающая пилюля «Пропустить» поверх иллюстрации.
  *
- * При крупном системном шрифте иллюстрация сжимается, а текст прокручивается.
- *
- * @param illustration Иллюстрация в скругленной панели.
- * @param title Заголовок.
- * @param body Пояснение.
- * @param modifier [Modifier], применяемый к контенту.
- * @param settingsPath Плашка с путем в настройках или `null`.
+ * @param text Подпись.
+ * @param onClick Колбэк нажатия.
  */
 @Composable
-fun PermissionContent(
-    illustration: @Composable BoxScope.() -> Unit,
-    title: String,
-    body: String,
-    modifier: Modifier = Modifier,
-    settingsPath: (@Composable () -> Unit)? = null
+fun PermissionSkipButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
-    val sizes = HereSize.Permission
-    val largeFont = LocalDensity.current.fontScale > sizes.largeFontScale
+    val sizes = HereSize.PermissionSkip
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .padding(horizontal = HereSpacing.screenHorizontal)
+    Surface(
+        onClick = onClick,
+        shape = HereShape.pill,
+        color = colors.surface.copy(alpha = sizes.surfaceAlpha),
+        modifier = modifier.overlayShadow(HereShape.pill)
     ) {
-        Spacer(modifier = Modifier.height(HereSpacing.s))
-
         Box(
+            contentAlignment = Alignment.Center,
             modifier = Modifier
-                .fillMaxWidth()
-                .height(if (largeFont) sizes.compactIllustrationHeight else sizes.illustrationHeight)
-                .clip(HereShape.dialog)
-                .then(
-                    if (colors.isDark) {
-                        Modifier.border(sizes.illustrationBorder, colors.outline, HereShape.dialog)
-                    } else {
-                        Modifier
-                    }
-                ),
-            content = illustration
-        )
-
-        Column(
-            modifier = Modifier
-                .weight(1f)
-                .verticalScroll(rememberScrollState())
-                .padding(top = sizes.textTopSpacing, bottom = HereSpacing.l)
+                .height(sizes.height)
+                .padding(horizontal = HereSpacing.l)
         ) {
             Text(
-                text = title,
-                style = MaterialTheme.typography.displaySmall,
+                text = text,
+                style = MaterialTheme.typography.titleMedium,
                 color = colors.textPrimary
             )
-
-            Spacer(modifier = Modifier.height(HereSpacing.m))
-
-            Text(
-                text = body,
-                style = MaterialTheme.typography.bodyLarge,
-                color = colors.textBody
-            )
-
-            settingsPath?.let { path ->
-                Spacer(modifier = Modifier.height(HereSpacing.l))
-                path()
-            }
         }
     }
 }
