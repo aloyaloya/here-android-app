@@ -40,12 +40,14 @@ private fun Context.hasLocationPermission(): Boolean =
 /**
  * Экран запроса геолокации: запрос, повтор после отказа и путь в настройки.
  *
- * @param onFinished Колбэк завершения онбординга.
+ * @param onFinished Колбэк завершения онбординга без доступа к геолокации.
+ * @param onPermissionGranted Колбэк завершения онбординга с выданным доступом.
  * @param onNavigateBack Колбэк кнопки «Назад».
  */
 @Composable
 fun LocationScreen(
     onFinished: () -> Unit,
+    onPermissionGranted: () -> Unit,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -58,7 +60,7 @@ fun LocationScreen(
     ) { result ->
         if (result.values.any { it }) {
             // TODO: добавить хаптик подтверждения
-            onFinished()
+            onPermissionGranted()
             return@rememberLauncherForActivityResult
         }
 
@@ -75,7 +77,7 @@ fun LocationScreen(
 
     LifecycleResumeEffect(step) {
         if (step == LocationStep.BLOCKED && context.hasLocationPermission()) {
-            onFinished()
+            onPermissionGranted()
         }
         onPauseOrDispose {}
     }

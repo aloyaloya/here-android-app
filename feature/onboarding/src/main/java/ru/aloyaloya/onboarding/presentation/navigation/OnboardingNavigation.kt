@@ -63,16 +63,19 @@ fun NavGraphBuilder.onboardingFeatureScreen(
 /**
  * Регистрирует экран запроса геолокации как destination в [NavGraphBuilder].
  *
- * @param onFinished Колбэк завершения онбординга.
+ * @param onFinished Колбэк завершения онбординга без доступа к геолокации.
+ * @param onPermissionGranted Колбэк завершения онбординга с выданным доступом.
  * @param onBackClick Колбэк кнопки «Назад».
  */
 fun NavGraphBuilder.onboardingLocationScreen(
     onFinished: () -> Unit,
+    onPermissionGranted: () -> Unit,
     onBackClick: () -> Unit
 ) {
     composable<OnboardingLocationRoute> {
         LocationScreen(
             onFinished = onFinished,
+            onPermissionGranted = onPermissionGranted,
             onNavigateBack = dropUnlessResumed(block = onBackClick)
         )
     }

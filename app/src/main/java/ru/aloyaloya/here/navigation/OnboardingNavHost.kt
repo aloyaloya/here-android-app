@@ -15,12 +15,14 @@ import ru.aloyaloya.onboarding.presentation.navigation.onboardingLocationScreen
 /**
  * Навигационный граф онбординга: экраны о возможностях и экран запроса геолокации.
  *
- * @param onFinished Колбэк: пользователь прошел онбординг.
+ * @param onFinished Колбэк: пользователь прошел онбординг без доступа к геолокации.
+ * @param onPermissionGranted Колбэк: пользователь прошел онбординг и выдал доступ.
  * @param modifier Модификатор для настройки внешнего вида контейнера навигации.
  */
 @Composable
 fun OnboardingNavHost(
     onFinished: () -> Unit,
+    onPermissionGranted: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val navController = rememberNavController()
@@ -48,6 +50,7 @@ fun OnboardingNavHost(
         )
         onboardingLocationScreen(
             onFinished = onFinished,
+            onPermissionGranted = onPermissionGranted,
             onBackClick = { navController.popBackStack() }
         )
     }
