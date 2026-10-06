@@ -1,5 +1,12 @@
 package ru.aloyaloya.design_system.component.permission
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateContentSize
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -24,6 +31,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clipToBounds
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.Layout
 import androidx.compose.ui.res.stringResource
@@ -46,7 +54,8 @@ import ru.aloyaloya.design_system.theme.HereTheme
  * @param onPrimaryClick Колбэк основной кнопки.
  * @param secondaryText Подпись вторичной кнопки или `null`, если ее нет.
  * @param onSecondaryClick Колбэк вторичной кнопки.
- * @param onNavigateBack Колбэк кнопки «Назад» или `null`, если ее нет.
+ * @param canNavigateBack Показывать ли кнопку «Назад».
+ * @param onNavigateBack Колбэк кнопки «Назад».
  * @param topAction Действие в правом верхнем углу, например [HereTextButton].
  * @param content Контент под кнопками, обычно [PermissionPage]; получает отступы верха и кнопок.
  */
@@ -57,7 +66,8 @@ fun PermissionScreen(
     modifier: Modifier = Modifier,
     secondaryText: String? = null,
     onSecondaryClick: () -> Unit = {},
-    onNavigateBack: (() -> Unit)? = null,
+    canNavigateBack: Boolean = false,
+    onNavigateBack: () -> Unit = {},
     topAction: @Composable RowScope.() -> Unit = {},
     content: @Composable (PaddingValues) -> Unit
 ) {
@@ -73,12 +83,11 @@ fun PermissionScreen(
                     .height(HereSize.TopAppBar.height)
                     .padding(horizontal = HereSize.TopAppBar.contentPadding)
             ) {
-                // TODO: проявлять кнопку «Назад» плавно
-                onNavigateBack?.let { onClick ->
+                AnimatedVisibility(visible = canNavigateBack, enter = fadeIn(), exit = fadeOut()) {
                     TopAppBarAction(
                         icon = R.drawable.ic_arrow_back,
                         contentDescription = stringResource(R.string.permission_back_content_description),
-                        onClick = onClick
+                        onClick = onNavigateBack
                     )
                 }
 
@@ -94,17 +103,24 @@ fun PermissionScreen(
                     .navigationBarsPadding()
                     .padding(bottom = HereSpacing.l)
             ) {
-                HerePrimaryButton(
-                    text = primaryText,
-                    onClick = onPrimaryClick
-                )
-
-                secondaryText?.let { text ->
-                    HereTextButton(
+                Crossfade(targetState = primaryText) { text ->
+                    HerePrimaryButton(
                         text = text,
-                        onClick = onSecondaryClick,
-                        modifier = Modifier.fillMaxWidth()
+                        onClick = onPrimaryClick
                     )
+                }
+
+                AnimatedContent(
+                    targetState = secondaryText,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() }
+                ) { text ->
+                    if (text != null) {
+                        HereTextButton(
+                            text = text,
+                            onClick = onSecondaryClick,
+                            modifier = Modifier.fillMaxWidth()
+                        )
+                    }
                 }
             }
         },
@@ -141,7 +157,12 @@ fun PermissionPage(
 
     Layout(
         content = {
-            Box(modifier = Modifier.clearAndSetSemantics {}, content = illustration)
+            Box(
+                modifier = Modifier
+                    .clipToBounds()
+                    .clearAndSetSemantics {},
+                content = illustration
+            )
 
             Column(
                 modifier = Modifier
@@ -156,6 +177,7 @@ fun PermissionPage(
                         }
                     )
                     .verticalScroll(rememberScrollState())
+                    .animateContentSize()
                     .padding(
                         top = sizes.topPadding,
                         start = HereSpacing.screenHorizontal,
@@ -168,23 +190,32 @@ fun PermissionPage(
                     Spacer(modifier = Modifier.height(sizes.indicatorSpacing))
                 }
 
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.displaySmall,
-                    color = colors.textPrimary
-                )
+                AnimatedContent(
+                    targetState = title to body,
+                    transitionSpec = { fadeIn() togetherWith fadeOut() }
+                ) { (title, body) ->
+                    Column {
+                        Text(
+                            text = title,
+                            style = MaterialTheme.typography.displaySmall,
+                            color = colors.textPrimary
+                        )
 
-                Spacer(modifier = Modifier.height(HereSpacing.m))
+                        Spacer(modifier = Modifier.height(HereSpacing.m))
 
-                Text(
-                    text = body,
-                    style = MaterialTheme.typography.bodyLarge,
-                    color = colors.textBody
-                )
+                        Text(
+                            text = body,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = colors.textBody
+                        )
+                    }
+                }
 
-                settingsPath?.let { path ->
-                    Spacer(modifier = Modifier.height(HereSpacing.l))
-                    path()
+                AnimatedVisibility(visible = settingsPath != null) {
+                    Column {
+                        Spacer(modifier = Modifier.height(HereSpacing.l))
+                        settingsPath?.invoke()
+                    }
                 }
             }
         },

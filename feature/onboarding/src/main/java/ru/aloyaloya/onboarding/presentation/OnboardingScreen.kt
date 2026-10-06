@@ -10,8 +10,12 @@ import androidx.activity.compose.BackHandler
 import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -20,6 +24,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
@@ -40,6 +45,9 @@ import ru.aloyaloya.onboarding.presentation.illustration.WelcomeIllustration
 
 private const val PAGE_COUNT = 4
 private const val LOCATION_PAGE = PAGE_COUNT - 1
+
+/** Отставание иллюстрации от страницы при листании. */
+private const val PARALLAX = 0.3f
 
 private val locationPermissions = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -72,6 +80,7 @@ fun OnboardingScreen(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
         if (result.values.any { it }) {
+            // TODO: добавить хаптик подтверждения
             onFinished()
             return@rememberLauncherForActivityResult
         }
@@ -133,9 +142,10 @@ fun OnboardingScreen(
             else -> stringResource(R.string.permission_continue_without)
         },
         onSecondaryClick = onFinished,
-        onNavigateBack = goBack.takeIf { canGoBack },
+        canNavigateBack = canGoBack,
+        onNavigateBack = goBack,
         topAction = {
-            if (!isLocationPage) {
+            AnimatedVisibility(visible = !isLocationPage, enter = fadeIn(), exit = fadeOut()) {
                 HereTextButton(
                     text = stringResource(R.string.onboarding_skip),
                     onClick = { scope.launch { pagerState.animateScrollToPage(LOCATION_PAGE) } }
@@ -145,14 +155,35 @@ fun OnboardingScreen(
     ) { contentPadding ->
         HorizontalPager(state = pagerState) { page ->
             val active = pagerState.currentPage == page
+            val parallax = Modifier.parallax(pagerState, page)
 
             if (page == LOCATION_PAGE) {
-                LocationPage(step = locationStep, active = active, contentPadding = contentPadding)
+                LocationPage(
+                    step = locationStep,
+                    active = active,
+                    contentPadding = contentPadding,
+                    illustrationModifier = parallax
+                )
             } else {
-                FeaturePage(page = page, active = active, contentPadding = contentPadding)
+                FeaturePage(
+                    page = page,
+                    active = active,
+                    contentPadding = contentPadding,
+                    illustrationModifier = parallax
+                )
             }
         }
     }
+}
+
+/**
+ * Иллюстрация отстает от страницы при листании.
+ *
+ * @param pagerState Состояние пейджера.
+ * @param page Номер страницы.
+ */
+private fun Modifier.parallax(pagerState: PagerState, page: Int): Modifier = graphicsLayer {
+    translationX = -pagerState.getOffsetDistanceInPages(page) * size.width * PARALLAX
 }
 
 /**
@@ -161,9 +192,15 @@ fun OnboardingScreen(
  * @param page Номер страницы до [LOCATION_PAGE].
  * @param active Текущая ли страница.
  * @param contentPadding Отступы от [PermissionScreen].
+ * @param illustrationModifier [Modifier], применяемый к иллюстрации.
  */
 @Composable
-private fun FeaturePage(page: Int, active: Boolean, contentPadding: PaddingValues) {
+private fun FeaturePage(
+    page: Int,
+    active: Boolean,
+    contentPadding: PaddingValues,
+    illustrationModifier: Modifier
+) {
     val emotions = HereTheme.colors.emotions
 
     val (background, title, body) = when (page) {
@@ -177,9 +214,9 @@ private fun FeaturePage(page: Int, active: Boolean, contentPadding: PaddingValue
         illustrationBackground = background,
         illustration = {
             when (page) {
-                0 -> WelcomeIllustration(active = active)
-                1 -> MemoryIllustration(active = active)
-                else -> CalendarIllustration(active = active)
+                0 -> WelcomeIllustration(active = active, modifier = illustrationModifier)
+                1 -> MemoryIllustration(active = active, modifier = illustrationModifier)
+                else -> CalendarIllustration(active = active, modifier = illustrationModifier)
             }
         },
         title = stringResource(title),
@@ -196,9 +233,15 @@ private fun FeaturePage(page: Int, active: Boolean, contentPadding: PaddingValue
  * @param step Шаг запроса.
  * @param active Текущая ли страница.
  * @param contentPadding Отступы от [PermissionScreen].
+ * @param illustrationModifier [Modifier], применяемый к иллюстрации.
  */
 @Composable
-private fun LocationPage(step: LocationStep, active: Boolean, contentPadding: PaddingValues) {
+private fun LocationPage(
+    step: LocationStep,
+    active: Boolean,
+    contentPadding: PaddingValues,
+    illustrationModifier: Modifier
+) {
     val (title, body) = when (step) {
         LocationStep.REQUEST -> R.string.onboarding_location_title to R.string.onboarding_location_body
         LocationStep.DENIED -> R.string.onboarding_location_denied_title to R.string.onboarding_location_denied_body
@@ -208,7 +251,9 @@ private fun LocationPage(step: LocationStep, active: Boolean, contentPadding: Pa
     PermissionPage(
         contentPadding = contentPadding,
         illustrationBackground = colorResource(R.color.onboarding_map_land),
-        illustration = { LocationIllustration(step = step, active = active) },
+        illustration = {
+            LocationIllustration(step = step, active = active, modifier = illustrationModifier)
+        },
         title = stringResource(title),
         body = stringResource(body),
         pageIndicator = {
