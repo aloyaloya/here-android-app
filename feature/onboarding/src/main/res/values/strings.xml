@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="onboarding_skip">Skip</string>
+    <string name="onboarding_next">Next</string>
+    <string name="onboarding_map_title">Your feelings live here</string>
+    <string name="onboarding_map_body">Every place where something moved you comes alive on the map — with its own color and face.</string>
+    <string name="onboarding_bubble_sea">The sea!</string>
+    <string name="onboarding_bubble_date">First date</string>
+    <string name="onboarding_memory_title">Keep the whole moment</string>
+    <string name="onboarding_memory_body">An emotion, a note, photos and videos — everything you want to remember about it.</string>
+    <string name="onboarding_calendar_title">Come back to your days</string>
+    <string name="onboarding_calendar_body">The calendar and summaries show how your mood has changed.</string>
+    <string name="onboarding_location_title">Let\'s show where you are</string>
+    <string name="onboarding_location_body">The map opens right next to you, and new memories land in place on their own. Your location stays on the phone.</string>
+    <string name="onboarding_location_denied_title">Without location, the map can\'t find you</string>
+    <string name="onboarding_location_denied_body">You\'ll pick the place for each memory on the map by hand. You can turn location on at any time.</string>
+    <string name="onboarding_location_blocked_title">Location is off in settings</string>
+    <string name="onboarding_location_blocked_body">Android won\'t ask again. Turn location on in the app settings — until then, you pick places by hand.</string>
+    <string name="onboarding_location_settings_label">Where to turn it on</string>
+    <string name="onboarding_location_settings_path">Permissions › Location</string>
+    <string name="permission_allow">Allow</string>
+    <string name="permission_not_now">Not now</string>
+    <string name="permission_try_again">Try again</string>
+    <string name="permission_continue_without">Continue without location</string>
+    <string name="permission_open_settings">Open settings</string>
+    <string name="onboarding_location_me">That\'s you</string>
+    <string name="onboarding_pick_hint">Drag the map to the spot</string>
+    <string name="onboarding_card_title">Coffee by the ponds</string>
+    <string name="onboarding_card_note">We sat on the bench until it got dark. I want to come back.</string>
+    <string name="onboarding_calendar_summary">Summary</string>
+</resources>

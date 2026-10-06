@@ -271,4 +271,67 @@ object HereSize {
         val disabledContainerAlpha = 0.12f
         val disabledContentAlpha = 0.38f
     }
+
+    /** Индикатор страниц пейджера. */
+    object PagerIndicator {
+        val dotSize = 8.dp
+        val activeWidth = 24.dp
+    }
+
+    /** Текстовая кнопка без фона. */
+    object TextButton {
+        val height = 48.dp
+        val horizontalPadding = 12.dp
+    }
+
+    /** Плашка с путем в системных настройках. */
+    object SettingsPathCard {
+        val iconSize = 24.dp
+    }
+
+    /** Иллюстрации онбординга. */
+    object OnboardingIllustration {
+        val cardMargin = 16.dp
+        val previewSize = 72.dp
+        val dayCellSize = 40.dp
+        val dayEmojiSize = 22.sp
+    }
+
+    /** Иллюстрация страницы геолокации. */
+    object LocationIllustration {
+        val youHaloSize = 128.dp
+        val youHaloAlpha = 0.22f
+        val pickerHeadSize = 48.dp
+        val pickerBorder = 4.dp
+        val pickerStemWidth = 4.dp
+        val pickerStemHeight = 24.dp
+        val pickerShadowWidth = 24.dp
+        val pickerShadowHeight = 8.dp
+        val pickerShadowAlpha = 0.14f
+        val darkPickerShadowAlpha = 0.35f
+    }
+
+    /** Персонаж-эмоция. */
+    object EmotionCharacter {
+        val small = 64.dp
+        val medium = 72.dp
+        val large = 88.dp
+        val heightRatio = 1.2f
+        val lookShift = 0.025f
+    }
+
+    /** Реплика персонажа. */
+    object CharacterBubble {
+        val verticalPadding = 6.dp
+        val horizontalPadding = 12.dp
+        val tailSize = 10.dp
+    }
+
+    /** Нижняя панель экрана разрешения. */
+    object PermissionSheet {
+        val topPadding = 24.dp
+        val indicatorSpacing = 20.dp
+        val darkBorder = 1.dp
+        val illustrationOverlap = 28.dp
+    }
 }

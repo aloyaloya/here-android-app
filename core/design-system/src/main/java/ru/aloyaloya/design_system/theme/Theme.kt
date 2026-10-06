@@ -8,9 +8,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.ReadOnlyComposable
 
-/** Режим темы, выбранный пользователем. [AUTO] следует за системной настройкой. */
-enum class ThemeMode { AUTO, LIGHT, DARK }
-
 private val LightScheme = lightColorScheme(
     background = LightBackground,
     onBackground = LightTextPrimary,
@@ -45,20 +42,14 @@ private val DarkScheme = darkColorScheme(
  * Кроме Material-схемы провайдит палитру [HereColors] через [LocalHereColors]:
  * из нее берут цвета собственные компоненты приложения.
  *
- * @param themeMode Режим темы. При [ThemeMode.AUTO] значение берется из системных настроек.
+ * @param darkTheme Темная ли тема. По умолчанию берется из конфигурации.
  * @param content Контент, отрисовываемый в этой теме.
  */
 @Composable
 fun HereTheme(
-    themeMode: ThemeMode = ThemeMode.AUTO,
+    darkTheme: Boolean = isSystemInDarkTheme(),
     content: @Composable () -> Unit
 ) {
-    val darkTheme = when (themeMode) {
-        ThemeMode.AUTO -> isSystemInDarkTheme()
-        ThemeMode.LIGHT -> false
-        ThemeMode.DARK -> true
-    }
-
     CompositionLocalProvider(
         LocalHereColors provides if (darkTheme) DarkHereColors else LightHereColors
     ) {

@@ -11,6 +11,9 @@ object HereShape {
     /** Карточки, плитки, поля, чипы и FAB. */
     val tile = RoundedCornerShape(16.dp)
 
+    /** Реплики персонажей. */
+    val bubble = RoundedCornerShape(12.dp)
+
     /** Диалоги. */
     val dialog = RoundedCornerShape(28.dp)
 

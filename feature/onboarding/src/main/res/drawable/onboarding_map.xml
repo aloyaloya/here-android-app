@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Фон-карта онбординга (A1, B1–B3). Рисуется во всю ширину с ContentScale.Crop от верха. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="360dp"
+    android:height="520dp"
+    android:viewportWidth="360"
+    android:viewportHeight="520">
+    <path
+        android:pathData="M0,0 H360 V520 H0 Z"
+        android:fillColor="@color/onboarding_map_land" />
+    <path
+        android:pathData="M44,191 L127,179 L141,340 L54,346 Z"
+        android:fillColor="@color/onboarding_map_green" />
+    <path
+        android:pathData="M148,52 L286,37 L286,133 L150,153 Z"
+        android:fillColor="@color/onboarding_map_green" />
+    <path
+        android:pathData="M215,540 C255,450 320,415 380,330"
+        android:strokeColor="@color/onboarding_map_water"
+        android:strokeWidth="46"
+        android:strokeLineCap="butt" />
+    <path
+        android:pathData="M-20,60 L380,20"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="7"
+        android:strokeLineCap="butt" />
+    <path
+        android:pathData="M20,-20 L55,540"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="7"
+        android:strokeLineCap="butt" />
+    <path
+        android:pathData="M-20,190 L380,130"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="14"
+        android:strokeLineCap="butt" />
+    <path
+        android:pathData="M-20,360 L380,400"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="14"
+        android:strokeLineCap="butt" />
+    <path
+        android:pathData="M120,-20 L175,540"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="14"
+        android:strokeLineCap="butt" />
+    <path
+        android:pathData="M300,-20 L285,540"
+        android:strokeColor="@color/onboarding_map_road"
+        android:strokeWidth="11"
+        android:strokeLineCap="butt" />
+</vector>

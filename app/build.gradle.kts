@@ -55,6 +55,7 @@ dependencies {
     implementation(project(":feature:calendar"))
     implementation(project(":feature:summary"))
     implementation(project(":feature:settings"))
+    implementation(project(":feature:onboarding"))
 
     implementation(libs.coil.core)
 
@@ -62,6 +63,7 @@ dependencies {
     ksp(libs.dagger.compiler)
 
     implementation(libs.androidx.navigation.compose)
+    implementation(libs.konfetti.compose)
     implementation(libs.androidx.core.ktx)
     implementation(libs.androidx.appcompat)
     implementation(libs.androidx.lifecycle.runtime.ktx)

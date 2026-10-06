@@ -5,21 +5,28 @@ import android.os.Bundle
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
+import androidx.compose.animation.Crossfade
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import ru.aloyaloya.design_system.theme.HereTheme
-import ru.aloyaloya.design_system.theme.ThemeMode
+import ru.aloyaloya.here.navigation.OnboardingNavHost
+import ru.aloyaloya.here.ui.Confetti
 import ru.aloyaloya.here.ui.HereApp
 
 /**
  * Главная Activity приложения.
  *
- * Подписывается на режим темы из [MainViewModel] и передает его в [HereTheme],
- * чтобы переключение применялось ко всему UI. Разрешенное значение темы нужно
- * и самой Activity: по нему подбирается вид системных баров.
+ * Тему берет из конфигурации: выбор в настройках применяется через `AppCompatDelegate`.
+ * По ней же подбирается вид системных баров.
+ * Пока онбординг не пройден, вместо приложения показывается он.
+ * Выданный в онбординге доступ отмечается конфетти поверх перехода в приложение.
  */
 class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
@@ -33,12 +40,9 @@ class MainActivity : AppCompatActivity() {
 
         enableEdgeToEdge()
         setContent {
-            val themeMode by viewModel.themeMode.collectAsState()
-            val darkTheme = when (themeMode) {
-                ThemeMode.AUTO -> isSystemInDarkTheme()
-                ThemeMode.LIGHT -> false
-                ThemeMode.DARK -> true
-            }
+            val onboardingCompleted by viewModel.onboardingCompleted.collectAsState()
+            val darkTheme = isSystemInDarkTheme()
+            var celebrating by remember { mutableStateOf(false) }
 
             LaunchedEffect(darkTheme) {
                 enableEdgeToEdge(
@@ -55,8 +59,26 @@ class MainActivity : AppCompatActivity() {
                 )
             }
 
-            HereTheme(themeMode = themeMode) {
-                HereApp(darkTheme = darkTheme)
+            HereTheme(darkTheme = darkTheme) {
+                Box {
+                    Crossfade(targetState = onboardingCompleted, label = "onboarding") { completed ->
+                        if (completed) {
+                            HereApp(darkTheme = darkTheme)
+                        } else {
+                            OnboardingNavHost(
+                                onFinished = viewModel::completeOnboarding,
+                                onPermissionGranted = {
+                                    celebrating = true
+                                    viewModel.completeOnboarding()
+                                }
+                            )
+                        }
+                    }
+
+                    if (celebrating) {
+                        Confetti(onEnded = { celebrating = false })
+                    }
+                }
             }
         }
     }

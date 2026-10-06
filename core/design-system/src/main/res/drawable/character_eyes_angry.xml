@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Глаза персонажа. Отдельный слой: в Compose сдвигается (взгляд) и сжимается по Y (моргание). Слой 2 из 3. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="40dp"
+    android:height="48dp"
+    android:viewportWidth="100"
+    android:viewportHeight="120">
+    <path
+        android:pathData="M33.5,47 a4.5,5 0 1,0 9.0,0 a4.5,5 0 1,0 -9.0,0 M57.5,47 a4.5,5 0 1,0 9.0,0 a4.5,5 0 1,0 -9.0,0"
+        android:fillColor="@color/character_ink" />
+    <path
+        android:pathData="M37.8,45 a1.7,1.7 0 1,0 3.4,0 a1.7,1.7 0 1,0 -3.4,0 M61.8,45 a1.7,1.7 0 1,0 3.4,0 a1.7,1.7 0 1,0 -3.4,0"
+        android:fillColor="@color/character_highlight" />
+</vector>

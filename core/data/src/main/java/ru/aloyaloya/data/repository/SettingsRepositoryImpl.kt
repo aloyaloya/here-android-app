@@ -36,6 +36,14 @@ class SettingsRepositoryImpl @Inject constructor(
     private val _reminder = MutableStateFlow(readReminder())
     override val reminder: StateFlow<DailyReminder> = _reminder.asStateFlow()
 
+    // TODO: вернуть preferences.getBoolean(KEY_ONBOARDING_COMPLETED, false) после проверки онбординга
+    private val _onboardingCompleted = MutableStateFlow(false)
+    override val onboardingCompleted: StateFlow<Boolean> = _onboardingCompleted.asStateFlow()
+
+    init {
+        applyNightMode(_theme.value)
+    }
+
     override val language: AppLanguage
         get() = when (AppCompatDelegate.getApplicationLocales()[0]?.language) {
             LANGUAGE_RUSSIAN -> AppLanguage.RUSSIAN
@@ -46,6 +54,7 @@ class SettingsRepositoryImpl @Inject constructor(
     override fun setTheme(theme: AppTheme) {
         _theme.value = theme
         preferences.edit().putString(KEY_THEME_MODE, theme.name).apply()
+        applyNightMode(theme)
     }
 
     override fun setHapticsEnabled(enabled: Boolean) {
@@ -70,6 +79,21 @@ class SettingsRepositoryImpl @Inject constructor(
         AppCompatDelegate.setApplicationLocales(LocaleListCompat.forLanguageTags(tags))
     }
 
+    override fun completeOnboarding() {
+        _onboardingCompleted.value = true
+        preferences.edit().putBoolean(KEY_ONBOARDING_COMPLETED, true).apply()
+    }
+
+    private fun applyNightMode(theme: AppTheme) {
+        AppCompatDelegate.setDefaultNightMode(
+            when (theme) {
+                AppTheme.AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                AppTheme.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+                AppTheme.DARK -> AppCompatDelegate.MODE_NIGHT_YES
+            }
+        )
+    }
+
     private fun readTheme(): AppTheme {
         val stored = preferences.getString(KEY_THEME_MODE, null) ?: return AppTheme.AUTO
 
@@ -77,7 +101,8 @@ class SettingsRepositoryImpl @Inject constructor(
     }
 
     private fun readReminder(): DailyReminder {
-        val minuteOfDay = preferences.getInt(KEY_REMINDER_MINUTE_OF_DAY, DEFAULT_REMINDER_MINUTE_OF_DAY)
+        val minuteOfDay =
+            preferences.getInt(KEY_REMINDER_MINUTE_OF_DAY, DEFAULT_REMINDER_MINUTE_OF_DAY)
 
         return DailyReminder(
             enabled = preferences.getBoolean(KEY_REMINDER_ENABLED, false),
@@ -91,6 +116,7 @@ class SettingsRepositoryImpl @Inject constructor(
         const val KEY_HAPTICS_ENABLED = "key_haptics_enabled"
         const val KEY_REMINDER_ENABLED = "key_reminder_enabled"
         const val KEY_REMINDER_MINUTE_OF_DAY = "key_reminder_minute_of_day"
+        const val KEY_ONBOARDING_COMPLETED = "key_onboarding_completed"
         const val DEFAULT_REMINDER_MINUTE_OF_DAY = 21 * 60
         const val LANGUAGE_RUSSIAN = "ru"
         const val LANGUAGE_ENGLISH = "en"
