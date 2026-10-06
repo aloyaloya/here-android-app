@@ -12,8 +12,8 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import ru.aloyaloya.design_system.theme.HereTheme
+import ru.aloyaloya.here.navigation.OnboardingNavHost
 import ru.aloyaloya.here.ui.HereApp
-import ru.aloyaloya.onboarding.presentation.OnboardingScreen
 
 /**
  * Главная Activity приложения.
@@ -57,7 +57,7 @@ class MainActivity : AppCompatActivity() {
                     if (completed) {
                         HereApp(darkTheme = darkTheme)
                     } else {
-                        OnboardingScreen(onFinished = viewModel::completeOnboarding)
+                        OnboardingNavHost(onFinished = viewModel::completeOnboarding)
                     }
                 }
             }

@@ -27,6 +27,9 @@ enum class OnboardingFeature(@StringRes val title: Int, @StringRes val body: Int
     CALENDAR(R.string.onboarding_calendar_title, R.string.onboarding_calendar_body)
 }
 
+/** Шагов в онбординге: возможности и геолокация. */
+internal val OnboardingSteps = OnboardingFeature.entries.size + 1
+
 /**
  * Экран о возможности приложения.
  *
