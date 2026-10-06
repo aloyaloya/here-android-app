@@ -49,4 +49,16 @@
     <string name="settings_yandex_maps_terms">Yandex Maps terms of use</string>
     <string name="settings_yandex_maps_terms_description">The map in the app runs on MapKit</string>
     <string name="settings_cancel">Cancel</string>
+    <string name="notifications_title">Get a nudge each evening?</string>
+    <string name="notifications_body">Once a day, at %s, you’ll get one notification to note how the day went. You can change the time in settings.</string>
+    <string name="notifications_blocked_title">Notifications are off</string>
+    <string name="notifications_blocked_body">Android won’t ask again, so the reminder can’t reach you. Allow notifications in the app settings.</string>
+    <string name="notifications_settings_label">Where to turn it on</string>
+    <string name="notifications_settings_path">Notifications › All Here notifications</string>
+    <string name="notifications_allow">Allow</string>
+    <string name="notifications_not_now">Not now</string>
+    <string name="notifications_open_settings">Open settings</string>
+    <string name="notifications_preview_app">Here • now</string>
+    <string name="notifications_preview_title">How was your day?</string>
+    <string name="notifications_preview_text">Mark the place and the mood of the day</string>
 </resources>

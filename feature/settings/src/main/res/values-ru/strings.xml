@@ -51,4 +51,16 @@
     <string name="settings_yandex_maps_terms">Условия использования Яндекс Карт</string>
     <string name="settings_yandex_maps_terms_description">Карта в приложении работает на MapKit</string>
     <string name="settings_cancel">Отмена</string>
+    <string name="notifications_title">Напоминать о дне?</string>
+    <string name="notifications_body">Раз в день, в %s, придёт одно уведомление — записать, как прошёл день. Время можно поменять в настройках.</string>
+    <string name="notifications_blocked_title">Уведомления выключены</string>
+    <string name="notifications_blocked_body">Android больше не покажет запрос, поэтому напоминание не придёт. Разреши уведомления в настройках приложения.</string>
+    <string name="notifications_settings_label">Где включить</string>
+    <string name="notifications_settings_path">Уведомления › Все уведомления Here</string>
+    <string name="notifications_allow">Разрешить</string>
+    <string name="notifications_not_now">Не сейчас</string>
+    <string name="notifications_open_settings">Открыть настройки</string>
+    <string name="notifications_preview_app">Here • сейчас</string>
+    <string name="notifications_preview_title">Как прошёл день?</string>
+    <string name="notifications_preview_text">Отметь место и настроение дня</string>
 </resources>
