@@ -77,12 +77,9 @@ private const val DROP_MILLIS = 300
 
 /**
  * Персонаж над карточкой месяца.
- *
- * @param active Текущая ли страница.
  */
 @Composable
 fun CalendarIllustration(
-    active: Boolean,
     modifier: Modifier = Modifier
 ) {
     IllustrationGroup(modifier = modifier) {
@@ -92,11 +89,11 @@ fun CalendarIllustration(
             look = LOOK_RIGHT,
             modifier = Modifier
                 .padding(start = HereSpacing.s)
-                .entrance(active = active, kind = Entrance.DROP, delayMillis = DROP_MILLIS)
+                .entrance(kind = Entrance.DROP, delayMillis = DROP_MILLIS)
         )
 
         CalendarCard(
-            modifier = Modifier.entrance(active = active, kind = Entrance.FADE, delayMillis = CARD_MILLIS)
+            modifier = Modifier.entrance(kind = Entrance.FADE, delayMillis = CARD_MILLIS)
         )
     }
 }

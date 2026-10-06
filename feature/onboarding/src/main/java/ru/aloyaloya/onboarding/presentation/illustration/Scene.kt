@@ -127,16 +127,14 @@ fun MapBackground(modifier: Modifier = Modifier) {
 }
 
 /**
- * Персонаж в своей точке сцены: падает при показе страницы.
+ * Персонаж в своей точке сцены: падает при показе экрана.
  *
  * @param spot Эмоция, место и взгляд персонажа.
- * @param active Текущая ли страница.
  * @param delayMillis Задержка падения.
  */
 @Composable
 fun SceneScope.CharacterAt(
     spot: CharacterSpot,
-    active: Boolean,
     delayMillis: Int
 ) {
     EmotionCharacter(
@@ -145,7 +143,7 @@ fun SceneScope.CharacterAt(
         look = spot.look,
         modifier = Modifier
             .pinTo(x = spot.centerX, y = spot.centerY)
-            .entrance(active = active, kind = Entrance.DROP, delayMillis = delayMillis)
+            .entrance(kind = Entrance.DROP, delayMillis = delayMillis)
     )
 }
 

@@ -18,7 +18,7 @@ private val SeaSpeaker = CharacterSpot(CharacterEmotion.HAPPY, 0.17f, 0.23f, Her
 /** Говорящий о свидании. */
 private val DateSpeaker = CharacterSpot(CharacterEmotion.TENDER, 0.63f, 0.26f, HereSize.EmotionCharacter.medium)
 
-/** Персонажи первой страницы. */
+/** Персонажи первого экрана. */
 private val WelcomeCharacters = listOf(
     SeaSpeaker,
     DateSpeaker,
@@ -42,12 +42,9 @@ private val DateTailInset = HereSpacing.xl
 
 /**
  * Карта с персонажами-эмоциями, двое из них говорят.
- *
- * @param active Текущая ли страница.
  */
 @Composable
 fun WelcomeIllustration(
-    active: Boolean,
     modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
@@ -60,7 +57,6 @@ fun WelcomeIllustration(
         WelcomeCharacters.forEachIndexed { index, spot ->
             CharacterAt(
                 spot = spot,
-                active = active,
                 delayMillis = DROP_START_MILLIS + index * DROP_STEP_MILLIS
             )
         }
@@ -73,7 +69,7 @@ fun WelcomeIllustration(
             tail = BubbleTail.START,
             modifier = Modifier
                 .pinTo(x = SeaSpeaker.right, y = SeaSpeaker.centerY, pivot = seaPivot)
-                .entrance(active = active, kind = Entrance.BUBBLE, delayMillis = SEA_BUBBLE_MILLIS, origin = seaPivot)
+                .entrance(kind = Entrance.BUBBLE, delayMillis = SEA_BUBBLE_MILLIS, origin = seaPivot)
         )
 
         val datePivot = TransformOrigin(0f, 0f)
@@ -85,7 +81,7 @@ fun WelcomeIllustration(
             tailInset = DateTailInset,
             modifier = Modifier
                 .pinTo(x = DateSpeaker.centerX - DateTailInset, y = DateSpeaker.bottom, pivot = datePivot)
-                .entrance(active = active, kind = Entrance.BUBBLE, delayMillis = DATE_BUBBLE_MILLIS, origin = datePivot)
+                .entrance(kind = Entrance.BUBBLE, delayMillis = DATE_BUBBLE_MILLIS, origin = datePivot)
         )
     }
 }

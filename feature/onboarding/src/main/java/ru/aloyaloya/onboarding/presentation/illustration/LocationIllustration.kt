@@ -96,13 +96,11 @@ private const val HALO_SHIFT_MILLIS = HALO_MILLIS / 2
 /**
  * Карта с персонажами: «ты» до отказа, прицел ручного выбора после.
  *
- * @param step Шаг страницы геолокации.
- * @param active Текущая ли страница.
+ * @param step Шаг экрана геолокации.
  */
 @Composable
 fun LocationIllustration(
     step: LocationStep,
-    active: Boolean,
     modifier: Modifier = Modifier
 ) {
     val characters = when (step) {
@@ -116,15 +114,14 @@ fun LocationIllustration(
         backdrop = { MapBackground() }
     ) {
         if (step == LocationStep.REQUEST) {
-            You(active = active)
+            You()
         } else {
-            Picker(active = active)
+            Picker()
         }
 
         characters.forEachIndexed { index, spot ->
             CharacterAt(
                 spot = spot,
-                active = active,
                 delayMillis = index * DROP_STEP_MILLIS
             )
         }
@@ -133,11 +130,9 @@ fun LocationIllustration(
 
 /**
  * «Ты» с пульсирующим ореолом и репликой под ним по центру сцены.
- *
- * @param active Текущая ли страница.
  */
 @Composable
-private fun SceneScope.You(active: Boolean) {
+private fun SceneScope.You() {
     val colors = HereTheme.colors
     val you = CharacterSpot(CharacterEmotion.YOU, 0.5f, 0.5f, HereSize.EmotionCharacter.large)
     val haloModifier = Modifier
@@ -156,7 +151,7 @@ private fun SceneScope.You(active: Boolean) {
         size = you.size,
         modifier = Modifier
             .pinTo(x = you.centerX, y = you.centerY)
-            .entrance(active = active, kind = Entrance.POP, delayMillis = YOU_POP_MILLIS)
+            .entrance(kind = Entrance.POP, delayMillis = YOU_POP_MILLIS)
     )
 
     val bubblePivot = TransformOrigin(0.5f, 0f)
@@ -167,7 +162,7 @@ private fun SceneScope.You(active: Boolean) {
         tail = BubbleTail.TOP,
         modifier = Modifier
             .pinTo(x = you.centerX, y = you.bottom, pivot = bubblePivot)
-            .entrance(active = active, kind = Entrance.BUBBLE, delayMillis = YOU_BUBBLE_MILLIS, origin = bubblePivot)
+            .entrance(kind = Entrance.BUBBLE, delayMillis = YOU_BUBBLE_MILLIS, origin = bubblePivot)
     )
 }
 
@@ -216,11 +211,9 @@ private fun Halo(modifier: Modifier = Modifier) {
 
 /**
  * Прицел ручного выбора места по центру сцены с подсказкой над ним.
- *
- * @param active Текущая ли страница.
  */
 @Composable
-private fun SceneScope.Picker(active: Boolean) {
+private fun SceneScope.Picker() {
     val colors = HereTheme.colors
     val sizes = HereSize.LocationIllustration
     val x = width / 2
@@ -245,7 +238,7 @@ private fun SceneScope.Picker(active: Boolean) {
     Box(
         modifier = Modifier
             .pinTo(x = x, y = tip, pivot = bottomCenter)
-            .entrance(active = active, kind = Entrance.DROP)
+            .entrance(kind = Entrance.DROP)
             .size(sizes.pickerHeadSize)
             .overlayShadow(CircleShape)
             .background(color = colors.textPrimary, shape = CircleShape)
@@ -259,6 +252,6 @@ private fun SceneScope.Picker(active: Boolean) {
         tail = BubbleTail.BOTTOM,
         modifier = Modifier
             .pinTo(x = x, y = tip - sizes.pickerHeadSize - HereSpacing.s, pivot = bottomCenter)
-            .entrance(active = active, kind = Entrance.BUBBLE, delayMillis = PICK_HINT_MILLIS, origin = bottomCenter)
+            .entrance(kind = Entrance.BUBBLE, delayMillis = PICK_HINT_MILLIS, origin = bottomCenter)
     )
 }

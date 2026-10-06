@@ -46,16 +46,14 @@ enum class Entrance(
 }
 
 /**
- * Появление, когда страница стала текущей; на ней же не повторяется.
+ * Появление при показе экрана.
  *
- * @param active Текущая ли страница.
  * @param kind Вид появления.
- * @param delayMillis Задержка от показа страницы.
+ * @param delayMillis Задержка от показа экрана.
  * @param origin Опора масштаба, у реплики — хвостик.
  */
 @Composable
 fun Modifier.entrance(
-    active: Boolean,
     kind: Entrance,
     delayMillis: Int = 0,
     origin: TransformOrigin = kind.origin
@@ -63,8 +61,8 @@ fun Modifier.entrance(
     val motion = rememberMotionEnabled()
     val progress = remember { Animatable(0f) }
 
-    LaunchedEffect(active, motion) {
-        if (!active || progress.value >= 1f) return@LaunchedEffect
+    LaunchedEffect(motion) {
+        if (progress.value >= 1f) return@LaunchedEffect
         if (!motion) {
             progress.snapTo(1f)
             return@LaunchedEffect

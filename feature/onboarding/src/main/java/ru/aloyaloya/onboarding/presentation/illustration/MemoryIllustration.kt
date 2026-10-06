@@ -52,12 +52,9 @@ private const val CALM_DROP_MILLIS = 600
 
 /**
  * Карточка воспоминания между двумя персонажами.
- *
- * @param active Текущая ли страница.
  */
 @Composable
 fun MemoryIllustration(
-    active: Boolean,
     modifier: Modifier = Modifier
 ) {
     IllustrationGroup(modifier = modifier) {
@@ -67,11 +64,11 @@ fun MemoryIllustration(
             look = LOOK_RIGHT,
             modifier = Modifier
                 .padding(start = HereSpacing.s)
-                .entrance(active = active, kind = Entrance.DROP, delayMillis = TENDER_DROP_MILLIS)
+                .entrance(kind = Entrance.DROP, delayMillis = TENDER_DROP_MILLIS)
         )
 
         MemoryCard(
-            modifier = Modifier.entrance(active = active, kind = Entrance.FADE, delayMillis = CARD_MILLIS)
+            modifier = Modifier.entrance(kind = Entrance.FADE, delayMillis = CARD_MILLIS)
         )
 
         EmotionCharacter(
@@ -81,7 +78,7 @@ fun MemoryIllustration(
             modifier = Modifier
                 .align(Alignment.End)
                 .padding(end = HereSpacing.m)
-                .entrance(active = active, kind = Entrance.DROP, delayMillis = CALM_DROP_MILLIS)
+                .entrance(kind = Entrance.DROP, delayMillis = CALM_DROP_MILLIS)
         )
     }
 }
