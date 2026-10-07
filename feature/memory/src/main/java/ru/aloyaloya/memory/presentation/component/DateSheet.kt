@@ -21,8 +21,7 @@ import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.memory.R
-import ru.aloyaloya.ui.emotion.color
-import ru.aloyaloya.ui.emotion.emoji
+import ru.aloyaloya.ui.emotion.character
 import java.time.LocalDate
 import java.time.YearMonth
 
@@ -50,7 +49,7 @@ fun DateSheet(
     var selectedDate by rememberSaveable { mutableStateOf(initialDate) }
     var shownMonth by rememberSaveable { mutableStateOf(YearMonth.from(initialDate)) }
     val markByDate = emotionByDate.mapValues { (_, emotion) ->
-        CalendarDayMark(emoji = emotion.emoji, color = emotion.color.solid)
+        CalendarDayMark(character = emotion.character)
     }
 
     HereBottomSheet(onDismissRequest = onDismissRequest) {

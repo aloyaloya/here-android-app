@@ -10,21 +10,23 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import ru.aloyaloya.design_system.component.character.CharacterEmotion
+import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
- * Эмоция строкой: эмодзи и название на мягком тоне эмоции.
+ * Эмоция строкой: статичный персонаж и название на мягком тоне эмоции.
  *
- * @param emoji Эмодзи эмоции.
+ * @param character Персонаж эмоции.
  * @param label Название эмоции.
  * @param color Мягкий тон эмоции из палитры: фон тега.
  * @param modifier [Modifier], применяемый к тегу.
  */
 @Composable
 fun EmotionTag(
-    emoji: String,
+    character: CharacterEmotion,
     label: String,
     color: Color,
     modifier: Modifier = Modifier
@@ -39,9 +41,11 @@ fun EmotionTag(
                 horizontal = HereSize.EmotionTag.horizontalPadding
             )
     ) {
-        Text(
-            text = emoji,
-            fontSize = HereSize.EmotionTag.emojiSize
+        EmotionCharacter(
+            emotion = character,
+            size = HereSize.EmotionTag.characterSize,
+            animated = false,
+            shadow = false
         )
 
         Text(

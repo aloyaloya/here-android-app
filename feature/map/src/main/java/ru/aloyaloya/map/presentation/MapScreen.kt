@@ -61,8 +61,7 @@ import ru.aloyaloya.mapkit.model.UserLocationStyle
 import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.mapkit.ui.YandexMapState
 import ru.aloyaloya.mapkit.ui.rememberYandexMapState
-import ru.aloyaloya.ui.emotion.color
-import ru.aloyaloya.ui.emotion.emoji
+import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 import ru.aloyaloya.design_system.R as DesignSystemR
 
@@ -317,7 +316,7 @@ private fun MapContent(
     val logoPlacement = MapLogoPlacement.UnderTopBar
 
     val colors = HereTheme.colors
-    val markers = uiState.memories.toMarkers()
+    val markers = remember(uiState.memories) { uiState.memories.toMarkers() }
     val userLocationStyle = remember(colors) {
         UserLocationStyle(
             fill = colors.accent,
@@ -344,24 +343,12 @@ private fun MapContent(
     )
 }
 
-/**
- * Переводит воспоминания в метки карты.
- *
- * Цвета эмоций живут в теме, поэтому метки собираются здесь, а не во вьюмодели.
- */
-@Composable
-private fun List<Memory>.toMarkers(): List<MapMarker> {
-    val outline = HereTheme.colors.surface
-
-    return map { memory ->
+/** Переводит воспоминания в метки карты: персонаж эмоции. */
+private fun List<Memory>.toMarkers(): List<MapMarker> =
+    map { memory ->
         MapMarker(
             id = memory.id,
             point = MapPoint(memory.latitude, memory.longitude),
-            icon = MapMarkerIcon(
-                emoji = memory.emotion.emoji,
-                fill = memory.emotion.color.solid,
-                outline = outline
-            )
+            icon = MapMarkerIcon(image = memory.emotion.character.image)
         )
     }
-}

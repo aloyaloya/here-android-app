@@ -1,13 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Тело персонажа: тень и круг в цвете эмоции с обводкой. Слой 1 из 3. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="40dp"
     android:height="48dp"
     android:viewportWidth="100"
     android:viewportHeight="120">
-    <path
-        android:pathData="M26,104 a24,4.5 0 1,0 48,0 a24,4.5 0 1,0 -48,0"
-        android:fillColor="@color/character_shadow" />
     <path
         android:pathData="M8,50 A42,42 0 1,0 92,50 A42,42 0 1,0 8,50 Z"
         android:fillColor="@color/character_tender"

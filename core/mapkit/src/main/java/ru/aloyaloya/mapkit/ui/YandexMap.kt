@@ -137,8 +137,8 @@ fun YandexMap(
         )
     }
 
-    LaunchedEffect(markersBinder, markers) {
-        markersBinder.apply(markers)
+    LaunchedEffect(markersBinder, markers, isDarkTheme) {
+        markersBinder.apply(markers, isDarkTheme)
     }
 
     LaunchedEffect(markersBinder, markersVisible) {

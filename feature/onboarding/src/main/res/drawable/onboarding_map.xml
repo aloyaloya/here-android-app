@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Фон-карта онбординга (A1, B1–B3). Рисуется во всю ширину с ContentScale.Crop от верха. -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
     android:width="360dp"
     android:height="520dp"

@@ -31,8 +31,8 @@ import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.onboarding.R
+import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
-import ru.aloyaloya.ui.emotion.emoji
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.format.TextStyle
@@ -232,9 +232,10 @@ private fun DayCell(
                 )
         ) {
             if (emotion != null) {
-                Text(
-                    text = emotion.emoji,
-                    fontSize = sizes.dayEmojiSize
+                EmotionCharacter(
+                    emotion = emotion.character,
+                    size = sizes.dayCharacterSize,
+                    animated = false
                 )
             } else {
                 Text(

@@ -50,8 +50,8 @@ import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.dominantEmotion
 import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
-import ru.aloyaloya.ui.emotion.emoji
 import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
@@ -129,7 +129,7 @@ private fun CalendarContent(
     }
 
     val markByDate = uiState.emotionByDate.mapValues { (_, emotion) ->
-        CalendarDayMark(emoji = emotion.emoji, color = emotion.color.solid)
+        CalendarDayMark(character = emotion.character)
     }
     val monthEmotion = remember(uiState.memoriesByDate, shownMonth) {
         uiState.memoriesByDate
@@ -247,7 +247,7 @@ private fun DayMemories(
 
         memories.forEach { memory ->
             HereMemoryRow(
-                emoji = memory.emotion.emoji,
+                character = memory.emotion.character,
                 color = memory.emotion.color.soft,
                 title = memory.title,
                 subtitle = TimeFormat.format(

@@ -1,6 +1,6 @@
 package ru.aloyaloya.mapkit.model
 
-import androidx.compose.ui.graphics.Color
+import androidx.annotation.DrawableRes
 
 /**
  * Метка на карте.
@@ -16,16 +16,12 @@ data class MapMarker(
 )
 
 /**
- * Вид метки: эмодзи в круге с обводкой.
+ * Вид метки: картинка из ресурсов.
  *
- * Цвета модуль берет снаружи, чтобы метки следовали за темой приложения.
+ * Цвета берутся из ресурсов картинки, поэтому метки сами следуют за темой.
  *
- * @param emoji Эмодзи в центре метки.
- * @param fill Цвет круга.
- * @param outline Цвет обводки.
+ * @param image Картинка метки.
  */
 data class MapMarkerIcon(
-    val emoji: String,
-    val fill: Color,
-    val outline: Color
+    @param:DrawableRes val image: Int
 )

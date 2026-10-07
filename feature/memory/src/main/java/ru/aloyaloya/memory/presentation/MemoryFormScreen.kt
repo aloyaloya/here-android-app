@@ -34,8 +34,8 @@ import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
+import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.emotion.EmotionChip
-import ru.aloyaloya.design_system.component.emotion.EmotionPin
 import ru.aloyaloya.design_system.component.field.HereDateTimeField
 import ru.aloyaloya.design_system.component.field.HereTextField
 import ru.aloyaloya.design_system.component.media.MediaAddTile
@@ -60,8 +60,8 @@ import ru.aloyaloya.memory.model.MemoryFormSheet
 import ru.aloyaloya.memory.model.MemoryFormUiState
 import ru.aloyaloya.memory.presentation.component.DateSheet
 import ru.aloyaloya.memory.presentation.component.TimeSheet
+import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
-import ru.aloyaloya.ui.emotion.emoji
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -302,9 +302,9 @@ private fun PlacePreview(
         }
 
         if (emotion != null && point != null) {
-            EmotionPin(
-                emoji = emotion.emoji,
-                color = emotion.color.solid,
+            EmotionCharacter(
+                emotion = emotion.character,
+                size = HereSize.EmotionCharacter.small,
                 modifier = Modifier.align(Alignment.Center)
             )
         }
@@ -384,7 +384,7 @@ private fun EmotionSection(
         ) {
             Emotion.entries.forEach { emotion ->
                 EmotionChip(
-                    emoji = emotion.emoji,
+                    character = emotion.character,
                     color = emotion.color,
                     selected = emotion == selectedEmotion,
                     onClick = { onEmotionSelected(emotion) }

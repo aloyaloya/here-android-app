@@ -19,10 +19,10 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import ru.aloyaloya.design_system.component.emotion.EmotionPin
+import ru.aloyaloya.design_system.component.character.CharacterEmotion
+import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
@@ -33,15 +33,13 @@ import java.time.format.TextStyle
 import java.util.Locale
 
 /**
- * Пин эмоции в дне календаря.
+ * Персонаж эмоции в дне календаря.
  *
- * @property emoji Эмодзи эмоции.
- * @property color Насыщенный тон эмоции.
+ * @property character Персонаж эмоции.
  */
 @Immutable
 data class CalendarDayMark(
-    val emoji: String,
-    val color: Color
+    val character: CharacterEmotion
 )
 
 /**
@@ -156,22 +154,23 @@ private fun DayCell(
             .clickable(onClick = onClick)
     ) {
         /**
-         * В дне с воспоминаниями пин говорит больше числа, поэтому число уступает ему
+         * В дне с воспоминаниями персонаж говорит больше числа, поэтому число уступает ему
          * место. Обратно оно возвращается, когда день выбирают: на залитой акцентом
-         * плитке пин все равно потерялся бы.
+         * плитке персонаж все равно потерялся бы.
          */
         AnimatedVisibility(
             visible = !selected && mark != null,
             enter = scaleIn(),
             exit = scaleOut()
         ) {
-            EmotionPin(
-                emoji = mark?.emoji.orEmpty(),
-                color = mark?.color ?: Color.Transparent,
-                size = HereSize.Calendar.pinSize,
-                border = HereSize.Calendar.pinBorder,
-                emojiSize = HereSize.Calendar.pinEmojiSize
-            )
+            mark?.let {
+                EmotionCharacter(
+                    emotion = it.character,
+                    size = HereSize.Calendar.characterSize,
+                    animated = false,
+                    shadow = false
+                )
+            }
         }
 
         AnimatedVisibility(

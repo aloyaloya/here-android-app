@@ -73,9 +73,7 @@ object HereSize {
         val navIconSize = 20.dp
         val navButtonSpacing = 8.dp
         val selectedBorder = 1.5.dp
-        val pinSize = 33.dp
-        val pinBorder = 1.dp
-        val pinEmojiSize = 18f.sp
+        val characterSize = 34.dp
         val monthSize = 18.sp
         val weekdaySize = 10.5f.sp
         val daySize = 17.sp
@@ -103,7 +101,7 @@ object HereSize {
         val horizontalPadding = 12.dp
         val contentSpacing = 10.dp
         val selectedBorder = 2.dp
-        val emojiSize = 36.sp
+        val selectedScale = 1.05f
     }
 
     /** Квадратная плитка эмоции в ряду. */
@@ -111,14 +109,7 @@ object HereSize {
         val size = 65.dp
         val spacing = 11.dp
         val selectedBorder = 2.dp
-        val emojiSize = 31.sp
-    }
-
-    /** Круглый пин эмоции. */
-    object EmotionPin {
-        val size = 58.dp
-        val border = 4.dp
-        val emojiSize = 28.sp
+        val characterSize = 44.dp
     }
 
     /** Превью выбранного места. */
@@ -205,13 +196,13 @@ object HereSize {
         val spacing = 10.dp
         val verticalPadding = 7.dp
         val horizontalPadding = 13.dp
-        val emojiSize = 18.sp
+        val characterSize = 28.dp
     }
 
     /** Квадратная плитка эмоции без выбора: иконка воспоминания. */
     object EmotionBadge {
         val size = 62.dp
-        val emojiSize = 30.sp
+        val characterSize = 40.dp
     }
 
     /** Значок видео поверх кадра. */
@@ -234,9 +225,6 @@ object HereSize {
     /** Экран воспоминания. */
     object Memory {
         val haloSize = 143.dp
-        val pinSize = 94.dp
-        val pinBorder = 5.dp
-        val pinEmojiSize = 44.sp
         val sheetCornerOverlap = 28.dp
         val sheetHorizontalPadding = 27.dp
         val sheetTopPadding = 22.dp
@@ -257,11 +245,10 @@ object HereSize {
 
     /** Экран итогов. */
     object Summary {
-        val emojiSize = 44.sp
         val cardSpacing = 12.dp
         val barHeight = 12.dp
         val barGap = 2.dp
-        val legendEmojiSize = 18.sp
+        val legendCharacterSize = 28.dp
         val recallPhotoHeight = 200.dp
     }
 
@@ -294,7 +281,7 @@ object HereSize {
         val cardMargin = 16.dp
         val previewSize = 72.dp
         val dayCellSize = 40.dp
-        val dayEmojiSize = 22.sp
+        val dayCharacterSize = 28.dp
     }
 
     /** Иллюстрация страницы геолокации. */

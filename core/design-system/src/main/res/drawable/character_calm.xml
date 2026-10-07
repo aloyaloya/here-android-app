@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/character_shadow" />
+    <item android:drawable="@drawable/character_body_calm" />
+    <item android:drawable="@drawable/character_eyes_calm" />
+    <item android:drawable="@drawable/character_face_calm" />
+</layer-list>

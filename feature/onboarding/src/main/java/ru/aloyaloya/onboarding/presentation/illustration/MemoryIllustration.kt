@@ -33,8 +33,8 @@ import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.onboarding.R
+import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
-import ru.aloyaloya.ui.emotion.emoji
 import ru.aloyaloya.ui.emotion.labelResId
 import java.time.LocalDateTime
 
@@ -103,7 +103,7 @@ private fun MemoryCard(modifier: Modifier = Modifier) {
             .padding(HereSpacing.xl)
     ) {
         EmotionTag(
-            emoji = emotion.emoji,
+            character = emotion.character,
             label = stringResource(emotion.labelResId),
             color = emotion.color.soft
         )
