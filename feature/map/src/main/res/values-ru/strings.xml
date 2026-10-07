@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <string name="map_screen_title">Карта эмоций</string>
+    <string name="map_empty_hint">Здесь пока пусто. Отметь место, где тебе было хорошо</string>
     <string name="map_screen_label">Карта</string>
 
     <string name="emotion_picker_title">Что чувствуешь здесь?</string>

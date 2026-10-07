@@ -313,7 +313,14 @@ object HereSize {
         val medium = 72.dp
         val large = 88.dp
         val heightRatio = 1.2f
+        /** Место под телом для тени, в долях ширины. */
+        val shadowSpaceRatio = 0.28f
         val lookShift = 0.025f
+    }
+
+    /** Подсказка на пустой карте. */
+    object MapEmptyHint {
+        val bubbleMaxWidth = 220.dp
     }
 
     /** Реплика персонажа. */
@@ -321,6 +328,7 @@ object HereSize {
         val verticalPadding = 6.dp
         val horizontalPadding = 12.dp
         val tailSize = 10.dp
+        val borderWidth = 1.dp
     }
 
     /** Нижняя панель экрана разрешения. */

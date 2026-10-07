@@ -13,8 +13,10 @@ import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.core.Easing
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.background
@@ -29,6 +31,7 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,7 +48,14 @@ import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
 import ru.aloyaloya.design_system.component.button.HereFab
+import ru.aloyaloya.design_system.component.character.BubbleTail
+import ru.aloyaloya.design_system.component.character.CharacterBubble
+import ru.aloyaloya.design_system.component.character.CharacterEmotion
+import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.picker.PlacePin
+import ru.aloyaloya.design_system.extension.Entrance
+import ru.aloyaloya.design_system.extension.entrance
+import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
@@ -75,6 +85,10 @@ private const val RESIZE_MILLIS = 260
 private val GrowEasing = Easing(OvershootInterpolator()::getInterpolation)
 private val ShrinkEasing = Easing(AccelerateInterpolator()::getInterpolation)
 private val BottomOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1f)
+private val BottomStartOrigin = TransformOrigin(pivotFractionX = 0f, pivotFractionY = 1f)
+
+/** Реплика пустой карты появляется после падения персонажа. */
+private const val EMPTY_BUBBLE_MILLIS = 700
 
 private val locationPermissions = arrayOf(
     Manifest.permission.ACCESS_FINE_LOCATION,
@@ -212,6 +226,21 @@ fun MapScreen(
                     PlacePin(moving = cameraMoving)
                 }
 
+                AnimatedVisibility(
+                    visible = uiState.memories.isEmpty() && !picking,
+                    enter = EnterTransition.None,
+                    exit = fadeOut(tween(RESIZE_MILLIS)) +
+                        scaleOut(tween(RESIZE_MILLIS, easing = ShrinkEasing), transformOrigin = BottomStartOrigin),
+                    modifier = Modifier
+                        .align(Alignment.BottomStart)
+                        .navigationBarsPadding()
+                        .padding(bottom = HereSize.NavBar.height)
+                        .padding(horizontal = HereSize.Fab.endMargin)
+                        .padding(bottom = HereSize.Fab.barSpacing)
+                ) {
+                    EmptyMapHint()
+                }
+
                 Column(
                     horizontalAlignment = Alignment.End,
                     verticalArrangement = Arrangement.spacedBy(HereSize.Fab.stackSpacing),
@@ -272,6 +301,37 @@ fun MapScreen(
                 )
             }
         }
+    }
+}
+
+/** Персонаж-«ты» в углу напротив кнопки добавления зовет отметить первое место. */
+@Composable
+private fun EmptyMapHint() {
+    val colors = HereTheme.colors
+    val characterSize = HereSize.EmotionCharacter.small
+
+    Column(
+        verticalArrangement = Arrangement.spacedBy(HereSpacing.xs),
+        // Низ тела, а не тени, встает на одну линию с низом кнопки.
+        modifier = Modifier.offset(y = characterSize * HereSize.EmotionCharacter.shadowSpaceRatio)
+    ) {
+        CharacterBubble(
+            text = stringResource(R.string.map_empty_hint),
+            containerColor = colors.surface,
+            contentColor = colors.textPrimary,
+            tail = BubbleTail.BOTTOM,
+            tailInset = characterSize / 2,
+            borderColor = colors.outline,
+            modifier = Modifier
+                .widthIn(max = HereSize.MapEmptyHint.bubbleMaxWidth)
+                .entrance(kind = Entrance.BUBBLE, delayMillis = EMPTY_BUBBLE_MILLIS, origin = BottomStartOrigin)
+        )
+
+        EmotionCharacter(
+            emotion = CharacterEmotion.YOU,
+            size = characterSize,
+            modifier = Modifier.entrance(kind = Entrance.DROP)
+        )
     }
 }
 
