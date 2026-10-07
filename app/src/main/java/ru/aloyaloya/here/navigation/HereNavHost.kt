@@ -4,6 +4,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import ru.aloyaloya.settings.presentation.navigation.NotificationsRoute
+import ru.aloyaloya.settings.presentation.navigation.navigateToNotifications
+import ru.aloyaloya.settings.presentation.navigation.notificationsScreen
 import ru.aloyaloya.settings.presentation.navigation.settingsScreen
 import ru.aloyaloya.summary.presentation.navigation.summaryScreen
 import ru.aloyaloya.calendar.presentation.navigation.calendarScreen
@@ -74,6 +77,12 @@ fun HereNavHost(
             onPlaceClick = { latitude, longitude -> onShowOnMap(MapPoint(latitude, longitude)) },
             onMemoryClick = { memoryId -> navController.navigateToMemory(memoryId) }
         )
-        settingsScreen(onBackClick = { navController.popBackStack() })
+        settingsScreen(
+            onBackClick = { navController.popBackStack() },
+            onNotificationsRequest = { navController.navigateToNotifications() }
+        )
+        notificationsScreen(
+            onClose = { navController.popBackStack(route = NotificationsRoute, inclusive = true) }
+        )
     }
 }

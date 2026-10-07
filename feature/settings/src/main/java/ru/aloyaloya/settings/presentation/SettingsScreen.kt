@@ -1,10 +1,7 @@
 package ru.aloyaloya.settings.presentation
 
-import android.Manifest
-import android.content.Context
-import android.content.pm.PackageManager
-import android.os.Build
 import androidx.annotation.StringRes
+import androidx.activity.compose.LocalActivity
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.background
@@ -16,8 +13,10 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Switch
 import androidx.compose.material3.SwitchDefaults
@@ -25,6 +24,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -33,14 +33,16 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
-import androidx.core.content.ContextCompat
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
-import ru.aloyaloya.design_system.format.TimeFormat
+import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
+import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.AppLanguage
@@ -50,6 +52,7 @@ import ru.aloyaloya.settings.model.BackupStatus
 import ru.aloyaloya.settings.model.SettingsUiState
 import java.time.LocalDate
 import java.time.LocalTime
+import ru.aloyaloya.design_system.R as DesignR
 
 private const val YANDEX_MAPS_TERMS_URL = "https://yandex.ru/legal/maps_termsofuse/"
 
@@ -66,7 +69,8 @@ private val ZIP_OPEN_MIME_TYPES = arrayOf(ZIP_MIME_TYPE, "application/octet-stre
  * @param onThemeSelected Колбэк выбора темы.
  * @param onLanguageSelected Колбэк выбора языка.
  * @param onHapticsChange Колбэк переключения тактильного отклика.
- * @param onReminderEnabledChange Колбэк включения вечернего напоминания.
+ * @param onReminderEnabledChange Колбэк выключения напоминания о дне.
+ * @param onNotificationsRequest Колбэк открытия экрана уведомлений.
  * @param onReminderTimeChange Колбэк выбора времени напоминания.
  * @param onExport Колбэк экспорта в выбранный файл.
  * @param onImport Колбэк импорта из выбранного файла.
@@ -81,23 +85,15 @@ fun SettingsScreen(
     onLanguageSelected: (AppLanguage) -> Unit,
     onHapticsChange: (Boolean) -> Unit,
     onReminderEnabledChange: (Boolean) -> Unit,
+    onNotificationsRequest: () -> Unit,
     onReminderTimeChange: (LocalTime) -> Unit,
     onExport: (destination: String) -> Unit,
     onImport: (source: String) -> Unit,
     onDeleteAllConfirmed: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val context = LocalContext.current
     var deleteAllDialogVisible by rememberSaveable { mutableStateOf(false) }
     var reminderTimeSheetVisible by rememberSaveable { mutableStateOf(false) }
-    var notificationsDenied by rememberSaveable { mutableStateOf(false) }
-
-    val notificationPermissionLauncher = rememberLauncherForActivityResult(
-        ActivityResultContracts.RequestPermission()
-    ) { granted ->
-        notificationsDenied = !granted
-        if (granted) onReminderEnabledChange(true)
-    }
 
     val exportLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.CreateDocument(ZIP_MIME_TYPE)
@@ -111,6 +107,17 @@ fun SettingsScreen(
     val busy = status == BackupStatus.Exporting || status == BackupStatus.Importing
     val hasMemories = (uiState.memoryCount ?: 0) > 0
     val uriHandler = LocalUriHandler.current
+
+    val context = LocalContext.current
+    val activity = LocalActivity.current
+    var notificationsBlocked by remember {
+        mutableStateOf(context.notificationsBlocked(activity, uiState.notificationsRequested))
+    }
+    LifecycleResumeEffect(uiState.notificationsRequested) {
+        notificationsBlocked = context.notificationsBlocked(activity, uiState.notificationsRequested)
+        onPauseOrDispose {}
+    }
+    val reminderEnabled = uiState.reminder.enabled && !notificationsBlocked
 
     Column(
         modifier = modifier
@@ -161,30 +168,23 @@ fun SettingsScreen(
             SettingsSection(title = stringResource(R.string.settings_section_reminder)) {
                 SwitchRow(
                     title = stringResource(R.string.settings_reminder),
-                    description = if (notificationsDenied) {
-                        stringResource(R.string.settings_reminder_denied)
-                    } else {
-                        stringResource(R.string.settings_reminder_description)
-                    },
-                    checked = uiState.reminder.enabled,
+                    description = stringResource(R.string.settings_reminder_description),
+                    checked = reminderEnabled,
                     onCheckedChange = { enabled ->
-                        if (enabled && needsNotificationPermission(context)) {
-                            notificationPermissionLauncher.launch(Manifest.permission.POST_NOTIFICATIONS)
+                        if (enabled) {
+                            onNotificationsRequest()
                         } else {
-                            notificationsDenied = false
                             onReminderEnabledChange(enabled)
                         }
-                    },
-                    descriptionColor = if (notificationsDenied) {
-                        HereTheme.colors.danger
-                    } else {
-                        HereTheme.colors.textSecondary
                     }
                 )
+                if (notificationsBlocked) {
+                    NotificationsBlockedCard(onClick = context::openNotificationSettings)
+                }
                 ActionRow(
                     title = stringResource(R.string.settings_reminder_time),
-                    description = uiState.reminder.time.format(TimeFormat),
-                    enabled = uiState.reminder.enabled,
+                    description = uiState.reminder.time.format(reminderTimeFormat(currentLocale())),
+                    enabled = reminderEnabled,
                     onClick = { reminderTimeSheetVisible = true }
                 )
             }
@@ -357,8 +357,7 @@ private fun SwitchRow(
     title: String,
     description: String,
     checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    descriptionColor: Color = HereTheme.colors.textSecondary
+    onCheckedChange: (Boolean) -> Unit
 ) {
     val colors = HereTheme.colors
 
@@ -379,7 +378,7 @@ private fun SwitchRow(
             Text(
                 text = description,
                 style = MaterialTheme.typography.bodySmall,
-                color = descriptionColor
+                color = colors.textSecondary
             )
         }
 
@@ -394,6 +393,56 @@ private fun SwitchRow(
                 uncheckedTrackColor = colors.surfaceMuted,
                 uncheckedBorderColor = colors.textTertiary
             )
+        )
+    }
+}
+
+/**
+ * Плашка «уведомления запрещены» с переходом в системные настройки.
+ *
+ * @param onClick Колбэк нажатия на плашку.
+ */
+@Composable
+private fun NotificationsBlockedCard(onClick: () -> Unit) {
+    val colors = HereTheme.colors
+    val iconSize = HereSize.SettingsPathCard.iconSize
+
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(HereSpacing.m),
+        modifier = Modifier
+            .padding(start = HereSpacing.m, end = HereSpacing.m, bottom = HereSpacing.m)
+            .fillMaxWidth()
+            .clip(HereShape.bubble)
+            .background(colors.surfaceMuted)
+            .clickable(onClick = onClick)
+            .padding(HereSpacing.m)
+    ) {
+        Icon(
+            painter = painterResource(DesignR.drawable.ic_notifications_off),
+            contentDescription = null,
+            tint = colors.textPrimary,
+            modifier = Modifier.size(iconSize)
+        )
+
+        Column(modifier = Modifier.weight(1f)) {
+            Text(
+                text = stringResource(R.string.settings_reminder_blocked),
+                style = MaterialTheme.typography.bodySmall,
+                color = colors.textPrimary
+            )
+            Text(
+                text = stringResource(R.string.notifications_open_settings),
+                style = MaterialTheme.typography.labelMedium,
+                color = colors.accent
+            )
+        }
+
+        Icon(
+            painter = painterResource(DesignR.drawable.ic_open_in_new),
+            contentDescription = null,
+            tint = colors.textSecondary,
+            modifier = Modifier.size(iconSize)
         )
     }
 }
@@ -456,11 +505,6 @@ private fun deleteAllDescription(memoryCount: Int?): String? = when {
     memoryCount > 0 -> pluralStringResource(R.plurals.settings_memory_count, memoryCount, memoryCount)
     else -> stringResource(R.string.settings_delete_all_empty)
 }
-
-private fun needsNotificationPermission(context: Context): Boolean =
-    Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU &&
-        ContextCompat.checkSelfPermission(context, Manifest.permission.POST_NOTIFICATIONS) !=
-        PackageManager.PERMISSION_GRANTED
 
 @Composable
 private fun appVersionName(): String {

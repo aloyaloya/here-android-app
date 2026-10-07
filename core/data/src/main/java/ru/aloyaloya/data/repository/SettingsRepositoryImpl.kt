@@ -36,9 +36,15 @@ class SettingsRepositoryImpl @Inject constructor(
     private val _reminder = MutableStateFlow(readReminder())
     override val reminder: StateFlow<DailyReminder> = _reminder.asStateFlow()
 
-    // TODO: вернуть preferences.getBoolean(KEY_ONBOARDING_COMPLETED, false) после проверки онбординга
-    private val _onboardingCompleted = MutableStateFlow(false)
+    private val _onboardingCompleted = MutableStateFlow(
+        preferences.getBoolean(KEY_ONBOARDING_COMPLETED, false)
+    )
     override val onboardingCompleted: StateFlow<Boolean> = _onboardingCompleted.asStateFlow()
+
+    private val _notificationsRequested = MutableStateFlow(
+        preferences.getBoolean(KEY_NOTIFICATIONS_REQUESTED, false)
+    )
+    override val notificationsRequested: StateFlow<Boolean> = _notificationsRequested.asStateFlow()
 
     init {
         applyNightMode(_theme.value)
@@ -84,6 +90,11 @@ class SettingsRepositoryImpl @Inject constructor(
         preferences.edit().putBoolean(KEY_ONBOARDING_COMPLETED, true).apply()
     }
 
+    override fun markNotificationsRequested() {
+        _notificationsRequested.value = true
+        preferences.edit().putBoolean(KEY_NOTIFICATIONS_REQUESTED, true).apply()
+    }
+
     private fun applyNightMode(theme: AppTheme) {
         AppCompatDelegate.setDefaultNightMode(
             when (theme) {
@@ -117,6 +128,7 @@ class SettingsRepositoryImpl @Inject constructor(
         const val KEY_REMINDER_ENABLED = "key_reminder_enabled"
         const val KEY_REMINDER_MINUTE_OF_DAY = "key_reminder_minute_of_day"
         const val KEY_ONBOARDING_COMPLETED = "key_onboarding_completed"
+        const val KEY_NOTIFICATIONS_REQUESTED = "key_notifications_requested"
         const val DEFAULT_REMINDER_MINUTE_OF_DAY = 21 * 60
         const val LANGUAGE_RUSSIAN = "ru"
         const val LANGUAGE_ENGLISH = "en"

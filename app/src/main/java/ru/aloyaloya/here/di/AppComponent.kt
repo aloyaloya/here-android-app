@@ -54,7 +54,7 @@ interface AppComponent {
     /** Настройки приложения. */
     val settingsRepository: SettingsRepository
 
-    /** Планировщик вечернего напоминания. */
+    /** Планировщик напоминания о дне. */
     val reminderScheduler: ReminderScheduler
 
     /** Фабрика подкомпонента фичи карты. */

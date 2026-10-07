@@ -311,6 +311,15 @@ object HereSize {
         val darkPickerShadowAlpha = 0.35f
     }
 
+    /** Иллюстрация экрана уведомлений. */
+    object NotificationIllustration {
+        val avatarSize = 40.dp
+        val iconSize = 20.dp
+        val badgeSize = 40.dp
+        val badgeBorder = 1.dp
+        val mutedAlpha = 0.5f
+    }
+
     /** Персонаж-эмоция. */
     object EmotionCharacter {
         val small = 64.dp
