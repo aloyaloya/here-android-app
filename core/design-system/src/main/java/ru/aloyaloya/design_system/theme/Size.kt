@@ -111,7 +111,7 @@ object HereSize {
         val size = 65.dp
         val spacing = 11.dp
         val selectedBorder = 2.dp
-        val emojiSize = 31.sp
+        val characterSize = 44.dp
     }
 
     /** Круглый пин эмоции. */
@@ -205,7 +205,7 @@ object HereSize {
         val spacing = 10.dp
         val verticalPadding = 7.dp
         val horizontalPadding = 13.dp
-        val emojiSize = 18.sp
+        val characterSize = 24.dp
     }
 
     /** Квадратная плитка эмоции без выбора: иконка воспоминания. */
@@ -234,9 +234,6 @@ object HereSize {
     /** Экран воспоминания. */
     object Memory {
         val haloSize = 143.dp
-        val pinSize = 94.dp
-        val pinBorder = 5.dp
-        val pinEmojiSize = 44.sp
         val sheetCornerOverlap = 28.dp
         val sheetHorizontalPadding = 27.dp
         val sheetTopPadding = 22.dp

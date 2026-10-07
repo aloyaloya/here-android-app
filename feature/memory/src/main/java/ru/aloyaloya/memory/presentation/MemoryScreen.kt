@@ -35,7 +35,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import ru.aloyaloya.design_system.component.emotion.EmotionPin
+import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
 import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
@@ -60,8 +60,8 @@ import ru.aloyaloya.memory.model.MemoryUiState
 import ru.aloyaloya.memory.presentation.component.DeleteMemoryDialog
 import ru.aloyaloya.memory.presentation.component.MediaViewer
 import ru.aloyaloya.memory.presentation.component.MemoryActionsSheet
+import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
-import ru.aloyaloya.ui.emotion.emoji
 import ru.aloyaloya.ui.emotion.labelResId
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 import java.time.Instant
@@ -202,7 +202,7 @@ private fun MemoryContent(
                     logoPlacement = MapLogoPlacement.BelowTopBar
                 )
 
-                MemoryPin(
+                MemoryCharacter(
                     emotion = memory.emotion,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -229,9 +229,9 @@ private fun MemoryContent(
 private fun mapBottomPadding(sheetHeight: Dp): Dp =
     (sheetHeight - HereSize.Memory.sheetCornerOverlap).coerceAtLeast(0.dp)
 
-/** Пин воспоминания с ореолом: та же метка, что на карте, только крупно. */
+/** Персонаж воспоминания с ореолом: та же метка, что на карте, только крупно и живой. */
 @Composable
-private fun MemoryPin(
+private fun MemoryCharacter(
     emotion: Emotion,
     modifier: Modifier = Modifier
 ) {
@@ -243,12 +243,9 @@ private fun MemoryPin(
             .size(HereSize.Memory.haloSize)
             .background(color = color.copy(alpha = HALO_ALPHA), shape = CircleShape)
     ) {
-        EmotionPin(
-            emoji = emotion.emoji,
-            color = color,
-            size = HereSize.Memory.pinSize,
-            border = HereSize.Memory.pinBorder,
-            emojiSize = HereSize.Memory.pinEmojiSize
+        EmotionCharacter(
+            emotion = emotion.character,
+            size = HereSize.EmotionCharacter.large
         )
     }
 }
@@ -279,7 +276,7 @@ private fun MemoryDetailSheet(
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(HereSize.Memory.headerSpacing)) {
             EmotionTag(
-                emoji = memory.emotion.emoji,
+                character = memory.emotion.character,
                 label = stringResource(memory.emotion.labelResId),
                 color = memory.emotion.color.soft
             )
