@@ -20,7 +20,6 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -37,22 +36,15 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.launch
 import ru.aloyaloya.calendar.R
 import ru.aloyaloya.calendar.model.CalendarUiState
 import ru.aloyaloya.design_system.component.calendar.CalendarDayMark
 import ru.aloyaloya.design_system.component.calendar.HereMonthGrid
 import ru.aloyaloya.design_system.component.calendar.HereMonthHeader
-import ru.aloyaloya.design_system.component.character.BubbleTail
-import ru.aloyaloya.design_system.component.character.CharacterBubble
-import ru.aloyaloya.design_system.component.character.CharacterEmotion
-import ru.aloyaloya.design_system.component.character.EmotionCharacter
+import ru.aloyaloya.design_system.component.character.CharacterEmptyState
 import ru.aloyaloya.design_system.component.memory.HereMemoryRow
-import ru.aloyaloya.design_system.extension.Entrance
-import ru.aloyaloya.design_system.extension.entrance
 import ru.aloyaloya.design_system.format.DayMonthFormat
 import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.format.currentLocale
@@ -281,7 +273,6 @@ private fun DayMemories(
 
 @Composable
 private fun EmptyDayHint(date: LocalDate) {
-    val colors = HereTheme.colors
     val today = LocalDate.now()
     val text = when {
         date == today -> R.string.calendar_day_empty_today
@@ -289,39 +280,13 @@ private fun EmptyDayHint(date: LocalDate) {
         else -> R.string.calendar_day_empty
     }
 
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .fillMaxWidth()
-            .padding(
-                top = HereSize.Calendar.emptyTopPadding,
-                bottom = HereSpacing.l
-            )
-    ) {
-        CharacterBubble(
-            text = stringResource(text),
-            containerColor = colors.surface,
-            contentColor = colors.textPrimary,
-            tail = BubbleTail.BOTTOM,
-            borderColor = colors.outline,
-            textAlign = TextAlign.Center,
-            modifier = Modifier
-                .widthIn(max = HereSize.Calendar.emptyBubbleMaxWidth)
-                .entrance(
-                    kind = Entrance.BUBBLE,
-                    delayMillis = EMPTY_BUBBLE_MILLIS,
-                    origin = EmptyBubbleOrigin
-                )
+    CharacterEmptyState(
+        text = stringResource(text),
+        modifier = Modifier.padding(
+            top = HereSize.EmptyState.topPadding,
+            bottom = HereSpacing.l
         )
-
-        EmotionCharacter(
-            emotion = CharacterEmotion.YOU,
-            size = HereSize.EmotionCharacter.small,
-            modifier = Modifier
-                .padding(top = HereSpacing.xs)
-                .entrance(kind = Entrance.DROP)
-        )
-    }
+    )
 }
 
 /** Кнопка возврата к сегодняшнему дню. */
@@ -338,9 +303,3 @@ private fun TodayButton(onClick: () -> Unit) {
             .padding(horizontal = HereSpacing.m, vertical = HereSpacing.s)
     )
 }
-
-/** Реплика пустого дня появляется после падения персонажа. */
-private const val EMPTY_BUBBLE_MILLIS = 700
-
-/** Опора реплики: хвостик снизу. */
-private val EmptyBubbleOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1f)

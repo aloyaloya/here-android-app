@@ -25,9 +25,9 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import ru.aloyaloya.design_system.component.button.HereSecondaryButton
+import ru.aloyaloya.design_system.component.character.CharacterEmptyState
 import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.emotion.EmotionBadge
 import ru.aloyaloya.design_system.component.media.MediaPhoto
@@ -110,15 +110,36 @@ private fun SummaryContent(
     onMemoryClick: (Long) -> Unit,
     onRecallAnother: () -> Unit
 ) {
+    val barsPadding = Modifier
+        .statusBarsPadding()
+        .navigationBarsPadding()
+        .padding(
+            top = HereSize.TopAppBar.height,
+            bottom = HereSize.NavBar.height
+        )
+
+    if (uiState.memoryCount < MIN_MEMORY_COUNT) {
+        Box(
+            modifier = barsPadding
+                .fillMaxSize()
+                .padding(
+                    horizontal = HereSpacing.l,
+                    vertical = HereSpacing.s
+                )
+        ) {
+            PeriodSelector(
+                selected = uiState.period,
+                onSelect = onPeriodSelected
+            )
+
+            NotEnoughMemories(modifier = Modifier.align(Alignment.Center))
+        }
+        return
+    }
+
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
-        modifier = Modifier
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .padding(
-                top = HereSize.TopAppBar.height,
-                bottom = HereSize.NavBar.height
-            )
+        modifier = barsPadding
             .verticalScroll(rememberScrollState())
             .padding(
                 horizontal = HereSpacing.l,
@@ -129,11 +150,6 @@ private fun SummaryContent(
             selected = uiState.period,
             onSelect = onPeriodSelected
         )
-
-        if (uiState.memoryCount < MIN_MEMORY_COUNT) {
-            NotEnoughMemories()
-            return@Column
-        }
 
         PeriodCard(uiState)
 
@@ -390,17 +406,10 @@ private fun Recall(
 
 /** Вместо итогов, пока воспоминаний меньше [MIN_MEMORY_COUNT]. */
 @Composable
-private fun NotEnoughMemories() {
-    Text(
+private fun NotEnoughMemories(modifier: Modifier = Modifier) {
+    CharacterEmptyState(
         text = stringResource(R.string.summary_not_enough),
-        style = MaterialTheme.typography.bodyMedium,
-        color = HereTheme.colors.textSecondary,
-        textAlign = TextAlign.Center,
-        modifier = Modifier
-            .fillMaxWidth()
-            .clip(HereShape.tile)
-            .background(HereTheme.colors.surface)
-            .padding(HereSpacing.xl)
+        modifier = modifier
     )
 }
 
