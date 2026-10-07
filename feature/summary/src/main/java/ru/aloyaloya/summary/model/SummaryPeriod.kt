@@ -12,13 +12,13 @@ import java.time.YearMonth
  * @property labelResId Подпись периода в переключателе.
  */
 enum class SummaryPeriod(@StringRes val labelResId: Int) {
-    MONTH(R.string.summary_period_month),
+    ALL_TIME(R.string.summary_period_all_time),
     YEAR(R.string.summary_period_year),
-    ALL_TIME(R.string.summary_period_all_time);
+    MONTH(R.string.summary_period_month);
 
     fun contains(date: LocalDate, today: LocalDate): Boolean = when (this) {
-        MONTH -> YearMonth.from(date) == YearMonth.from(today)
-        YEAR -> Year.from(date) == Year.from(today)
         ALL_TIME -> true
+        YEAR -> Year.from(date) == Year.from(today)
+        MONTH -> YearMonth.from(date) == YearMonth.from(today)
     }
 }

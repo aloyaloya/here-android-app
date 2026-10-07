@@ -13,7 +13,7 @@
     <string name="summary_place_unknown">Place without an address</string>
     <string name="summary_recall_title">Recall</string>
     <string name="summary_recall_another">Recall another</string>
-    <string name="summary_not_enough">Add a couple more memories and your places will show up here</string>
+    <string name="summary_not_enough">Add a few more memories and your summary will appear here</string>
     <plurals name="summary_memory_count">
         <item quantity="one">%d memory</item>
         <item quantity="other">%d memories</item>

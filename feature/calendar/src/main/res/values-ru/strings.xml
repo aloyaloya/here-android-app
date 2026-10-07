@@ -3,5 +3,7 @@
     <string name="calendar_screen_title">Календарь</string>
     <string name="calendar_screen_label">Календарь</string>
     <string name="calendar_day_empty">В этот день воспоминаний нет</string>
+    <string name="calendar_day_empty_today">Сегодня пока пусто. Отметь, где тебе хорошо</string>
+    <string name="calendar_day_empty_future">Этот день ещё впереди</string>
     <string name="calendar_today">Сегодня</string>
 </resources>

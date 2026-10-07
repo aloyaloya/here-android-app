@@ -20,10 +20,15 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
+import java.time.LocalDateTime
 import ru.aloyaloya.design_system.component.character.CharacterEmotion
 import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
+import ru.aloyaloya.design_system.component.scene.LOOK_LEFT
+import ru.aloyaloya.design_system.component.scene.LOOK_RIGHT
+import ru.aloyaloya.design_system.extension.Entrance
+import ru.aloyaloya.design_system.extension.entrance
 import ru.aloyaloya.design_system.format.DayMonthFormat
 import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.format.currentLocale
@@ -36,7 +41,6 @@ import ru.aloyaloya.onboarding.R
 import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.labelResId
-import java.time.LocalDateTime
 
 /** Момент воспоминания на иллюстрации. */
 private val MemoryMoment = LocalDateTime.of(2026, 7, 15, 18, 40)

@@ -3,5 +3,7 @@
     <string name="calendar_screen_title">Calendar</string>
     <string name="calendar_screen_label">Calendar</string>
     <string name="calendar_day_empty">No memories on this day</string>
+    <string name="calendar_day_empty_today">Nothing here yet today. Mark where you feel good</string>
+    <string name="calendar_day_empty_future">This day is still ahead</string>
     <string name="calendar_today">Today</string>
 </resources>

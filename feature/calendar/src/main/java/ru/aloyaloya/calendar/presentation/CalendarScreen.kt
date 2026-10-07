@@ -1,5 +1,13 @@
 package ru.aloyaloya.calendar.presentation
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,17 +30,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
 import ru.aloyaloya.calendar.R
@@ -40,6 +43,7 @@ import ru.aloyaloya.calendar.model.CalendarUiState
 import ru.aloyaloya.design_system.component.calendar.CalendarDayMark
 import ru.aloyaloya.design_system.component.calendar.HereMonthGrid
 import ru.aloyaloya.design_system.component.calendar.HereMonthHeader
+import ru.aloyaloya.design_system.component.character.CharacterEmptyState
 import ru.aloyaloya.design_system.component.memory.HereMemoryRow
 import ru.aloyaloya.design_system.format.DayMonthFormat
 import ru.aloyaloya.design_system.format.TimeFormat
@@ -48,7 +52,6 @@ import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
-import ru.aloyaloya.domain.model.dominantEmotion
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
@@ -63,6 +66,13 @@ private val FirstMonth = YearMonth.of(1900, 1)
 
 /** Сколько месяцев в листалке: хватает и назад, и вперед на любую жизнь. */
 private const val MONTH_COUNT = 12 * 300
+
+/** Смена дня: старые карточки сжимаются и тают, новые вырастают. */
+private const val DAY_SWITCH_MILLIS = 220
+private const val DAY_SWITCH_SCALE = 0.92f
+
+/** Пустые дни — одно содержимое: персонаж остается на месте, меняется только реплика. */
+private const val EMPTY_DAY_KEY = "empty"
 
 private fun monthAt(page: Int): YearMonth = FirstMonth.plusMonths(page.toLong())
 
@@ -131,17 +141,6 @@ private fun CalendarContent(
     val markByDate = uiState.emotionByDate.mapValues { (_, emotion) ->
         CalendarDayMark(character = emotion.character)
     }
-    val monthEmotion = remember(uiState.memoriesByDate, shownMonth) {
-        uiState.memoriesByDate
-            .filterKeys { YearMonth.from(it) == shownMonth }
-            .values
-            .flatten()
-            .dominantEmotion()
-    }
-
-    // TODO: плавно менять цвет фона при перелистывании месяца
-    MoodGlow(color = monthEmotion?.color?.solid)
-
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
         modifier = Modifier
@@ -187,24 +186,40 @@ private fun CalendarContent(
             }
         }
 
-        DayMemories(
-            date = selectedDate,
-            memories = uiState.memoriesByDate[selectedDate].orEmpty(),
-            onTodayClick = if (selectedDate != today || shownMonth != YearMonth.from(today)) {
-                {
-                    selectedDate = today
-                    showMonth(YearMonth.from(today))
-                }
-            } else {
-                null
+        AnimatedContent(
+            targetState = selectedDate,
+            transitionSpec = {
+                (fadeIn(tween(DAY_SWITCH_MILLIS)) +
+                    scaleIn(tween(DAY_SWITCH_MILLIS), initialScale = DAY_SWITCH_SCALE)) togetherWith
+                    (fadeOut(tween(DAY_SWITCH_MILLIS)) +
+                        scaleOut(tween(DAY_SWITCH_MILLIS), targetScale = DAY_SWITCH_SCALE)) using
+                    SizeTransform(clip = false)
             },
-            onMemoryClick = onMemoryClick
-        )
+            contentAlignment = Alignment.TopCenter,
+            contentKey = { date ->
+                if (uiState.memoriesByDate[date].isNullOrEmpty()) EMPTY_DAY_KEY else date
+            },
+            label = "calendar-day"
+        ) { date ->
+            DayMemories(
+                date = date,
+                memories = uiState.memoriesByDate[date].orEmpty(),
+                onTodayClick = if (date != today || shownMonth != YearMonth.from(today)) {
+                    {
+                        selectedDate = today
+                        showMonth(YearMonth.from(today))
+                    }
+                } else {
+                    null
+                },
+                onMemoryClick = onMemoryClick
+            )
+        }
     }
 }
 
 /**
- * Заголовок выбранного дня и его воспоминания, или подсказка, что их нет.
+ * Заголовок выбранного дня и его воспоминания или персонаж, если их нет.
  *
  * @param onTodayClick Колбэк возврата к сегодняшнему дню или `null`, если он и так выбран
  * и его месяц на экране: тогда кнопки нет.
@@ -216,6 +231,11 @@ private fun DayMemories(
     onTodayClick: (() -> Unit)?,
     onMemoryClick: (Long) -> Unit
 ) {
+    if (memories.isEmpty()) {
+        EmptyDayHint(date = date)
+        return
+    }
+
     val dayFormat = DayMonthFormat.withLocale(currentLocale())
 
     Column(verticalArrangement = Arrangement.spacedBy(HereSize.MemoryRow.spacing)) {
@@ -237,14 +257,6 @@ private fun DayMemories(
             }
         }
 
-        if (memories.isEmpty()) {
-            Text(
-                text = stringResource(R.string.calendar_day_empty),
-                style = MaterialTheme.typography.bodyMedium,
-                color = HereTheme.colors.textTertiary
-            )
-        }
-
         memories.forEach { memory ->
             HereMemoryRow(
                 character = memory.emotion.character,
@@ -257,6 +269,24 @@ private fun DayMemories(
             )
         }
     }
+}
+
+@Composable
+private fun EmptyDayHint(date: LocalDate) {
+    val today = LocalDate.now()
+    val text = when {
+        date == today -> R.string.calendar_day_empty_today
+        date.isAfter(today) -> R.string.calendar_day_empty_future
+        else -> R.string.calendar_day_empty
+    }
+
+    CharacterEmptyState(
+        text = stringResource(text),
+        modifier = Modifier.padding(
+            top = HereSize.EmptyState.topPadding,
+            bottom = HereSpacing.l
+        )
+    )
 }
 
 /** Кнопка возврата к сегодняшнему дню. */
@@ -273,35 +303,3 @@ private fun TodayButton(onClick: () -> Unit) {
             .padding(horizontal = HereSpacing.m, vertical = HereSpacing.s)
     )
 }
-
-/**
- * Мягкое пятно цвета за карточкой месяца.
- *
- * Центр пятна ниже верхней панели, а край растворяется в фон раньше, чем доходит
- * до нее: иначе на границе панели и экрана был бы виден шов.
- *
- * @param color Цвет пятна или `null`, если в месяце нет воспоминаний.
- */
-@Composable
-private fun MoodGlow(color: Color?) {
-    if (color == null) return
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .drawBehind {
-                drawRect(
-                    brush = Brush.radialGradient(
-                        colors = listOf(color.copy(alpha = GLOW_ALPHA), color.copy(alpha = 0f)),
-                        center = Offset(size.width / 2, size.height * GLOW_CENTER_FRACTION),
-                        radius = size.width * GLOW_RADIUS_FRACTION
-                    )
-                )
-            }
-    )
-}
-
-/** Насыщенность пятна: фон подсказывает настроение, а не спорит с днями. */
-private const val GLOW_ALPHA = 0.45f
-private const val GLOW_CENTER_FRACTION = 0.5f
-private const val GLOW_RADIUS_FRACTION = 1.1f

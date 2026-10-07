@@ -39,7 +39,7 @@ class SummaryViewModel @Inject constructor(
     private val addressRepository: AddressRepository
 ) : ViewModel() {
 
-    private val period = MutableStateFlow(SummaryPeriod.MONTH)
+    private val period = MutableStateFlow(SummaryPeriod.ALL_TIME)
 
     /** Порядок перебора «Вспомнить»: свой на каждый запуск, постоянный внутри него. */
     private val recallSeed = Random.nextLong()

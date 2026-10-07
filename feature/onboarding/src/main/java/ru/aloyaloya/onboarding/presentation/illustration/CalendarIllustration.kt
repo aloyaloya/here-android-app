@@ -20,10 +20,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import java.time.LocalDate
+import java.time.YearMonth
+import java.time.format.TextStyle
 import ru.aloyaloya.design_system.component.calendar.DAYS_IN_WEEK
 import ru.aloyaloya.design_system.component.calendar.monthGrid
 import ru.aloyaloya.design_system.component.character.CharacterEmotion
 import ru.aloyaloya.design_system.component.character.EmotionCharacter
+import ru.aloyaloya.design_system.component.scene.LOOK_RIGHT
+import ru.aloyaloya.design_system.extension.Entrance
+import ru.aloyaloya.design_system.extension.entrance
 import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
@@ -33,9 +39,6 @@ import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.onboarding.R
 import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
-import java.time.LocalDate
-import java.time.YearMonth
-import java.time.format.TextStyle
 
 /** Месяц на иллюстрации. */
 private val IllustrationMonth = YearMonth.of(2026, 7)

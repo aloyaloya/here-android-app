@@ -1,4 +1,4 @@
-package ru.aloyaloya.onboarding.presentation.illustration
+package ru.aloyaloya.design_system.extension
 
 import androidx.compose.animation.core.Animatable
 import androidx.compose.animation.core.AnimationSpec
@@ -16,7 +16,6 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.delay
-import ru.aloyaloya.design_system.extension.rememberMotionEnabled
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 
