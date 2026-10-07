@@ -24,6 +24,15 @@ import ru.aloyaloya.design_system.component.character.BubbleTail
 import ru.aloyaloya.design_system.component.character.CharacterBubble
 import ru.aloyaloya.design_system.component.character.CharacterEmotion
 import ru.aloyaloya.design_system.component.character.EmotionCharacter
+import ru.aloyaloya.design_system.component.scene.CharacterAt
+import ru.aloyaloya.design_system.component.scene.CharacterSpot
+import ru.aloyaloya.design_system.component.scene.DROP_STEP_MILLIS
+import ru.aloyaloya.design_system.component.scene.IllustrationScene
+import ru.aloyaloya.design_system.component.scene.LOOK_LEFT
+import ru.aloyaloya.design_system.component.scene.LOOK_RIGHT
+import ru.aloyaloya.design_system.component.scene.SceneScope
+import ru.aloyaloya.design_system.extension.Entrance
+import ru.aloyaloya.design_system.extension.entrance
 import ru.aloyaloya.design_system.extension.overlayShadow
 import ru.aloyaloya.design_system.extension.rememberLoopsEnabled
 import ru.aloyaloya.design_system.theme.HereSize
