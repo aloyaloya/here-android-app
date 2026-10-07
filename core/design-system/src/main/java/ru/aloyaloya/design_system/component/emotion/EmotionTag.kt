@@ -44,7 +44,8 @@ fun EmotionTag(
         EmotionCharacter(
             emotion = character,
             size = HereSize.EmotionTag.characterSize,
-            animated = false
+            animated = false,
+            shadow = false
         )
 
         Text(

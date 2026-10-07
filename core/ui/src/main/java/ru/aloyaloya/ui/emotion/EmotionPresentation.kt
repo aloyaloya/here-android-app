@@ -16,17 +16,6 @@ import ru.aloyaloya.ui.R
  * лежит здесь, чтобы лист выбора, календарь и аналитика показывали эмоцию одинаково.
  */
 
-/** Эмодзи эмоции. */
-val Emotion.emoji: String
-    get() = when (this) {
-        Emotion.HAPPY -> "😊"
-        Emotion.TENDER -> "🥰"
-        Emotion.SURPRISED -> "😮"
-        Emotion.CALM -> "😌"
-        Emotion.SAD -> "😢"
-        Emotion.ANGRY -> "😠"
-    }
-
 /** Персонаж эмоции. */
 val Emotion.character: CharacterEmotion
     get() = when (this) {

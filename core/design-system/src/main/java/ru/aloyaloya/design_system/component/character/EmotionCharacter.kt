@@ -13,10 +13,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
@@ -74,12 +76,13 @@ private val BreathOrigin = TransformOrigin(0.5f, 0.95f)
 private val EyesOrigin = TransformOrigin(0.5f, 0.37f)
 
 /**
- * Персонаж-эмоция из трех слоев: тело, глаза, лицо.
+ * Персонаж-эмоция из трех слоев: тело, глаза, лицо, и тень под ними.
  *
  * @param emotion Эмоция персонажа, смена — через crossfade.
- * @param size Ширина персонажа, высота в [HereSize.EmotionCharacter.heightRatio] раз больше.
+ * @param size Ширина персонажа, с тенью высота в [HereSize.EmotionCharacter.heightRatio] раз больше.
  * @param look Взгляд: −1 влево, 0 прямо, 1 вправо.
  * @param animated Дышит и моргает ли персонаж.
+ * @param shadow Рисовать ли тень, без нее персонаж квадратный.
  */
 @Composable
 fun EmotionCharacter(
@@ -87,8 +90,11 @@ fun EmotionCharacter(
     size: Dp,
     modifier: Modifier = Modifier,
     look: Float = 0f,
-    animated: Boolean = true
+    animated: Boolean = true,
+    shadow: Boolean = true
 ) {
+    val height = size * HereSize.EmotionCharacter.heightRatio
+
     val loops = animated && rememberLoopsEnabled()
     val breath = remember { Animatable(0f) }
     val blink = remember { Animatable(1f) }
@@ -126,17 +132,56 @@ fun EmotionCharacter(
         }
     }
 
+    Box(modifier = modifier.size(width = size, height = if (shadow) height else size)) {
+        Box(
+            modifier = Modifier
+                .wrapContentHeight(Alignment.Top, unbounded = true)
+                .size(width = size, height = height)
+        ) {
+            if (shadow) {
+                Image(
+                    painter = painterResource(R.drawable.character_shadow),
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize()
+                )
+            }
+
+            CharacterLayers(
+                emotion = emotion,
+                breath = { breath.value },
+                blink = { blink.value },
+                lookShift = { lookShift },
+                modifier = Modifier.matchParentSize()
+            )
+        }
+    }
+}
+
+/**
+ * Тело, глаза и лицо персонажа: дышат вместе, глаза моргают и смотрят в сторону.
+ *
+ * @param emotion Эмоция персонажа, смена — через crossfade.
+ * @param breath Фаза дыхания от 0 до 1.
+ * @param blink Высота глаз от 0 до 1.
+ * @param lookShift Взгляд: −1 влево, 0 прямо, 1 вправо.
+ */
+@Composable
+private fun CharacterLayers(
+    emotion: CharacterEmotion,
+    breath: () -> Float,
+    blink: () -> Float,
+    lookShift: () -> Float,
+    modifier: Modifier = Modifier
+) {
     Crossfade(
         targetState = emotion,
         animationSpec = tween(FACE_MILLIS),
         label = "face",
-        modifier = modifier
-            .size(width = size, height = size * HereSize.EmotionCharacter.heightRatio)
-            .graphicsLayer {
-                transformOrigin = BreathOrigin
-                translationY = -BREATH_LIFT * this.size.height * breath.value
-                scaleY = 1f + BREATH_STRETCH * breath.value
-            }
+        modifier = modifier.graphicsLayer {
+            transformOrigin = BreathOrigin
+            translationY = -BREATH_LIFT * this.size.height * breath()
+            scaleY = 1f + BREATH_STRETCH * breath()
+        }
     ) { shown ->
         Box(modifier = Modifier.fillMaxSize()) {
             Image(
@@ -151,8 +196,8 @@ fun EmotionCharacter(
                     .matchParentSize()
                     .graphicsLayer {
                         transformOrigin = EyesOrigin
-                        translationX = lookShift * this.size.width * HereSize.EmotionCharacter.lookShift
-                        scaleY = blink.value
+                        translationX = lookShift() * this.size.width * HereSize.EmotionCharacter.lookShift
+                        scaleY = blink()
                     }
             )
             Image(

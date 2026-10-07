@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Цвета персонажей-эмоций, тёмная тема. Совпадают с HereColors — менять вместе. -->
 <resources>
     <color name="character_ring">#241F1B</color>
     <color name="character_ink">#F6F0EA</color>

@@ -261,7 +261,8 @@ private fun EmotionMixCard(
                     EmotionCharacter(
                         emotion = share.emotion.character,
                         size = HereSize.Summary.legendCharacterSize,
-                        animated = false
+                        animated = false,
+                        shadow = false
                     )
                     Text(
                         text = stringResource(share.emotion.labelResId),

@@ -73,9 +73,7 @@ object HereSize {
         val navIconSize = 20.dp
         val navButtonSpacing = 8.dp
         val selectedBorder = 1.5.dp
-        val pinSize = 33.dp
-        val pinBorder = 1.dp
-        val pinEmojiSize = 18f.sp
+        val characterSize = 34.dp
         val monthSize = 18.sp
         val weekdaySize = 10.5f.sp
         val daySize = 17.sp
@@ -112,13 +110,6 @@ object HereSize {
         val spacing = 11.dp
         val selectedBorder = 2.dp
         val characterSize = 44.dp
-    }
-
-    /** Круглый пин эмоции. */
-    object EmotionPin {
-        val size = 58.dp
-        val border = 4.dp
-        val emojiSize = 28.sp
     }
 
     /** Превью выбранного места. */
@@ -205,7 +196,7 @@ object HereSize {
         val spacing = 10.dp
         val verticalPadding = 7.dp
         val horizontalPadding = 13.dp
-        val characterSize = 24.dp
+        val characterSize = 28.dp
     }
 
     /** Квадратная плитка эмоции без выбора: иконка воспоминания. */
@@ -257,7 +248,7 @@ object HereSize {
         val cardSpacing = 12.dp
         val barHeight = 12.dp
         val barGap = 2.dp
-        val legendCharacterSize = 24.dp
+        val legendCharacterSize = 28.dp
         val recallPhotoHeight = 200.dp
     }
 
@@ -290,7 +281,7 @@ object HereSize {
         val cardMargin = 16.dp
         val previewSize = 72.dp
         val dayCellSize = 40.dp
-        val dayEmojiSize = 22.sp
+        val dayCharacterSize = 28.dp
     }
 
     /** Иллюстрация страницы геолокации. */

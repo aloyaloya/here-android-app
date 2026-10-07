@@ -1,5 +1,4 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Цвета фона-карты онбординга = стиль MapKit (светлая). -->
 <resources>
     <color name="onboarding_map_land">#F0EAE4</color>
     <color name="onboarding_map_road">#FDFBF9</color>
