@@ -39,11 +39,11 @@ class SettingsViewModel @Inject constructor(
     val uiState: StateFlow<SettingsUiState> = combine(
         combine(settingsRepository.theme, language, ::Pair),
         settingsRepository.hapticsEnabled,
-        settingsRepository.reminder,
+        combine(settingsRepository.reminder, settingsRepository.notificationsRequested, ::Pair),
         memoryRepository.observeAll().map { it.size },
         backupStatus
-    ) { (theme, appLanguage), hapticsEnabled, reminder, memoryCount, status ->
-        SettingsUiState(theme, appLanguage, hapticsEnabled, reminder, memoryCount, status)
+    ) { (theme, appLanguage), hapticsEnabled, (reminder, notificationsRequested), memoryCount, status ->
+        SettingsUiState(theme, appLanguage, hapticsEnabled, reminder, notificationsRequested, memoryCount, status)
     }.stateIn(
         scope = viewModelScope,
         started = SharingStarted.Eagerly,
@@ -52,6 +52,7 @@ class SettingsViewModel @Inject constructor(
             language = language.value,
             hapticsEnabled = settingsRepository.hapticsEnabled.value,
             reminder = settingsRepository.reminder.value,
+            notificationsRequested = settingsRepository.notificationsRequested.value,
             memoryCount = null,
             backupStatus = BackupStatus.Idle
         )

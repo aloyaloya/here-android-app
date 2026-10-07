@@ -42,7 +42,7 @@ import java.util.Locale
 import ru.aloyaloya.design_system.R as DesignR
 
 /**
- * Вечер: часы, дата и превью напоминания, в [NotificationsStep.BLOCKED] приглушенное.
+ * Часы, дата и превью напоминания, в [NotificationsStep.BLOCKED] приглушенное.
  *
  * @param step Шаг экрана.
  * @param time Время напоминания.
@@ -54,6 +54,7 @@ fun NotificationsIllustration(
     modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
+    val sizes = HereSize.NotificationIllustration
     val locale = currentLocale()
     val dateFormat = remember(locale) {
         DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "EEEEdMMMM"), locale)
@@ -90,7 +91,7 @@ fun NotificationsIllustration(
         Box {
             NotificationPreview(
                 modifier = Modifier.alpha(
-                    if (step == NotificationsStep.BLOCKED) HereSize.NotificationIllustration.mutedAlpha else 1f
+                    if (step == NotificationsStep.BLOCKED) sizes.mutedAlpha else 1f
                 )
             )
 
@@ -99,8 +100,8 @@ fun NotificationsIllustration(
                     modifier = Modifier
                         .align(Alignment.TopEnd)
                         .offset(
-                            x = -HereSpacing.m,
-                            y = -HereSize.NotificationIllustration.badgeSize / 2
+                            x = -(HereSpacing.l + sizes.iconSize / 2 - sizes.badgeSize / 2),
+                            y = -(sizes.badgeSize / 2 + HereSpacing.s)
                         )
                 )
             }

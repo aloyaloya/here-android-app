@@ -20,6 +20,8 @@ interface SettingsRepository {
 
     val onboardingCompleted: StateFlow<Boolean>
 
+    val notificationsRequested: StateFlow<Boolean>
+
     fun setTheme(theme: AppTheme)
 
     fun setHapticsEnabled(enabled: Boolean)
@@ -29,4 +31,6 @@ interface SettingsRepository {
     fun setLanguage(language: AppLanguage)
 
     fun completeOnboarding()
+
+    fun markNotificationsRequested()
 }

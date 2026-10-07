@@ -11,7 +11,7 @@ import ru.aloyaloya.here.MainActivity
 import ru.aloyaloya.here.R
 
 /**
- * Уведомление с вечерним напоминанием записать день.
+ * Уведомление с напоминанием записать день.
  */
 internal object ReminderNotification {
 

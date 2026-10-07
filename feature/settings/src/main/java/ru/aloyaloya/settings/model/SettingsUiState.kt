@@ -10,7 +10,8 @@ import ru.aloyaloya.domain.model.DailyReminder
  * @property theme Выбранная тема.
  * @property language Выбранный язык.
  * @property hapticsEnabled Включен ли тактильный отклик.
- * @property reminder Вечернее напоминание.
+ * @property reminder Напоминание о дне.
+ * @property notificationsRequested Спрашивали ли разрешение на уведомления.
  * @property memoryCount Сколько воспоминаний сохранено, или `null`, пока база не ответила.
  * @property backupStatus Состояние экспорта и импорта.
  */
@@ -19,6 +20,7 @@ data class SettingsUiState(
     val language: AppLanguage,
     val hapticsEnabled: Boolean,
     val reminder: DailyReminder,
+    val notificationsRequested: Boolean,
     val memoryCount: Int?,
     val backupStatus: BackupStatus
 )

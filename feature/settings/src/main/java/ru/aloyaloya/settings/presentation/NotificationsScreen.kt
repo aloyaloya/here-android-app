@@ -30,7 +30,7 @@ import ru.aloyaloya.settings.R
 import java.time.LocalTime
 
 /**
- * Экран запроса уведомлений для вечернего напоминания.
+ * Экран запроса уведомлений для напоминания о дне.
  *
  * @param reminderTime Время напоминания.
  * @param permissionRequested Спрашивали ли разрешение раньше.

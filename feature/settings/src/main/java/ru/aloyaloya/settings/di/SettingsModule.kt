@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import dagger.Binds
 import dagger.Module
 import dagger.multibindings.IntoMap
+import ru.aloyaloya.settings.presentation.NotificationsViewModel
 import ru.aloyaloya.settings.presentation.SettingsViewModel
 import ru.aloyaloya.ui.di.ViewModelKey
 
@@ -20,4 +21,9 @@ interface SettingsModule {
     @IntoMap
     @ViewModelKey(SettingsViewModel::class)
     fun bindsSettingsViewModel(vm: SettingsViewModel): ViewModel
+
+    @Binds
+    @IntoMap
+    @ViewModelKey(NotificationsViewModel::class)
+    fun bindsNotificationsViewModel(vm: NotificationsViewModel): ViewModel
 }
