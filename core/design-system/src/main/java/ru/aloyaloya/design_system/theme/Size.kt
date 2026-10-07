@@ -211,7 +211,7 @@ object HereSize {
     /** Квадратная плитка эмоции без выбора: иконка воспоминания. */
     object EmotionBadge {
         val size = 62.dp
-        val emojiSize = 30.sp
+        val characterSize = 40.dp
     }
 
     /** Значок видео поверх кадра. */

@@ -15,15 +15,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
+import ru.aloyaloya.design_system.component.character.CharacterEmotion
 import ru.aloyaloya.design_system.component.emotion.EmotionBadge
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
- * Строка воспоминания в списке: иконка эмоции, заголовок и подпись под ним.
- **
- * @param emoji Эмодзи эмоции.
+ * Строка воспоминания в списке: персонаж эмоции, заголовок и подпись под ним.
+ *
+ * @param character Персонаж эмоции.
  * @param color Мягкий тон эмоции из палитры.
  * @param title Заголовок воспоминания.
  * @param subtitle Подпись под заголовком.
@@ -32,7 +33,7 @@ import ru.aloyaloya.design_system.theme.HereTheme
  */
 @Composable
 fun HereMemoryRow(
-    emoji: String,
+    character: CharacterEmotion,
     color: Color,
     title: String,
     subtitle: String,
@@ -52,7 +53,7 @@ fun HereMemoryRow(
             .padding(sizes.padding)
     ) {
         EmotionBadge(
-            emoji = emoji,
+            character = character,
             color = color
         )
 

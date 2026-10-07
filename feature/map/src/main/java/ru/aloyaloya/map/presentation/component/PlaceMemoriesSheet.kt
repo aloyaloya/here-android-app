@@ -19,8 +19,8 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.map.R
+import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
-import ru.aloyaloya.ui.emotion.emoji
 import java.time.Instant
 import java.time.ZoneId
 
@@ -63,7 +63,7 @@ fun PlaceMemoriesSheet(
             ) {
                 memories.forEach { memory ->
                     HereMemoryRow(
-                        emoji = memory.emotion.emoji,
+                        character = memory.emotion.character,
                         color = memory.emotion.color.soft,
                         title = memory.title,
                         subtitle = dateFormat.format(

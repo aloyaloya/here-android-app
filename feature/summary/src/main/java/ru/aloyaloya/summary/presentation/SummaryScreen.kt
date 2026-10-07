@@ -47,6 +47,7 @@ import ru.aloyaloya.summary.model.EmotionShare
 import ru.aloyaloya.summary.model.MoodPlace
 import ru.aloyaloya.summary.model.SummaryPeriod
 import ru.aloyaloya.summary.model.SummaryUiState
+import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.emoji
 import ru.aloyaloya.ui.emotion.labelResId
@@ -291,7 +292,7 @@ private fun MoodPlaces(
 
         places.forEach { place ->
             HereMemoryRow(
-                emoji = place.dominantEmotion.emoji,
+                character = place.dominantEmotion.character,
                 color = place.dominantEmotion.color.soft,
                 title = place.address ?: stringResource(R.string.summary_place_unknown),
                 subtitle = pluralStringResource(
@@ -353,7 +354,7 @@ private fun Recall(
                 modifier = Modifier.padding(HereSize.MemoryRow.padding)
             ) {
                 EmotionBadge(
-                    emoji = memory.emotion.emoji,
+                    character = memory.emotion.character,
                     color = memory.emotion.color.soft
                 )
 
