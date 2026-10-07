@@ -79,6 +79,9 @@ private const val MONTH_COUNT = 12 * 300
 private const val DAY_SWITCH_MILLIS = 220
 private const val DAY_SWITCH_SCALE = 0.92f
 
+/** Пустые дни — одно содержимое: персонаж остается на месте, меняется только реплика. */
+private const val EMPTY_DAY_KEY = "empty"
+
 private fun monthAt(page: Int): YearMonth = FirstMonth.plusMonths(page.toLong())
 
 private val YearMonth.page: Int
@@ -201,6 +204,9 @@ private fun CalendarContent(
                     SizeTransform(clip = false)
             },
             contentAlignment = Alignment.TopCenter,
+            contentKey = { date ->
+                if (uiState.memoriesByDate[date].isNullOrEmpty()) EMPTY_DAY_KEY else date
+            },
             label = "calendar-day"
         ) { date ->
             DayMemories(
