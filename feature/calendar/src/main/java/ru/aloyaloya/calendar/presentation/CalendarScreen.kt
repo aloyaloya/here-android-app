@@ -23,17 +23,12 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
@@ -58,7 +53,6 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Memory
-import ru.aloyaloya.domain.model.dominantEmotion
 import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
 import java.time.Instant
@@ -140,17 +134,6 @@ private fun CalendarContent(
     val markByDate = uiState.emotionByDate.mapValues { (_, emotion) ->
         CalendarDayMark(character = emotion.character)
     }
-    val monthEmotion = remember(uiState.memoriesByDate, shownMonth) {
-        uiState.memoriesByDate
-            .filterKeys { YearMonth.from(it) == shownMonth }
-            .values
-            .flatten()
-            .dominantEmotion()
-    }
-
-    // TODO: плавно менять цвет фона при перелистывании месяца
-    MoodGlow(color = monthEmotion?.color?.solid)
-
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
         modifier = Modifier
@@ -325,40 +308,8 @@ private fun TodayButton(onClick: () -> Unit) {
     )
 }
 
-/**
- * Мягкое пятно цвета за карточкой месяца.
- *
- * Центр пятна ниже верхней панели, а край растворяется в фон раньше, чем доходит
- * до нее: иначе на границе панели и экрана был бы виден шов.
- *
- * @param color Цвет пятна или `null`, если в месяце нет воспоминаний.
- */
-@Composable
-private fun MoodGlow(color: Color?) {
-    if (color == null) return
-
-    Box(
-        modifier = Modifier
-            .fillMaxSize()
-            .drawBehind {
-                drawRect(
-                    brush = Brush.radialGradient(
-                        colors = listOf(color.copy(alpha = GLOW_ALPHA), color.copy(alpha = 0f)),
-                        center = Offset(size.width / 2, size.height * GLOW_CENTER_FRACTION),
-                        radius = size.width * GLOW_RADIUS_FRACTION
-                    )
-                )
-            }
-    )
-}
-
 /** Реплика пустого дня появляется после падения персонажа. */
 private const val EMPTY_BUBBLE_MILLIS = 700
 
 /** Опора реплики: хвостик снизу. */
 private val EmptyBubbleOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1f)
-
-/** Насыщенность пятна: фон подсказывает настроение, а не спорит с днями. */
-private const val GLOW_ALPHA = 0.45f
-private const val GLOW_CENTER_FRACTION = 0.5f
-private const val GLOW_RADIUS_FRACTION = 1.1f
