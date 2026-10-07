@@ -254,11 +254,10 @@ object HereSize {
 
     /** Экран итогов. */
     object Summary {
-        val emojiSize = 44.sp
         val cardSpacing = 12.dp
         val barHeight = 12.dp
         val barGap = 2.dp
-        val legendEmojiSize = 18.sp
+        val legendCharacterSize = 24.dp
         val recallPhotoHeight = 200.dp
     }
 
