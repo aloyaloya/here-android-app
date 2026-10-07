@@ -1,5 +1,6 @@
 package ru.aloyaloya.memory.presentation
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
@@ -19,6 +20,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -32,7 +34,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import ru.aloyaloya.design_system.component.character.EmotionCharacter
@@ -46,10 +53,11 @@ import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
-import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.model.MediaType
+import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapPoint
@@ -65,7 +73,9 @@ import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.labelResId
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 import java.time.Instant
+import java.time.LocalDate
 import java.time.ZoneId
+import java.time.temporal.ChronoUnit
 import ru.aloyaloya.design_system.R as DesignSystemR
 
 private const val HALO_ALPHA = 0.42f
@@ -73,6 +83,7 @@ private const val SHEET_MAX_HEIGHT_FRACTION = 0.6f
 private const val MAP_ZOOM = 15.5f
 
 private const val SEPARATOR = " · "
+private const val DAYS_IN_WEEK = 7
 
 /**
  * Экран воспоминания.
@@ -286,13 +297,9 @@ private fun MemoryDetailSheet(
                 style = MaterialTheme.typography.titleLarge,
                 color = colors.textPrimary
             )
-
-            Text(
-                text = subtitle(happenedAt = memory.happenedAt, address = address),
-                style = MaterialTheme.typography.bodyMedium,
-                color = colors.textSecondary
-            )
         }
+
+        MemoryFacts(happenedAt = memory.happenedAt, address = address)
 
         if (memory.description.isNotBlank()) {
             Text(
@@ -354,12 +361,85 @@ private fun MediaSection(
     }
 }
 
-/** Когда и где это было: дата, время и адрес одной строкой. */
+/** Когда и где это было: дата и сколько прошло, время и адрес, если он известен. */
 @Composable
-private fun subtitle(happenedAt: Long, address: String?): String {
+private fun MemoryFacts(
+    happenedAt: Long,
+    address: String?
+) {
     val dateFormat = FullDateFormat.withLocale(currentLocale())
     val moment = Instant.ofEpochMilli(happenedAt).atZone(ZoneId.systemDefault())
-    val dateTime = dateFormat.format(moment) + SEPARATOR + TimeFormat.format(moment)
 
-    return if (address == null) dateTime else dateTime + SEPARATOR + address
+    Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
+        MemoryFact(
+            icon = DesignSystemR.drawable.ic_calendar_outline,
+            text = dateFormat.format(moment),
+            hint = elapsedText(moment.toLocalDate())
+        )
+
+        MemoryFact(
+            icon = DesignSystemR.drawable.ic_clock_outline,
+            text = TimeFormat.format(moment)
+        )
+
+        address?.let { place ->
+            MemoryFact(
+                icon = DesignSystemR.drawable.ic_place,
+                text = place
+            )
+        }
+    }
+}
+
+@Composable
+private fun MemoryFact(
+    @DrawableRes icon: Int,
+    text: String,
+    hint: String? = null
+) {
+    val colors = HereTheme.colors
+
+    Row(horizontalArrangement = Arrangement.spacedBy(HereSpacing.m)) {
+        Icon(
+            painter = painterResource(icon),
+            contentDescription = null,
+            tint = colors.textSecondary,
+            modifier = Modifier.size(HereSize.Memory.factIconSize)
+        )
+
+        Text(
+            text = buildAnnotatedString {
+                append(text)
+                hint?.let {
+                    withStyle(SpanStyle(color = colors.textSecondary)) {
+                        append(SEPARATOR + it)
+                    }
+                }
+            },
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.textPrimary
+        )
+    }
+}
+
+/** Сколько прошло с [date]: «вчера», «3 месяца назад»; `null` для дня в будущем. */
+@Composable
+private fun elapsedText(date: LocalDate): String? {
+    val today = LocalDate.now()
+    val days = ChronoUnit.DAYS.between(date, today).toInt()
+    val months = ChronoUnit.MONTHS.between(date, today).toInt()
+    val years = ChronoUnit.YEARS.between(date, today).toInt()
+
+    return when {
+        years > 0 -> pluralStringResource(R.plurals.memory_elapsed_years, years, years)
+        months > 0 -> pluralStringResource(R.plurals.memory_elapsed_months, months, months)
+        days >= DAYS_IN_WEEK -> {
+            val weeks = days / DAYS_IN_WEEK
+            pluralStringResource(R.plurals.memory_elapsed_weeks, weeks, weeks)
+        }
+        days > 1 -> pluralStringResource(R.plurals.memory_elapsed_days, days, days)
+        days == 1 -> stringResource(R.string.memory_elapsed_yesterday)
+        days == 0 -> stringResource(R.string.memory_elapsed_today)
+        else -> null
+    }
 }

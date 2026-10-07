@@ -17,6 +17,32 @@
     <string name="memory_media_title">Фото и видео</string>
     <string name="memory_media_close">Закрыть просмотр</string>
     <string name="memory_media_counter">%1$d из %2$d</string>
+    <string name="memory_elapsed_today">сегодня</string>
+    <string name="memory_elapsed_yesterday">вчера</string>
+    <plurals name="memory_elapsed_days">
+        <item quantity="one">%d день назад</item>
+        <item quantity="few">%d дня назад</item>
+        <item quantity="many">%d дней назад</item>
+        <item quantity="other">%d дня назад</item>
+    </plurals>
+    <plurals name="memory_elapsed_weeks">
+        <item quantity="one">%d неделю назад</item>
+        <item quantity="few">%d недели назад</item>
+        <item quantity="many">%d недель назад</item>
+        <item quantity="other">%d недели назад</item>
+    </plurals>
+    <plurals name="memory_elapsed_months">
+        <item quantity="one">%d месяц назад</item>
+        <item quantity="few">%d месяца назад</item>
+        <item quantity="many">%d месяцев назад</item>
+        <item quantity="other">%d месяца назад</item>
+    </plurals>
+    <plurals name="memory_elapsed_years">
+        <item quantity="one">%d год назад</item>
+        <item quantity="few">%d года назад</item>
+        <item quantity="many">%d лет назад</item>
+        <item quantity="other">%d года назад</item>
+    </plurals>
     <string name="memory_more">Действия</string>
     <string name="memory_action_edit">Редактировать</string>
     <string name="memory_action_delete">Удалить</string>
