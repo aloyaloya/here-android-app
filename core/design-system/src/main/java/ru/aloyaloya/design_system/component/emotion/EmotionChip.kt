@@ -66,7 +66,8 @@ fun EmotionChip(
         EmotionCharacter(
             emotion = character,
             size = HereSize.EmotionChip.characterSize,
-            animated = selected
+            animated = selected,
+            shadow = false
         )
     }
 }
