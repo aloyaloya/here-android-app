@@ -1,5 +1,13 @@
 package ru.aloyaloya.calendar.presentation
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -66,6 +74,10 @@ private val FirstMonth = YearMonth.of(1900, 1)
 
 /** Сколько месяцев в листалке: хватает и назад, и вперед на любую жизнь. */
 private const val MONTH_COUNT = 12 * 300
+
+/** Смена дня: старые карточки сжимаются и тают, новые вырастают. */
+private const val DAY_SWITCH_MILLIS = 220
+private const val DAY_SWITCH_SCALE = 0.92f
 
 private fun monthAt(page: Int): YearMonth = FirstMonth.plusMonths(page.toLong())
 
@@ -179,19 +191,32 @@ private fun CalendarContent(
             }
         }
 
-        DayMemories(
-            date = selectedDate,
-            memories = uiState.memoriesByDate[selectedDate].orEmpty(),
-            onTodayClick = if (selectedDate != today || shownMonth != YearMonth.from(today)) {
-                {
-                    selectedDate = today
-                    showMonth(YearMonth.from(today))
-                }
-            } else {
-                null
+        AnimatedContent(
+            targetState = selectedDate,
+            transitionSpec = {
+                (fadeIn(tween(DAY_SWITCH_MILLIS)) +
+                    scaleIn(tween(DAY_SWITCH_MILLIS), initialScale = DAY_SWITCH_SCALE)) togetherWith
+                    (fadeOut(tween(DAY_SWITCH_MILLIS)) +
+                        scaleOut(tween(DAY_SWITCH_MILLIS), targetScale = DAY_SWITCH_SCALE)) using
+                    SizeTransform(clip = false)
             },
-            onMemoryClick = onMemoryClick
-        )
+            contentAlignment = Alignment.TopCenter,
+            label = "calendar-day"
+        ) { date ->
+            DayMemories(
+                date = date,
+                memories = uiState.memoriesByDate[date].orEmpty(),
+                onTodayClick = if (date != today || shownMonth != YearMonth.from(today)) {
+                    {
+                        selectedDate = today
+                        showMonth(YearMonth.from(today))
+                    }
+                } else {
+                    null
+                },
+                onMemoryClick = onMemoryClick
+            )
+        }
     }
 }
 
