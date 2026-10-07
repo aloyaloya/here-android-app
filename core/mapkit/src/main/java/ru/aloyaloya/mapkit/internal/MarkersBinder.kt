@@ -39,6 +39,7 @@ internal class MarkersBinder(
     private val map get() = mapView.mapWindow.map
 
     private var current: List<MapMarker> = emptyList()
+    private var dark = false
 
     private val placemarks = mutableListOf<PlacemarkMapObject>()
     private val clusters = mutableMapOf<Cluster, PointF>()
@@ -66,7 +67,7 @@ internal class MarkersBinder(
     }
 
     private val clusterListener = ClusterListener { cluster ->
-        val stack = MarkerIcons.stack(context, cluster.markers().stackIcons())
+        val stack = MarkerIcons.stack(context, cluster.markers().stackIcons(), dark)
         cluster.appearance.setIcon(stack.image, scaled(stack.anchor))
         clusters.keys.removeAll { !it.isValid }
         clusters[cluster] = stack.anchor
@@ -79,8 +80,16 @@ internal class MarkersBinder(
         collection.addTapListener(tapListener)
     }
 
-    fun apply(markers: List<MapMarker>) {
-        if (markers == current) return
+    /**
+     * Ставит метки на карту.
+     *
+     * @param markers Метки.
+     * @param dark Темная ли тема: от нее зависят цвета иконок.
+     */
+    fun apply(markers: List<MapMarker>, dark: Boolean) {
+        if (markers == current && dark == this.dark) return
+
+        this.dark = dark
 
         collection.clear()
         placemarks.clear()
@@ -88,7 +97,7 @@ internal class MarkersBinder(
         markers.forEach { marker ->
             placemarks += collection.addPlacemark().apply {
                 geometry = Point(marker.point.latitude, marker.point.longitude)
-                setIcon(MarkerIcons.get(context, marker.icon))
+                setIcon(MarkerIcons.get(context, marker.icon, dark))
                 userData = marker
                 setIconStyle(scaled())
             }
@@ -110,7 +119,7 @@ internal class MarkersBinder(
     }
 
     /** Стиль иконки с текущим масштабом. */
-    private fun scaled(anchor: PointF = CENTER) =
+    private fun scaled(anchor: PointF = MarkerIcons.anchor) =
         IconStyle().setAnchor(anchor).setScale(resize.scale)
 
     /** Подводит камеру так, чтобы метки стопки поместились на экран с запасом по краям. */
@@ -177,6 +186,5 @@ internal class MarkersBinder(
         const val FIT_ZOOM_MARGIN = 0.8f
 
         val CAMERA_ANIMATION = Animation(Animation.Type.SMOOTH, 0.4f)
-        val CENTER = PointF(0.5f, 0.5f)
     }
 }

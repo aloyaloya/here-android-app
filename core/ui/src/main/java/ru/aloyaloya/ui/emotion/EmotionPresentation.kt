@@ -3,6 +3,7 @@ package ru.aloyaloya.ui.emotion
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.ReadOnlyComposable
+import ru.aloyaloya.design_system.component.character.CharacterEmotion
 import ru.aloyaloya.design_system.theme.EmotionColor
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
@@ -24,6 +25,17 @@ val Emotion.emoji: String
         Emotion.CALM -> "😌"
         Emotion.SAD -> "😢"
         Emotion.ANGRY -> "😠"
+    }
+
+/** Персонаж эмоции. */
+val Emotion.character: CharacterEmotion
+    get() = when (this) {
+        Emotion.HAPPY -> CharacterEmotion.HAPPY
+        Emotion.TENDER -> CharacterEmotion.TENDER
+        Emotion.SURPRISED -> CharacterEmotion.SURPRISED
+        Emotion.CALM -> CharacterEmotion.CALM
+        Emotion.SAD -> CharacterEmotion.SAD
+        Emotion.ANGRY -> CharacterEmotion.ANGRY
     }
 
 /** Название эмоции. */

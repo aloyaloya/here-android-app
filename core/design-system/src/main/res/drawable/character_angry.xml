@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Персонаж целиком для статичных картинок: тело, глаза, лицо. -->
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android">
+    <item android:drawable="@drawable/character_body_angry" />
+    <item android:drawable="@drawable/character_eyes_angry" />
+    <item android:drawable="@drawable/character_face_angry" />
+</layer-list>

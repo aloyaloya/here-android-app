@@ -27,19 +27,20 @@ import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.extension.rememberLoopsEnabled
 import ru.aloyaloya.design_system.theme.HereSize
 
-/** Персонаж: три слоя одной эмоции или «ты». */
+/** Персонаж: три слоя одной эмоции или «ты» и статичная картинка из них. */
 enum class CharacterEmotion(
     @param:DrawableRes val body: Int,
     @param:DrawableRes val eyes: Int,
-    @param:DrawableRes val face: Int
+    @param:DrawableRes val face: Int,
+    @param:DrawableRes val image: Int
 ) {
-    HAPPY(R.drawable.character_body_happy, R.drawable.character_eyes_happy, R.drawable.character_face_happy),
-    TENDER(R.drawable.character_body_tender, R.drawable.character_eyes_tender, R.drawable.character_face_tender),
-    SURPRISED(R.drawable.character_body_surprised, R.drawable.character_eyes_surprised, R.drawable.character_face_surprised),
-    CALM(R.drawable.character_body_calm, R.drawable.character_eyes_calm, R.drawable.character_face_calm),
-    SAD(R.drawable.character_body_sad, R.drawable.character_eyes_sad, R.drawable.character_face_sad),
-    ANGRY(R.drawable.character_body_angry, R.drawable.character_eyes_angry, R.drawable.character_face_angry),
-    YOU(R.drawable.character_body_you, R.drawable.character_eyes_you, R.drawable.character_face_you)
+    HAPPY(R.drawable.character_body_happy, R.drawable.character_eyes_happy, R.drawable.character_face_happy, R.drawable.character_happy),
+    TENDER(R.drawable.character_body_tender, R.drawable.character_eyes_tender, R.drawable.character_face_tender, R.drawable.character_tender),
+    SURPRISED(R.drawable.character_body_surprised, R.drawable.character_eyes_surprised, R.drawable.character_face_surprised, R.drawable.character_surprised),
+    CALM(R.drawable.character_body_calm, R.drawable.character_eyes_calm, R.drawable.character_face_calm, R.drawable.character_calm),
+    SAD(R.drawable.character_body_sad, R.drawable.character_eyes_sad, R.drawable.character_face_sad, R.drawable.character_sad),
+    ANGRY(R.drawable.character_body_angry, R.drawable.character_eyes_angry, R.drawable.character_face_angry, R.drawable.character_angry),
+    YOU(R.drawable.character_body_you, R.drawable.character_eyes_you, R.drawable.character_face_you, R.drawable.character_you)
 }
 
 /** Полный вдох и выдох. */
