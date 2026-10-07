@@ -22,8 +22,8 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.map.R
+import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
-import ru.aloyaloya.ui.emotion.emoji
 import ru.aloyaloya.ui.emotion.labelResId
 
 private const val EMOTIONS_PER_ROW = 3
@@ -91,7 +91,7 @@ private fun EmotionGrid(
             ) {
                 rowEmotions.forEach { emotion ->
                     EmotionTile(
-                        emoji = emotion.emoji,
+                        character = emotion.character,
                         label = stringResource(emotion.labelResId),
                         color = emotion.color,
                         selected = emotion == selectedEmotion,

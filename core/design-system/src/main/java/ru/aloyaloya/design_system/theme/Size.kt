@@ -103,7 +103,7 @@ object HereSize {
         val horizontalPadding = 12.dp
         val contentSpacing = 10.dp
         val selectedBorder = 2.dp
-        val emojiSize = 36.sp
+        val selectedScale = 1.05f
     }
 
     /** Квадратная плитка эмоции в ряду. */
