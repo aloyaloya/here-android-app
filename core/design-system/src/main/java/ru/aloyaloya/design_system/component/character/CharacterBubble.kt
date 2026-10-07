@@ -15,6 +15,7 @@ import androidx.compose.ui.graphics.Path
 import androidx.compose.ui.graphics.StrokeJoin
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
 import androidx.compose.ui.unit.dp
@@ -34,6 +35,7 @@ enum class BubbleTail { TOP, BOTTOM, START, END }
  * @param tail Сторона хвостика.
  * @param tailInset Центр хвостика от начала стороны или `null` — по центру.
  * @param borderColor Цвет обводки или `null` — без нее.
+ * @param textAlign Выравнивание текста.
  */
 @Composable
 fun CharacterBubble(
@@ -43,7 +45,8 @@ fun CharacterBubble(
     tail: BubbleTail,
     modifier: Modifier = Modifier,
     tailInset: Dp? = null,
-    borderColor: Color? = null
+    borderColor: Color? = null,
+    textAlign: TextAlign = TextAlign.Unspecified
 ) {
     val protrusion = HereSize.CharacterBubble.tailSize / sqrt(2f)
     val borderWidth = if (borderColor != null) HereSize.CharacterBubble.borderWidth else 0.dp
@@ -97,6 +100,7 @@ fun CharacterBubble(
             style = MaterialTheme.typography.bodyLarge,
             fontWeight = FontWeight.Bold,
             color = contentColor,
+            textAlign = textAlign,
             modifier = Modifier
                 .background(color = containerColor, shape = HereShape.bubble)
                 .then(

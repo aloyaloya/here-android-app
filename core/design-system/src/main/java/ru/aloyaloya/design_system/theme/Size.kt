@@ -74,6 +74,8 @@ object HereSize {
         val navButtonSpacing = 8.dp
         val selectedBorder = 1.5.dp
         val characterSize = 34.dp
+        val emptyBubbleMaxWidth = 240.dp
+        val emptyTopPadding = 40.dp
         val monthSize = 18.sp
         val weekdaySize = 10.5f.sp
         val daySize = 17.sp

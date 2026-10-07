@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.rememberScrollState
@@ -33,14 +34,22 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import kotlinx.coroutines.launch
 import ru.aloyaloya.calendar.R
 import ru.aloyaloya.calendar.model.CalendarUiState
 import ru.aloyaloya.design_system.component.calendar.CalendarDayMark
 import ru.aloyaloya.design_system.component.calendar.HereMonthGrid
 import ru.aloyaloya.design_system.component.calendar.HereMonthHeader
+import ru.aloyaloya.design_system.component.character.BubbleTail
+import ru.aloyaloya.design_system.component.character.CharacterBubble
+import ru.aloyaloya.design_system.component.character.CharacterEmotion
+import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.memory.HereMemoryRow
+import ru.aloyaloya.design_system.extension.Entrance
+import ru.aloyaloya.design_system.extension.entrance
 import ru.aloyaloya.design_system.format.DayMonthFormat
 import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.format.currentLocale
@@ -48,8 +57,8 @@ import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
-import ru.aloyaloya.domain.model.dominantEmotion
 import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.domain.model.dominantEmotion
 import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
 import java.time.Instant
@@ -204,7 +213,7 @@ private fun CalendarContent(
 }
 
 /**
- * Заголовок выбранного дня и его воспоминания, или подсказка, что их нет.
+ * Заголовок выбранного дня и его воспоминания или персонаж, если их нет.
  *
  * @param onTodayClick Колбэк возврата к сегодняшнему дню или `null`, если он и так выбран
  * и его месяц на экране: тогда кнопки нет.
@@ -216,6 +225,11 @@ private fun DayMemories(
     onTodayClick: (() -> Unit)?,
     onMemoryClick: (Long) -> Unit
 ) {
+    if (memories.isEmpty()) {
+        EmptyDayHint(date = date)
+        return
+    }
+
     val dayFormat = DayMonthFormat.withLocale(currentLocale())
 
     Column(verticalArrangement = Arrangement.spacedBy(HereSize.MemoryRow.spacing)) {
@@ -237,14 +251,6 @@ private fun DayMemories(
             }
         }
 
-        if (memories.isEmpty()) {
-            Text(
-                text = stringResource(R.string.calendar_day_empty),
-                style = MaterialTheme.typography.bodyMedium,
-                color = HereTheme.colors.textTertiary
-            )
-        }
-
         memories.forEach { memory ->
             HereMemoryRow(
                 character = memory.emotion.character,
@@ -256,6 +262,51 @@ private fun DayMemories(
                 onClick = { onMemoryClick(memory.id) }
             )
         }
+    }
+}
+
+@Composable
+private fun EmptyDayHint(date: LocalDate) {
+    val colors = HereTheme.colors
+    val today = LocalDate.now()
+    val text = when {
+        date == today -> R.string.calendar_day_empty_today
+        date.isAfter(today) -> R.string.calendar_day_empty_future
+        else -> R.string.calendar_day_empty
+    }
+
+    Column(
+        horizontalAlignment = Alignment.CenterHorizontally,
+        modifier = Modifier
+            .fillMaxWidth()
+            .padding(
+                top = HereSize.Calendar.emptyTopPadding,
+                bottom = HereSpacing.l
+            )
+    ) {
+        CharacterBubble(
+            text = stringResource(text),
+            containerColor = colors.surface,
+            contentColor = colors.textPrimary,
+            tail = BubbleTail.BOTTOM,
+            borderColor = colors.outline,
+            textAlign = TextAlign.Center,
+            modifier = Modifier
+                .widthIn(max = HereSize.Calendar.emptyBubbleMaxWidth)
+                .entrance(
+                    kind = Entrance.BUBBLE,
+                    delayMillis = EMPTY_BUBBLE_MILLIS,
+                    origin = EmptyBubbleOrigin
+                )
+        )
+
+        EmotionCharacter(
+            emotion = CharacterEmotion.YOU,
+            size = HereSize.EmotionCharacter.small,
+            modifier = Modifier
+                .padding(top = HereSpacing.xs)
+                .entrance(kind = Entrance.DROP)
+        )
     }
 }
 
@@ -300,6 +351,12 @@ private fun MoodGlow(color: Color?) {
             }
     )
 }
+
+/** Реплика пустого дня появляется после падения персонажа. */
+private const val EMPTY_BUBBLE_MILLIS = 700
+
+/** Опора реплики: хвостик снизу. */
+private val EmptyBubbleOrigin = TransformOrigin(pivotFractionX = 0.5f, pivotFractionY = 1f)
 
 /** Насыщенность пятна: фон подсказывает настроение, а не спорит с днями. */
 private const val GLOW_ALPHA = 0.45f

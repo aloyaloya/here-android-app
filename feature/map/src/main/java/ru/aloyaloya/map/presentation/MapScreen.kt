@@ -26,7 +26,6 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.layout.padding
@@ -55,8 +54,8 @@ import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.picker.PlacePin
 import ru.aloyaloya.design_system.extension.Entrance
 import ru.aloyaloya.design_system.extension.entrance
-import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
@@ -143,7 +142,7 @@ fun MapScreen(
         locationGranted = result.values.any { it }
 
         val blocked = !locationGranted && !rationaleBeforeRequest &&
-            activity?.shouldShowRequestPermissionRationale(locationPermissions.first()) == false
+                activity?.shouldShowRequestPermissionRationale(locationPermissions.first()) == false
         if (blocked) {
             context.startActivity(
                 Intent(
@@ -230,7 +229,10 @@ fun MapScreen(
                     visible = uiState.memories.isEmpty() && !picking,
                     enter = EnterTransition.None,
                     exit = fadeOut(tween(RESIZE_MILLIS)) +
-                        scaleOut(tween(RESIZE_MILLIS, easing = ShrinkEasing), transformOrigin = BottomStartOrigin),
+                            scaleOut(
+                                tween(RESIZE_MILLIS, easing = ShrinkEasing),
+                                transformOrigin = BottomStartOrigin
+                            ),
                     modifier = Modifier
                         .align(Alignment.BottomStart)
                         .navigationBarsPadding()
@@ -304,7 +306,6 @@ fun MapScreen(
     }
 }
 
-/** Персонаж-«ты» в углу напротив кнопки добавления зовет отметить первое место. */
 @Composable
 private fun EmptyMapHint() {
     val colors = HereTheme.colors
@@ -312,7 +313,6 @@ private fun EmptyMapHint() {
 
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.xs),
-        // Низ тела, а не тени, встает на одну линию с низом кнопки.
         modifier = Modifier.offset(y = characterSize * HereSize.EmotionCharacter.shadowSpaceRatio)
     ) {
         CharacterBubble(
@@ -324,7 +324,11 @@ private fun EmptyMapHint() {
             borderColor = colors.outline,
             modifier = Modifier
                 .widthIn(max = HereSize.MapEmptyHint.bubbleMaxWidth)
-                .entrance(kind = Entrance.BUBBLE, delayMillis = EMPTY_BUBBLE_MILLIS, origin = BottomStartOrigin)
+                .entrance(
+                    kind = Entrance.BUBBLE,
+                    delayMillis = EMPTY_BUBBLE_MILLIS,
+                    origin = BottomStartOrigin
+                )
         )
 
         EmotionCharacter(
