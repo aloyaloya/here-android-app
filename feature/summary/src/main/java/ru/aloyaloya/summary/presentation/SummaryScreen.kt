@@ -34,6 +34,7 @@ import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
 import ru.aloyaloya.design_system.component.memory.HereMemoryRow
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
+import ru.aloyaloya.design_system.extension.staggeredEntrance
 import ru.aloyaloya.design_system.format.FullDateFormat
 import ru.aloyaloya.design_system.format.MonthYearFormat
 import ru.aloyaloya.design_system.format.currentLocale
@@ -151,18 +152,30 @@ private fun SummaryContent(
             onSelect = onPeriodSelected
         )
 
-        PeriodCard(uiState)
+        PeriodCard(
+            uiState = uiState,
+            modifier = Modifier.staggeredEntrance(order = 0)
+        )
 
-        EmotionMixCard(uiState.emotionShares, total = uiState.memoryCount)
+        EmotionMixCard(
+            shares = uiState.emotionShares,
+            total = uiState.memoryCount,
+            modifier = Modifier.staggeredEntrance(order = 1)
+        )
 
-        MoodPlaces(uiState.places, onPlaceClick)
+        MoodPlaces(
+            places = uiState.places,
+            onPlaceClick = onPlaceClick,
+            modifier = Modifier.staggeredEntrance(order = 2)
+        )
 
         uiState.recall?.let { memory ->
             Recall(
                 memory = memory,
                 canRecallAnother = uiState.canRecallAnother,
                 onClick = { onMemoryClick(memory.id) },
-                onAnotherClick = onRecallAnother
+                onAnotherClick = onRecallAnother,
+                modifier = Modifier.staggeredEntrance(order = 3)
             )
         }
     }
@@ -172,13 +185,16 @@ private fun SummaryContent(
  * Карточка периода: название, главная эмоция и сколько всего было.
  */
 @Composable
-private fun PeriodCard(uiState: SummaryUiState.Content) {
+private fun PeriodCard(
+    uiState: SummaryUiState.Content,
+    modifier: Modifier = Modifier
+) {
     val colors = HereTheme.colors
     val emotion = uiState.dominantEmotion
 
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSize.Summary.cardSpacing),
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .clip(HereShape.tile)
             .background(emotion?.color?.soft ?: colors.surface)
@@ -237,11 +253,15 @@ private fun PeriodCard(uiState: SummaryUiState.Content) {
 @Composable
 private fun EmotionMixCard(
     shares: List<EmotionShare>,
-    total: Int
+    total: Int,
+    modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
 
-    Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
+        modifier = modifier
+    ) {
         SummarySectionLabel(stringResource(R.string.summary_emotions_title))
 
         Column(
@@ -303,9 +323,13 @@ private fun EmotionMixCard(
 @Composable
 private fun MoodPlaces(
     places: List<MoodPlace>,
-    onPlaceClick: (latitude: Double, longitude: Double) -> Unit
+    onPlaceClick: (latitude: Double, longitude: Double) -> Unit,
+    modifier: Modifier = Modifier
 ) {
-    Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
+        modifier = modifier
+    ) {
         SummarySectionLabel(stringResource(R.string.summary_places_title))
 
         places.forEach { place ->
@@ -332,14 +356,18 @@ private fun Recall(
     memory: Memory,
     canRecallAnother: Boolean,
     onClick: () -> Unit,
-    onAnotherClick: () -> Unit
+    onAnotherClick: () -> Unit,
+    modifier: Modifier = Modifier
 ) {
     val dateFormat = FullDateFormat.withLocale(currentLocale())
 
     val colors = HereTheme.colors
     val media = memory.media.firstOrNull()
 
-    Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
+    Column(
+        verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
+        modifier = modifier
+    ) {
         SummarySectionLabel(stringResource(R.string.summary_recall_title))
 
         Column(

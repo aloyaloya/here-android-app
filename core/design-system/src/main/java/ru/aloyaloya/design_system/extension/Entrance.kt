@@ -81,3 +81,17 @@ fun Modifier.entrance(
         translationY = kind.startShift.toPx() * (1f - value)
     }
 }
+
+/**
+ * Появление элемента в очереди: каждый следующий чуть позже предыдущего.
+ *
+ * @param order Место элемента сверху вниз.
+ */
+@Composable
+fun Modifier.staggeredEntrance(order: Int): Modifier =
+    entrance(
+        kind = Entrance.FADE,
+        delayMillis = order * STAGGER_MILLIS
+    )
+
+private const val STAGGER_MILLIS = 50
