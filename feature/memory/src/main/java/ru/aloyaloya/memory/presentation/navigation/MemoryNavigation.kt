@@ -1,6 +1,5 @@
 package ru.aloyaloya.memory.presentation.navigation
 
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
@@ -11,7 +10,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import kotlinx.serialization.Serializable
-import ru.aloyaloya.design_system.extension.LocalNavAnimatedVisibilityScope
 import ru.aloyaloya.memory.di.MemoryComponent
 import ru.aloyaloya.memory.presentation.MemoryScreen
 import ru.aloyaloya.memory.presentation.MemoryViewModel
@@ -62,21 +60,19 @@ fun NavGraphBuilder.memoryScreen(
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this) {
-            MemoryScreen(
-                uiState = uiState,
-                onBackClick = onBackClick,
-                onMoreClick = viewModel::onMoreClick,
-                onEditClick = {
-                    viewModel.onSheetDismiss()
-                    onEditClick(route.memoryId)
-                },
-                onDeleteClick = viewModel::onDeleteClick,
-                onMediaClick = viewModel::onMediaClick,
-                onViewerDismiss = viewModel::onViewerDismiss,
-                onDeleteConfirm = viewModel::onDeleteConfirm,
-                onSheetDismiss = viewModel::onSheetDismiss
-            )
-        }
+        MemoryScreen(
+            uiState = uiState,
+            onBackClick = onBackClick,
+            onMoreClick = viewModel::onMoreClick,
+            onEditClick = {
+                viewModel.onSheetDismiss()
+                onEditClick(route.memoryId)
+            },
+            onDeleteClick = viewModel::onDeleteClick,
+            onMediaClick = viewModel::onMediaClick,
+            onViewerDismiss = viewModel::onViewerDismiss,
+            onDeleteConfirm = viewModel::onDeleteConfirm,
+            onSheetDismiss = viewModel::onSheetDismiss
+        )
     }
 }

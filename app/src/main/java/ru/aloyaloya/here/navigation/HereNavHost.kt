@@ -3,20 +3,17 @@ package ru.aloyaloya.here.navigation
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import ru.aloyaloya.design_system.extension.LocalSharedTransitionScope
 import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.settings.presentation.navigation.NotificationsRoute
 import ru.aloyaloya.settings.presentation.navigation.navigateToNotifications
@@ -40,7 +37,6 @@ import ru.aloyaloya.memory.presentation.navigation.navigateToNewMemory
  * и регистрирует экраны приложения.
  *
  * Разделы сменяют друг друга растворением, а экраны поверх них въезжают сбоку.
- * Граф лежит в [SharedTransitionLayout], чтобы персонажи перелетали между экранами.
  *
  * @param navController Контроллер навигации, управляющий back stack и переходами.
  * @param placePicking Включен ли режим выбора места: им владеет [ru.aloyaloya.here.ui.HereApp],
@@ -62,32 +58,10 @@ fun HereNavHost(
     onMapFocusShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    SharedTransitionLayout(modifier = modifier) {
-        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
-            HereNavGraph(
-                navController = navController,
-                placePicking = placePicking,
-                onPlacePickingChange = onPlacePickingChange,
-                mapFocus = mapFocus,
-                onShowOnMap = onShowOnMap,
-                onMapFocusShown = onMapFocusShown
-            )
-        }
-    }
-}
-
-@Composable
-private fun HereNavGraph(
-    navController: NavHostController,
-    placePicking: Boolean,
-    onPlacePickingChange: (Boolean) -> Unit,
-    mapFocus: MapPoint?,
-    onShowOnMap: (MapPoint) -> Unit,
-    onMapFocusShown: () -> Unit
-) {
     NavHost(
         navController = navController,
         startDestination = MapRoute,
+        modifier = modifier,
         enterTransition = { enter(forward = true) },
         exitTransition = { exit(forward = true) },
         popEnterTransition = { enter(forward = false) },

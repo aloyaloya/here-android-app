@@ -1,6 +1,5 @@
 package ru.aloyaloya.calendar.presentation.navigation
 
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -10,7 +9,6 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
-import ru.aloyaloya.design_system.extension.LocalNavAnimatedVisibilityScope
 import ru.aloyaloya.calendar.di.CalendarComponent
 import ru.aloyaloya.calendar.presentation.CalendarScreen
 import ru.aloyaloya.calendar.presentation.CalendarViewModel
@@ -53,11 +51,9 @@ fun NavGraphBuilder.calendarScreen(onMemoryClick: (Long) -> Unit) {
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this) {
-            CalendarScreen(
-                uiState = uiState,
-                onMemoryClick = onMemoryClick
-            )
-        }
+        CalendarScreen(
+            uiState = uiState,
+            onMemoryClick = onMemoryClick
+        )
     }
 }

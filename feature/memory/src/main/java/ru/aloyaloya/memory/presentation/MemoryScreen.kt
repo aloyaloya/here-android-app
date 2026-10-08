@@ -25,9 +25,11 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.SideEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -48,10 +50,12 @@ import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.component.topbar.TopAppBarAction
-import ru.aloyaloya.design_system.extension.sharedCharacter
+import ru.aloyaloya.design_system.extension.Entrance
+import ru.aloyaloya.design_system.extension.entrance
 import ru.aloyaloya.design_system.format.FullDateFormat
 import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.format.currentLocale
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
@@ -215,7 +219,6 @@ private fun MemoryContent(
                 )
 
                 MemoryCharacter(
-                    memoryId = memory.id,
                     emotion = memory.emotion,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -242,14 +245,17 @@ private fun MemoryContent(
 private fun mapBottomPadding(sheetHeight: Dp): Dp =
     (sheetHeight - HereSize.Memory.sheetCornerOverlap).coerceAtLeast(0.dp)
 
-/** Персонаж воспоминания с ореолом: та же метка, что на карте, только крупно и живой. */
+/** Персонаж воспоминания с ореолом: падает в него при первом показе экрана. */
 @Composable
 private fun MemoryCharacter(
-    memoryId: Long,
     emotion: Emotion,
     modifier: Modifier = Modifier
 ) {
     val color = emotion.color.solid
+    var firstShow by rememberSaveable { mutableStateOf(true) }
+    val dropping = remember { firstShow }
+
+    SideEffect { firstShow = false }
 
     Box(
         contentAlignment = Alignment.Center,
@@ -260,7 +266,14 @@ private fun MemoryCharacter(
         EmotionCharacter(
             emotion = emotion.character,
             size = HereSize.EmotionCharacter.large,
-            modifier = Modifier.sharedCharacter(memoryId)
+            modifier = if (dropping) {
+                Modifier.entrance(
+                    kind = Entrance.DROP,
+                    delayMillis = HereMotion.Duration.medium
+                )
+            } else {
+                Modifier
+            }
         )
     }
 }
