@@ -16,6 +16,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.delay
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 
@@ -34,12 +35,12 @@ enum class Entrance(
     val startShift: Dp
 ) {
     DROP(
-        spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow),
+        HereMotion.bouncy(),
         TransformOrigin(0.5f, 1f),
         1f,
         -HereSize.EmotionCharacter.small
     ),
-    POP(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow), TransformOrigin(0.5f, 0.6f), 0.4f, 0.dp),
+    POP(HereMotion.bouncy(), TransformOrigin(0.5f, 0.6f), 0.4f, 0.dp),
     FADE(tween(360, easing = EaseOut), TransformOrigin.Center, 1f, HereSpacing.s),
     BUBBLE(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium), TransformOrigin.Center, 0.85f, 0.dp)
 }

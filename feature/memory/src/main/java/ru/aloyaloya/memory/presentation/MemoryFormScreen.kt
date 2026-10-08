@@ -6,8 +6,6 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.Spring
-import androidx.compose.animation.core.spring
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
@@ -45,6 +43,7 @@ import ru.aloyaloya.design_system.component.topbar.HereModalTopBar
 import ru.aloyaloya.design_system.format.FullDateFormat
 import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.format.currentLocale
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
@@ -312,10 +311,7 @@ private fun PlacePreview(
         AnimatedVisibility(
             visible = address != null,
             enter = scaleIn(
-                animationSpec = spring(
-                    dampingRatio = Spring.DampingRatioMediumBouncy,
-                    stiffness = Spring.StiffnessLow
-                ),
+                animationSpec = HereMotion.bouncy(),
                 initialScale = ADDRESS_INITIAL_SCALE,
                 transformOrigin = TransformOrigin(0f, 1f)
             ) + fadeIn(),
