@@ -1,5 +1,6 @@
 package ru.aloyaloya.summary.presentation.navigation
 
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -9,6 +10,7 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import kotlinx.serialization.Serializable
+import ru.aloyaloya.design_system.extension.LocalNavAnimatedVisibilityScope
 import ru.aloyaloya.summary.di.SummaryComponent
 import ru.aloyaloya.summary.presentation.SummaryScreen
 import ru.aloyaloya.summary.presentation.SummaryViewModel
@@ -56,12 +58,14 @@ fun NavGraphBuilder.summaryScreen(
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
-        SummaryScreen(
-            uiState = uiState,
-            onPeriodSelected = viewModel::onPeriodSelected,
-            onPlaceClick = onPlaceClick,
-            onMemoryClick = onMemoryClick,
-            onRecallAnother = viewModel::onRecallAnother
-        )
+        CompositionLocalProvider(LocalNavAnimatedVisibilityScope provides this) {
+            SummaryScreen(
+                uiState = uiState,
+                onPeriodSelected = viewModel::onPeriodSelected,
+                onPlaceClick = onPlaceClick,
+                onMemoryClick = onMemoryClick,
+                onRecallAnother = viewModel::onRecallAnother
+            )
+        }
     }
 }

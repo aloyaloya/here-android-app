@@ -265,7 +265,8 @@ private fun DayMemories(
                 subtitle = TimeFormat.format(
                     Instant.ofEpochMilli(memory.happenedAt).atZone(ZoneId.systemDefault())
                 ),
-                onClick = { onMemoryClick(memory.id) }
+                onClick = { onMemoryClick(memory.id) },
+                memoryId = memory.id
             )
         }
     }

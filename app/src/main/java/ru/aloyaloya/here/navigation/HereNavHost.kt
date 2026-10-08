@@ -1,9 +1,23 @@
 package ru.aloyaloya.here.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.SharedTransitionLayout
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import ru.aloyaloya.design_system.extension.LocalSharedTransitionScope
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.settings.presentation.navigation.NotificationsRoute
 import ru.aloyaloya.settings.presentation.navigation.navigateToNotifications
 import ru.aloyaloya.settings.presentation.navigation.notificationsScreen
@@ -25,6 +39,9 @@ import ru.aloyaloya.memory.presentation.navigation.navigateToNewMemory
  * Настраивает [NavHost], определяет стартовый маршрут [MapRoute]
  * и регистрирует экраны приложения.
  *
+ * Разделы сменяют друг друга растворением, а экраны поверх них въезжают сбоку.
+ * Граф лежит в [SharedTransitionLayout], чтобы персонажи перелетали между экранами.
+ *
  * @param navController Контроллер навигации, управляющий back stack и переходами.
  * @param placePicking Включен ли режим выбора места: им владеет [ru.aloyaloya.here.ui.HereApp],
  * потому что режим меняет не только карту, но и панели приложения.
@@ -45,11 +62,36 @@ fun HereNavHost(
     onMapFocusShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // TODO: сделать анимацию перехода
+    SharedTransitionLayout(modifier = modifier) {
+        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
+            HereNavGraph(
+                navController = navController,
+                placePicking = placePicking,
+                onPlacePickingChange = onPlacePickingChange,
+                mapFocus = mapFocus,
+                onShowOnMap = onShowOnMap,
+                onMapFocusShown = onMapFocusShown
+            )
+        }
+    }
+}
+
+@Composable
+private fun HereNavGraph(
+    navController: NavHostController,
+    placePicking: Boolean,
+    onPlacePickingChange: (Boolean) -> Unit,
+    mapFocus: MapPoint?,
+    onShowOnMap: (MapPoint) -> Unit,
+    onMapFocusShown: () -> Unit
+) {
     NavHost(
         navController = navController,
         startDestination = MapRoute,
-        modifier = modifier
+        enterTransition = { enter(forward = true) },
+        exitTransition = { exit(forward = true) },
+        popEnterTransition = { enter(forward = false) },
+        popExitTransition = { exit(forward = false) }
     ) {
         mapScreen(
             picking = placePicking,
@@ -86,3 +128,35 @@ fun HereNavHost(
         )
     }
 }
+
+/** Смена разделов: новый проявляется с легким приближением. */
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.enter(forward: Boolean): EnterTransition =
+    if (initialState.isTopLevel && targetState.isTopLevel) {
+        fadeIn(HereMotion.effects()) + scaleIn(HereMotion.spatial(), initialScale = FADE_THROUGH_SCALE)
+    } else {
+        fadeIn(HereMotion.effects()) + slideInHorizontally(HereMotion.spatial()) { width ->
+            axisShift(width, forward)
+        }
+    }
+
+/** Уход экрана: раздел растворяется, остальные уезжают в сторону, противоположную входу. */
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.exit(forward: Boolean): ExitTransition =
+    if (initialState.isTopLevel && targetState.isTopLevel) {
+        fadeOut(HereMotion.effects())
+    } else {
+        fadeOut(HereMotion.effects()) + slideOutHorizontally(HereMotion.spatial()) { width ->
+            -axisShift(width, forward)
+        }
+    }
+
+private fun axisShift(width: Int, forward: Boolean): Int {
+    val shift = (width * AXIS_SHIFT_FRACTION).toInt()
+    return if (forward) shift else -shift
+}
+
+private val NavBackStackEntry.isTopLevel: Boolean
+    get() = TopLevelDestination.entries.any { destination.hasRoute(it.route) }
+
+private const val FADE_THROUGH_SCALE = 0.92f
+
+private const val AXIS_SHIFT_FRACTION = 0.1f

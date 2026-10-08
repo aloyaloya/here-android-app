@@ -30,6 +30,7 @@ import ru.aloyaloya.design_system.theme.HereTheme
  * @param subtitle Подпись под заголовком.
  * @param onClick Колбэк нажатия на строку.
  * @param modifier [Modifier], применяемый к строке.
+ * @param memoryId Воспоминание, к которому перелетает персонаж, или `null`.
  */
 @Composable
 fun HereMemoryRow(
@@ -38,7 +39,8 @@ fun HereMemoryRow(
     title: String,
     subtitle: String,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    memoryId: Long? = null
 ) {
     val sizes = HereSize.MemoryRow
 
@@ -54,7 +56,8 @@ fun HereMemoryRow(
     ) {
         EmotionBadge(
             character = character,
-            color = color
+            color = color,
+            memoryId = memoryId
         )
 
         Column(verticalArrangement = Arrangement.spacedBy(sizes.textSpacing)) {

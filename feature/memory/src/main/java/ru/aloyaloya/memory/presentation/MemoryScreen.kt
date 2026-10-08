@@ -48,6 +48,7 @@ import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.component.topbar.TopAppBarAction
+import ru.aloyaloya.design_system.extension.sharedCharacter
 import ru.aloyaloya.design_system.format.FullDateFormat
 import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.format.currentLocale
@@ -214,6 +215,7 @@ private fun MemoryContent(
                 )
 
                 MemoryCharacter(
+                    memoryId = memory.id,
                     emotion = memory.emotion,
                     modifier = Modifier.align(Alignment.Center)
                 )
@@ -243,6 +245,7 @@ private fun mapBottomPadding(sheetHeight: Dp): Dp =
 /** Персонаж воспоминания с ореолом: та же метка, что на карте, только крупно и живой. */
 @Composable
 private fun MemoryCharacter(
+    memoryId: Long,
     emotion: Emotion,
     modifier: Modifier = Modifier
 ) {
@@ -256,7 +259,8 @@ private fun MemoryCharacter(
     ) {
         EmotionCharacter(
             emotion = emotion.character,
-            size = HereSize.EmotionCharacter.large
+            size = HereSize.EmotionCharacter.large,
+            modifier = Modifier.sharedCharacter(memoryId)
         )
     }
 }

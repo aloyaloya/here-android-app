@@ -9,6 +9,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import ru.aloyaloya.design_system.component.character.CharacterEmotion
 import ru.aloyaloya.design_system.component.character.EmotionCharacter
+import ru.aloyaloya.design_system.extension.sharedCharacter
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 
@@ -18,12 +19,14 @@ import ru.aloyaloya.design_system.theme.HereSize
  * @param character Персонаж эмоции.
  * @param color Мягкий тон эмоции из палитры.
  * @param modifier [Modifier], применяемый к иконке.
+ * @param memoryId Воспоминание, к которому перелетает персонаж, или `null`.
  */
 @Composable
 fun EmotionBadge(
     character: CharacterEmotion,
     color: Color,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    memoryId: Long? = null
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -34,7 +37,8 @@ fun EmotionBadge(
         EmotionCharacter(
             emotion = character,
             size = HereSize.EmotionBadge.characterSize,
-            animated = false
+            animated = false,
+            modifier = Modifier.sharedCharacter(memoryId)
         )
     }
 }

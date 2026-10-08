@@ -373,7 +373,8 @@ private fun Recall(
             ) {
                 EmotionBadge(
                     character = memory.emotion.character,
-                    color = memory.emotion.color.soft
+                    color = memory.emotion.color.soft,
+                    memoryId = memory.id
                 )
 
                 Column(verticalArrangement = Arrangement.spacedBy(HereSize.MemoryRow.textSpacing)) {
