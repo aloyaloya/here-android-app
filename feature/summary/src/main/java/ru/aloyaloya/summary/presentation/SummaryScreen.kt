@@ -1,5 +1,6 @@
 package ru.aloyaloya.summary.presentation
 
+import androidx.compose.animation.animateContentSize
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -38,6 +39,7 @@ import ru.aloyaloya.design_system.extension.staggeredEntrance
 import ru.aloyaloya.design_system.format.FullDateFormat
 import ru.aloyaloya.design_system.format.MonthYearFormat
 import ru.aloyaloya.design_system.format.currentLocale
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
@@ -196,6 +198,7 @@ private fun PeriodCard(
         verticalArrangement = Arrangement.spacedBy(HereSize.Summary.cardSpacing),
         modifier = modifier
             .fillMaxWidth()
+            .animateContentSize(animationSpec = HereMotion.spatial())
             .clip(HereShape.tile)
             .background(emotion?.color?.soft ?: colors.surface)
             .padding(HereSpacing.l)
@@ -268,6 +271,7 @@ private fun EmotionMixCard(
             verticalArrangement = Arrangement.spacedBy(HereSize.Summary.cardSpacing),
             modifier = Modifier
                 .fillMaxWidth()
+                .animateContentSize(animationSpec = HereMotion.spatial())
                 .clip(HereShape.tile)
                 .background(colors.surface)
                 .padding(HereSpacing.l)
@@ -328,7 +332,7 @@ private fun MoodPlaces(
 ) {
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
-        modifier = modifier
+        modifier = modifier.animateContentSize(animationSpec = HereMotion.spatial())
     ) {
         SummarySectionLabel(stringResource(R.string.summary_places_title))
 
@@ -373,6 +377,7 @@ private fun Recall(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .animateContentSize(animationSpec = HereMotion.spatial())
                 .clip(HereShape.tile)
                 .background(colors.surface)
                 .clickable(onClick = onClick)
