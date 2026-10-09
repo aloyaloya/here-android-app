@@ -1,6 +1,8 @@
 package ru.aloyaloya.settings.presentation
 
 import android.text.format.DateFormat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
@@ -20,16 +22,21 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.graphics.CompositingStrategy
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import ru.aloyaloya.design_system.extension.Entrance
+import ru.aloyaloya.design_system.extension.entrance
 import ru.aloyaloya.design_system.extension.overlayShadow
 import ru.aloyaloya.design_system.format.currentLocale
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
@@ -40,6 +47,12 @@ import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 import java.util.Locale
 import ru.aloyaloya.design_system.R as DesignR
+
+/** Задержка карточки после часов. */
+private const val CARD_MILLIS = 120
+
+/** Задержка значка: карточка уже на месте или успела приглушиться. */
+private const val BADGE_MILLIS = 300
 
 /**
  * Часы, дата и превью напоминания, в [NotificationsStep.BLOCKED] приглушенное.
@@ -60,7 +73,12 @@ fun NotificationsIllustration(
         DateTimeFormatter.ofPattern(DateFormat.getBestDateTimePattern(locale, "EEEEdMMMM"), locale)
     }
 
-    // TODO: появление часов и карточки, смена шага — crossfade 150 мс
+    val previewAlpha by animateFloatAsState(
+        targetValue = if (step == NotificationsStep.BLOCKED) sizes.mutedAlpha else 1f,
+        animationSpec = tween(HereMotion.Duration.short),
+        label = "preview-alpha"
+    )
+
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(HereSpacing.xl, Alignment.CenterVertically),
@@ -73,7 +91,10 @@ fun NotificationsIllustration(
                 bottom = HereSize.PermissionSheet.illustrationOverlap
             )
     ) {
-        Column(horizontalAlignment = Alignment.CenterHorizontally) {
+        Column(
+            horizontalAlignment = Alignment.CenterHorizontally,
+            modifier = Modifier.entrance(kind = Entrance.FADE)
+        ) {
             Text(
                 text = time.format(reminderTimeFormat(locale)),
                 style = MaterialTheme.typography.displayLarge,
@@ -90,9 +111,12 @@ fun NotificationsIllustration(
 
         Box {
             NotificationPreview(
-                modifier = Modifier.alpha(
-                    if (step == NotificationsStep.BLOCKED) sizes.mutedAlpha else 1f
-                )
+                modifier = Modifier
+                    .entrance(kind = Entrance.FADE, delayMillis = CARD_MILLIS)
+                    .graphicsLayer {
+                        alpha = previewAlpha
+                        compositingStrategy = CompositingStrategy.ModulateAlpha
+                    }
             )
 
             if (step == NotificationsStep.BLOCKED) {
@@ -103,6 +127,7 @@ fun NotificationsIllustration(
                             x = -(HereSpacing.l + sizes.iconSize / 2 - sizes.badgeSize / 2),
                             y = -(sizes.badgeSize / 2 + HereSpacing.s)
                         )
+                        .entrance(kind = Entrance.POP, delayMillis = BADGE_MILLIS)
                 )
             }
         }
@@ -195,7 +220,6 @@ private fun MutedBadge(modifier: Modifier = Modifier) {
     val colors = HereTheme.colors
     val sizes = HereSize.NotificationIllustration
 
-    // TODO: появление значка — pop
     Box(
         contentAlignment = Alignment.Center,
         modifier = modifier

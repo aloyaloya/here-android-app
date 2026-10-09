@@ -10,6 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
@@ -76,6 +77,7 @@ fun Modifier.entrance(
         val scale = lerp(kind.startScale, 1f, value)
         transformOrigin = origin
         alpha = value.coerceIn(0f, 1f)
+        compositingStrategy = CompositingStrategy.ModulateAlpha
         scaleX = scale
         scaleY = scale
         translationY = kind.startShift.toPx() * (1f - value)
