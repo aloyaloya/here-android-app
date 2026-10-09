@@ -3,7 +3,9 @@ package ru.aloyaloya.memory.presentation.navigation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.lifecycle.ViewModelStoreOwner
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewmodel.compose.viewModel
@@ -118,9 +120,13 @@ private fun MemoryForm(
     }
 
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val haptic = LocalHapticFeedback.current
 
     LaunchedEffect(uiState.saved) {
-        if (uiState.saved) onClose()
+        if (uiState.saved) {
+            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+            onClose()
+        }
     }
 
     MemoryFormScreen(

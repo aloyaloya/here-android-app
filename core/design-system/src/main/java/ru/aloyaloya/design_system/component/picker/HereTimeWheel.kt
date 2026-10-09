@@ -24,11 +24,15 @@ import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
+import kotlinx.coroutines.flow.drop
+import kotlinx.coroutines.flow.onEach
 import java.time.LocalTime
 import kotlin.math.abs
 
@@ -131,12 +135,13 @@ private fun Wheel(
     }
 
     val currentOnSelect by rememberUpdatedState(onSelect)
+    val haptic = LocalHapticFeedback.current
 
-    // TODO: добавить хаптики
     LaunchedEffect(listState) {
-        snapshotFlow { centerIndex }.collect { index ->
-            values.getOrNull(index)?.let(currentOnSelect)
-        }
+        snapshotFlow { centerIndex }
+            .onEach { index -> values.getOrNull(index)?.let(currentOnSelect) }
+            .drop(1)
+            .collect { haptic.performHapticFeedback(HapticFeedbackType.SegmentFrequentTick) }
     }
 
     LaunchedEffect(selected) {

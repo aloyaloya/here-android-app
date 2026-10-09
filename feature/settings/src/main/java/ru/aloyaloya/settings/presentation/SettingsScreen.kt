@@ -31,7 +31,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
@@ -360,13 +362,19 @@ private fun SwitchRow(
     onCheckedChange: (Boolean) -> Unit
 ) {
     val colors = HereTheme.colors
+    val haptic = LocalHapticFeedback.current
 
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(HereSpacing.m),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable { onCheckedChange(!checked) }
+            .clickable {
+                haptic.performHapticFeedback(
+                    if (checked) HapticFeedbackType.ToggleOff else HapticFeedbackType.ToggleOn
+                )
+                onCheckedChange(!checked)
+            }
             .padding(HereSpacing.l)
     ) {
         Column(modifier = Modifier.weight(1f)) {

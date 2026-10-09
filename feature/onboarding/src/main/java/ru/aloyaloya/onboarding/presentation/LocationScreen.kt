@@ -15,7 +15,9 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.colorResource
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
@@ -53,13 +55,14 @@ fun LocationScreen(
 ) {
     val context = LocalContext.current
     val activity = LocalActivity.current
+    val haptic = LocalHapticFeedback.current
     var step by rememberSaveable { mutableStateOf(LocationStep.REQUEST) }
 
     val permissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestMultiplePermissions()
     ) { result ->
         if (result.values.any { it }) {
-            // TODO: добавить хаптик подтверждения
+            haptic.performHapticFeedback(HapticFeedbackType.Confirm)
             onPermissionGranted()
             return@rememberLauncherForActivityResult
         }
