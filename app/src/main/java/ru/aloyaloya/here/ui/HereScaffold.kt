@@ -10,8 +10,14 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBar
@@ -57,14 +63,34 @@ fun HereScaffold(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
+    val contentOffsets = remember { mutableStateMapOf<TopLevelDestination, Float>() }
+    val scrollConnection = remember(currentTopLevelDestination) {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                currentTopLevelDestination?.let { destination ->
+                    contentOffsets[destination] = (contentOffsets[destination] ?: 0f) - consumed.y
+                }
+                return Offset.Zero
+            }
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(HereTheme.colors.background)
+            .nestedScroll(scrollConnection)
     ) {
         content()
 
         if (currentTopLevelDestination != null) {
+            val contentScrolled =
+                (contentOffsets[currentTopLevelDestination] ?: 0f) > SCROLLED_THRESHOLD
+
             AnimatedContent(
                 targetState = contextMode,
                 transitionSpec = {
@@ -95,7 +121,8 @@ fun HereScaffold(
                 } else {
                     TopAppBar(
                         title = stringResource(currentTopLevelDestination.titleResId),
-                        onSettingsClick = onSettingsClick
+                        onSettingsClick = onSettingsClick,
+                        scrolled = contentScrolled
                     )
                 }
             }
@@ -123,3 +150,5 @@ private fun modeShift(width: Int, forward: Boolean): Int {
 }
 
 private const val MODE_SHIFT_FRACTION = 0.1f
+
+private const val SCROLLED_THRESHOLD = 0.5f
