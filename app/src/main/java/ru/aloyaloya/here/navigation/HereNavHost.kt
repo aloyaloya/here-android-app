@@ -3,6 +3,7 @@ package ru.aloyaloya.here.navigation
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -14,13 +15,8 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import ru.aloyaloya.design_system.theme.HereMotion
-import ru.aloyaloya.settings.presentation.navigation.NotificationsRoute
-import ru.aloyaloya.settings.presentation.navigation.navigateToNotifications
-import ru.aloyaloya.settings.presentation.navigation.notificationsScreen
-import ru.aloyaloya.settings.presentation.navigation.settingsScreen
-import ru.aloyaloya.summary.presentation.navigation.summaryScreen
 import ru.aloyaloya.calendar.presentation.navigation.calendarScreen
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.map.presentation.navigation.MapRoute
 import ru.aloyaloya.map.presentation.navigation.mapScreen
 import ru.aloyaloya.mapkit.model.MapPoint
@@ -29,14 +25,18 @@ import ru.aloyaloya.memory.presentation.navigation.memoryScreen
 import ru.aloyaloya.memory.presentation.navigation.navigateToEditMemory
 import ru.aloyaloya.memory.presentation.navigation.navigateToMemory
 import ru.aloyaloya.memory.presentation.navigation.navigateToNewMemory
+import ru.aloyaloya.settings.presentation.navigation.NotificationsRoute
+import ru.aloyaloya.settings.presentation.navigation.navigateToNotifications
+import ru.aloyaloya.settings.presentation.navigation.notificationsScreen
+import ru.aloyaloya.settings.presentation.navigation.settingsScreen
+import ru.aloyaloya.summary.presentation.navigation.summaryScreen
 
 /**
  * Корневой навигационный граф приложения Here.
  *
  * Настраивает [NavHost], определяет стартовый маршрут [MapRoute]
  * и регистрирует экраны приложения.
- *
- * Разделы сменяют друг друга растворением, а экраны поверх них въезжают сбоку.
+
  *
  * @param navController Контроллер навигации, управляющий back stack и переходами.
  * @param placePicking Включен ли режим выбора места: им владеет [ru.aloyaloya.here.ui.HereApp],
@@ -103,12 +103,19 @@ fun HereNavHost(
     }
 }
 
+private fun <T> enterSpec() = tween<T>(
+    durationMillis = HereMotion.Duration.medium,
+    delayMillis = HereMotion.Duration.short
+)
+
+private fun <T> exitSpec() = tween<T>(durationMillis = HereMotion.Duration.short)
+
 /** Смена разделов: новый проявляется с легким приближением. */
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.enter(forward: Boolean): EnterTransition =
     if (initialState.isTopLevel && targetState.isTopLevel) {
-        fadeIn(HereMotion.effects()) + scaleIn(HereMotion.spatial(), initialScale = FADE_THROUGH_SCALE)
+        fadeIn(enterSpec()) + scaleIn(enterSpec(), initialScale = FADE_THROUGH_SCALE)
     } else {
-        fadeIn(HereMotion.effects()) + slideInHorizontally(HereMotion.spatial()) { width ->
+        fadeIn(enterSpec()) + slideInHorizontally(enterSpec()) { width ->
             axisShift(width, forward)
         }
     }
@@ -116,9 +123,9 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.enter(forward: Boo
 /** Уход экрана: раздел растворяется, остальные уезжают в сторону, противоположную входу. */
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.exit(forward: Boolean): ExitTransition =
     if (initialState.isTopLevel && targetState.isTopLevel) {
-        fadeOut(HereMotion.effects())
+        fadeOut(exitSpec())
     } else {
-        fadeOut(HereMotion.effects()) + slideOutHorizontally(HereMotion.spatial()) { width ->
+        fadeOut(exitSpec()) + slideOutHorizontally(exitSpec()) { width ->
             -axisShift(width, forward)
         }
     }
