@@ -1,7 +1,5 @@
 package ru.aloyaloya.design_system.component.topbar
 
-import androidx.compose.animation.animateColorAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Row
@@ -13,9 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereSize
-import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
  * Верхняя панель приложения с заголовком текущего раздела и кнопкой настроек.
@@ -35,11 +31,7 @@ fun TopAppBar(
     modifier: Modifier = Modifier,
     scrolled: Boolean = false
 ) {
-    val containerColor by animateColorAsState(
-        targetValue = if (scrolled) HereTheme.colors.surfaceMuted else HereTheme.colors.background,
-        animationSpec = tween(HereMotion.Duration.medium),
-        label = "top-app-bar-container"
-    )
+    val containerColor by animateTopAppBarContainerColor(scrolled)
 
     Row(
         modifier = modifier
