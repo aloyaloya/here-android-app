@@ -48,6 +48,7 @@ dependencies {
     implementation(libs.androidx.compose.material3)
     implementation(platform(libs.androidx.compose.bom))
     implementation(libs.coil.compose)
+    implementation(libs.konfetti.compose)
     implementation(libs.coil.video)
 
     testImplementation(libs.junit)

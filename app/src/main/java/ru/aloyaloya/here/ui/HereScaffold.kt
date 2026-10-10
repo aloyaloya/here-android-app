@@ -1,17 +1,30 @@
 package ru.aloyaloya.here.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.mutableStateMapOf
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBar
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBarItem
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.component.topbar.TopAppBar
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.here.navigation.TopLevelDestination
 import ru.aloyaloya.design_system.R as DesignSystemR
@@ -50,29 +63,68 @@ fun HereScaffold(
     modifier: Modifier = Modifier,
     content: @Composable () -> Unit
 ) {
+    val contentOffsets = remember { mutableStateMapOf<TopLevelDestination, Float>() }
+    val scrollConnection = remember(currentTopLevelDestination) {
+        object : NestedScrollConnection {
+            override fun onPostScroll(
+                consumed: Offset,
+                available: Offset,
+                source: NestedScrollSource
+            ): Offset {
+                currentTopLevelDestination?.let { destination ->
+                    contentOffsets[destination] = (contentOffsets[destination] ?: 0f) - consumed.y
+                }
+                return Offset.Zero
+            }
+        }
+    }
+
     Box(
         modifier = modifier
             .fillMaxSize()
             .background(HereTheme.colors.background)
+            .nestedScroll(scrollConnection)
     ) {
         content()
 
         if (currentTopLevelDestination != null) {
-            if (contextMode != null) {
-                HereContextTopAppBar(
-                    title = stringResource(contextMode.titleResId),
-                    navigationContentDescription = stringResource(
-                        DesignSystemR.string.context_bar_back_content_description
-                    ),
-                    onNavigateBack = contextMode.onExit,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
-            } else {
-                TopAppBar(
-                    title = stringResource(currentTopLevelDestination.titleResId),
-                    onSettingsClick = onSettingsClick,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
+            val contentScrolled =
+                (contentOffsets[currentTopLevelDestination] ?: 0f) > SCROLLED_THRESHOLD
+
+            AnimatedContent(
+                targetState = contextMode,
+                transitionSpec = {
+                    val forward = targetState != null
+                    (fadeIn(HereMotion.fadeThroughEnter()) +
+                            slideInHorizontally(HereMotion.fadeThroughEnter()) { width ->
+                                HereMotion.axisShift(width, forward)
+                            }) togetherWith
+                            (fadeOut(HereMotion.fadeThroughExit()) +
+                                    slideOutHorizontally(HereMotion.fadeThroughExit()) { width ->
+                                        -HereMotion.axisShift(width, forward)
+                                    })
+                },
+                contentKey = { mode -> mode != null },
+                label = "top-app-bar",
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .background(HereTheme.colors.background)
+            ) { mode ->
+                if (mode != null) {
+                    HereContextTopAppBar(
+                        title = stringResource(mode.titleResId),
+                        navigationContentDescription = stringResource(
+                            DesignSystemR.string.context_bar_back_content_description
+                        ),
+                        onNavigateBack = mode.onExit
+                    )
+                } else {
+                    TopAppBar(
+                        title = stringResource(currentTopLevelDestination.titleResId),
+                        onSettingsClick = onSettingsClick,
+                        scrolled = contentScrolled
+                    )
+                }
             }
 
             BottomNavigationBar(
@@ -91,3 +143,5 @@ fun HereScaffold(
         }
     }
 }
+
+private const val SCROLLED_THRESHOLD = 0.5f

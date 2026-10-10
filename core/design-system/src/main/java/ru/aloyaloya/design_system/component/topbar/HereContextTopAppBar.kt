@@ -8,11 +8,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.theme.HereSize
-import ru.aloyaloya.design_system.theme.HereTheme
 
 /**
  * Верхняя панель режима: стрелка выхода, название экрана и действия справа.
@@ -21,6 +21,7 @@ import ru.aloyaloya.design_system.theme.HereTheme
  * @param navigationContentDescription Описание выхода для программ чтения с экрана.
  * @param onNavigateBack Колбэк выхода из режима.
  * @param modifier Внешний [Modifier] панели.
+ * @param scrolled Уехал ли контент под панель: тогда панель темнеет, отделяясь от него.
  * @param actions Кнопки справа.
  */
 @Composable
@@ -29,12 +30,15 @@ fun HereContextTopAppBar(
     navigationContentDescription: String?,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    scrolled: Boolean = false,
     actions: @Composable RowScope.() -> Unit = {}
 ) {
+    val containerColor by animateTopAppBarContainerColor(scrolled)
+
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .background(HereTheme.colors.background)
+            .background(containerColor)
             .statusBarsPadding()
             .height(HereSize.TopAppBar.height)
             .padding(horizontal = HereSize.TopAppBar.contentPadding),

@@ -42,7 +42,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -56,11 +58,14 @@ import ru.aloyaloya.design_system.extension.Entrance
 import ru.aloyaloya.design_system.extension.entrance
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.map.R
 import ru.aloyaloya.map.model.MapUiState
+import ru.aloyaloya.map.presentation.component.FirstMemory
+import ru.aloyaloya.map.presentation.component.FirstMemoryCelebration
 import ru.aloyaloya.map.presentation.component.PlaceMemoriesSheet
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapMarker
@@ -117,6 +122,7 @@ private fun Context.hasLocationPermission(): Boolean =
  * @param onPickCancel Колбэк выхода из режима выбора места.
  * @param focus Точка, которую нужно показать, или `null`. Приходит с других экранов.
  * @param onFocusShown Колбэк: камера встала на [focus], точку можно забыть.
+ * @param onNewMemoryShown Колбэк: пин нового воспоминания упал на карту.
  */
 @Composable
 fun MapScreen(
@@ -124,6 +130,7 @@ fun MapScreen(
     picking: Boolean,
     focus: MapPoint?,
     onFocusShown: () -> Unit,
+    onNewMemoryShown: () -> Unit,
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
     onMemoryClick: (Long) -> Unit,
     onPickStart: () -> Unit,
@@ -175,12 +182,33 @@ fun MapScreen(
             var pickedPoint by remember { mutableStateOf<MapPoint?>(null) }
             var cameraMoving by remember { mutableStateOf(false) }
             var placeMemoryIds by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
+            var firstMemory by remember { mutableStateOf<FirstMemory?>(null) }
             val mapState = rememberYandexMapState()
+            val haptic = LocalHapticFeedback.current
 
             LaunchedEffect(focus) {
                 focus ?: return@LaunchedEffect
                 mapState.moveTo(focus, uiState.mapConfig.userLocationZoom)
                 onFocusShown()
+            }
+
+            LaunchedEffect(uiState.newMemory) {
+                val memory = uiState.newMemory ?: return@LaunchedEffect
+                val first = uiState.memories.size == 1
+                mapState.moveTo(
+                    point = MapPoint(memory.latitude, memory.longitude),
+                    zoom = uiState.mapConfig.userLocationZoom
+                )
+                mapState.dropMarker(
+                    id = memory.id,
+                    delayMillis = HereMotion.Duration.long.toLong()
+                )
+                if (first) {
+                    firstMemory = mapState.markerBounds(memory.id)
+                        ?.let { pin -> FirstMemory(memory.emotion, pin) }
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                }
+                onNewMemoryShown()
             }
 
             BackHandler(enabled = picking, onBack = onPickCancel)
@@ -275,6 +303,14 @@ fun MapScreen(
                                 onPickStart()
                             }
                         }
+                    )
+                }
+
+                firstMemory?.let { current ->
+                    FirstMemoryCelebration(
+                        firstMemory = current,
+                        dismissed = cameraMoving || picking,
+                        onEnded = { firstMemory = null }
                     )
                 }
             }

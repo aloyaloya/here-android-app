@@ -1,15 +1,21 @@
 package ru.aloyaloya.here.navigation
 
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.EnterTransition
+import androidx.compose.animation.ExitTransition
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.navigation.NavBackStackEntry
+import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import ru.aloyaloya.settings.presentation.navigation.NotificationsRoute
-import ru.aloyaloya.settings.presentation.navigation.navigateToNotifications
-import ru.aloyaloya.settings.presentation.navigation.notificationsScreen
-import ru.aloyaloya.settings.presentation.navigation.settingsScreen
-import ru.aloyaloya.summary.presentation.navigation.summaryScreen
 import ru.aloyaloya.calendar.presentation.navigation.calendarScreen
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.map.presentation.navigation.MapRoute
 import ru.aloyaloya.map.presentation.navigation.mapScreen
 import ru.aloyaloya.mapkit.model.MapPoint
@@ -18,12 +24,18 @@ import ru.aloyaloya.memory.presentation.navigation.memoryScreen
 import ru.aloyaloya.memory.presentation.navigation.navigateToEditMemory
 import ru.aloyaloya.memory.presentation.navigation.navigateToMemory
 import ru.aloyaloya.memory.presentation.navigation.navigateToNewMemory
+import ru.aloyaloya.settings.presentation.navigation.NotificationsRoute
+import ru.aloyaloya.settings.presentation.navigation.navigateToNotifications
+import ru.aloyaloya.settings.presentation.navigation.notificationsScreen
+import ru.aloyaloya.settings.presentation.navigation.settingsScreen
+import ru.aloyaloya.summary.presentation.navigation.summaryScreen
 
 /**
  * Корневой навигационный граф приложения Here.
  *
  * Настраивает [NavHost], определяет стартовый маршрут [MapRoute]
  * и регистрирует экраны приложения.
+
  *
  * @param navController Контроллер навигации, управляющий back stack и переходами.
  * @param placePicking Включен ли режим выбора места: им владеет [ru.aloyaloya.here.ui.HereApp],
@@ -45,11 +57,14 @@ fun HereNavHost(
     onMapFocusShown: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    // TODO: сделать анимацию перехода
     NavHost(
         navController = navController,
         startDestination = MapRoute,
-        modifier = modifier
+        modifier = modifier,
+        enterTransition = { enter(forward = true) },
+        exitTransition = { exit(forward = true) },
+        popEnterTransition = { enter(forward = false) },
+        popExitTransition = { exit(forward = false) }
     ) {
         mapScreen(
             picking = placePicking,
@@ -86,3 +101,31 @@ fun HereNavHost(
         )
     }
 }
+
+/** Смена разделов: новый проявляется с легким приближением. */
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.enter(forward: Boolean): EnterTransition =
+    if (initialState.isTopLevel && targetState.isTopLevel) {
+        fadeIn(HereMotion.fadeThroughEnter()) +
+                scaleIn(HereMotion.fadeThroughEnter(), initialScale = FADE_THROUGH_SCALE)
+    } else {
+        fadeIn(HereMotion.fadeThroughEnter()) +
+                slideInHorizontally(HereMotion.fadeThroughEnter()) { width ->
+                    HereMotion.axisShift(width, forward)
+                }
+    }
+
+/** Уход экрана: раздел растворяется, остальные уезжают в сторону, противоположную входу. */
+private fun AnimatedContentTransitionScope<NavBackStackEntry>.exit(forward: Boolean): ExitTransition =
+    if (initialState.isTopLevel && targetState.isTopLevel) {
+        fadeOut(HereMotion.fadeThroughExit())
+    } else {
+        fadeOut(HereMotion.fadeThroughExit()) +
+                slideOutHorizontally(HereMotion.fadeThroughExit()) { width ->
+                    -HereMotion.axisShift(width, forward)
+                }
+    }
+
+private val NavBackStackEntry.isTopLevel: Boolean
+    get() = TopLevelDestination.entries.any { destination.hasRoute(it.route) }
+
+private const val FADE_THROUGH_SCALE = 0.92f

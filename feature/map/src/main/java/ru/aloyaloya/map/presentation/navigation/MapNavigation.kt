@@ -71,6 +71,7 @@ fun NavGraphBuilder.mapScreen(
             picking = picking,
             focus = focus,
             onFocusShown = onFocusShown,
+            onNewMemoryShown = viewModel::onNewMemoryShown,
             onEmotionConfirmed = onEmotionConfirmed,
             onMemoryClick = onMemoryClick,
             onPickStart = { onPickingChange(true) },

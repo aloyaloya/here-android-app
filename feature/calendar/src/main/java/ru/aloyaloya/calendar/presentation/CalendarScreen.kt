@@ -45,6 +45,7 @@ import ru.aloyaloya.design_system.component.calendar.HereMonthGrid
 import ru.aloyaloya.design_system.component.calendar.HereMonthHeader
 import ru.aloyaloya.design_system.component.character.CharacterEmptyState
 import ru.aloyaloya.design_system.component.memory.HereMemoryRow
+import ru.aloyaloya.design_system.extension.staggeredEntrance
 import ru.aloyaloya.design_system.format.DayMonthFormat
 import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.format.currentLocale
@@ -257,7 +258,7 @@ private fun DayMemories(
             }
         }
 
-        memories.forEach { memory ->
+        memories.forEachIndexed { index, memory ->
             HereMemoryRow(
                 character = memory.emotion.character,
                 color = memory.emotion.color.soft,
@@ -265,7 +266,8 @@ private fun DayMemories(
                 subtitle = TimeFormat.format(
                     Instant.ofEpochMilli(memory.happenedAt).atZone(ZoneId.systemDefault())
                 ),
-                onClick = { onMemoryClick(memory.id) }
+                onClick = { onMemoryClick(memory.id) },
+                modifier = Modifier.staggeredEntrance(order = index)
             )
         }
     }

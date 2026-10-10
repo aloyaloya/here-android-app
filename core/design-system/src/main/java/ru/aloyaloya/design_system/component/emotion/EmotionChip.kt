@@ -12,6 +12,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
 import ru.aloyaloya.design_system.component.character.CharacterEmotion
 import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.theme.EmotionColor
@@ -40,6 +42,8 @@ fun EmotionChip(
     onClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val haptic = LocalHapticFeedback.current
+
     val background by animateColorAsState(
         targetValue = if (selected) color.solid else color.soft,
         label = "emotion-chip-background"
@@ -61,7 +65,10 @@ fun EmotionChip(
                 color = borderColor,
                 shape = HereShape.tile
             )
-            .clickable(onClick = onClick)
+            .clickable {
+                if (!selected) haptic.performHapticFeedback(HapticFeedbackType.SegmentTick)
+                onClick()
+            }
     ) {
         EmotionCharacter(
             emotion = character,

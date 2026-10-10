@@ -9,15 +9,19 @@ import androidx.compose.animation.Crossfade
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.hapticfeedback.HapticFeedback
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
+import androidx.compose.ui.platform.LocalHapticFeedback
+import ru.aloyaloya.design_system.component.celebration.Confetti
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.here.navigation.OnboardingNavHost
-import ru.aloyaloya.here.ui.Confetti
 import ru.aloyaloya.here.ui.HereApp
 
 /**
@@ -41,6 +45,7 @@ class MainActivity : AppCompatActivity() {
         enableEdgeToEdge()
         setContent {
             val onboardingCompleted by viewModel.onboardingCompleted.collectAsState()
+            val hapticsEnabled by viewModel.hapticsEnabled.collectAsState()
             val darkTheme = isSystemInDarkTheme()
             var celebrating by remember { mutableStateOf(false) }
 
@@ -60,27 +65,38 @@ class MainActivity : AppCompatActivity() {
             }
 
             HereTheme(darkTheme = darkTheme) {
-                Box {
-                    Crossfade(targetState = onboardingCompleted, label = "onboarding") { completed ->
-                        if (completed) {
-                            HereApp(darkTheme = darkTheme)
-                        } else {
-                            OnboardingNavHost(
-                                onFinished = viewModel::completeOnboarding,
-                                onPermissionGranted = {
-                                    celebrating = true
-                                    viewModel.completeOnboarding()
-                                }
-                            )
-                        }
-                    }
+                val haptic = LocalHapticFeedback.current
 
-                    if (celebrating) {
-                        Confetti(onEnded = { celebrating = false })
+                CompositionLocalProvider(
+                    LocalHapticFeedback provides if (hapticsEnabled) haptic else NoHapticFeedback
+                ) {
+                    Box {
+                        Crossfade(targetState = onboardingCompleted, label = "onboarding") { completed ->
+                            if (completed) {
+                                HereApp(darkTheme = darkTheme)
+                            } else {
+                                OnboardingNavHost(
+                                    onFinished = viewModel::completeOnboarding,
+                                    onPermissionGranted = {
+                                        celebrating = true
+                                        viewModel.completeOnboarding()
+                                    }
+                                )
+                            }
+                        }
+
+                        if (celebrating) {
+                            Confetti(onEnded = { celebrating = false })
+                        }
                     }
                 }
             }
         }
+    }
+
+    /** Отклик, который ничего не делает: тактильный отклик выключен в настройках. */
+    private object NoHapticFeedback : HapticFeedback {
+        override fun performHapticFeedback(hapticFeedbackType: HapticFeedbackType) = Unit
     }
 
     private companion object {

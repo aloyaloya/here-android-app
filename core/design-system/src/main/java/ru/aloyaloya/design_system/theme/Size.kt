@@ -234,13 +234,7 @@ object HereSize {
         val mediaSpacing = 10.dp
         val mediaSize = 107.dp
         val dividerThickness = 1.dp
-    }
-
-    /** Пункт меню в листе действий. */
-    object SheetAction {
-        val height = 60.dp
-        val iconSize = 24.dp
-        val iconSpacing = 14.dp
+        val factIconSize = 20.dp
     }
 
     /** Экран итогов. */

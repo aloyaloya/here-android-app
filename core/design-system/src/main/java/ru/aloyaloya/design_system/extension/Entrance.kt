@@ -10,12 +10,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.CompositingStrategy
 import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.util.lerp
 import kotlinx.coroutines.delay
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 
@@ -34,12 +36,12 @@ enum class Entrance(
     val startShift: Dp
 ) {
     DROP(
-        spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow),
+        HereMotion.bouncy(),
         TransformOrigin(0.5f, 1f),
         1f,
         -HereSize.EmotionCharacter.small
     ),
-    POP(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessLow), TransformOrigin(0.5f, 0.6f), 0.4f, 0.dp),
+    POP(HereMotion.bouncy(), TransformOrigin(0.5f, 0.6f), 0.4f, 0.dp),
     FADE(tween(360, easing = EaseOut), TransformOrigin.Center, 1f, HereSpacing.s),
     BUBBLE(spring(Spring.DampingRatioMediumBouncy, Spring.StiffnessMedium), TransformOrigin.Center, 0.85f, 0.dp)
 }
@@ -75,8 +77,23 @@ fun Modifier.entrance(
         val scale = lerp(kind.startScale, 1f, value)
         transformOrigin = origin
         alpha = value.coerceIn(0f, 1f)
+        compositingStrategy = CompositingStrategy.ModulateAlpha
         scaleX = scale
         scaleY = scale
         translationY = kind.startShift.toPx() * (1f - value)
     }
 }
+
+/**
+ * Появление элемента в очереди: каждый следующий чуть позже предыдущего.
+ *
+ * @param order Место элемента сверху вниз.
+ */
+@Composable
+fun Modifier.staggeredEntrance(order: Int): Modifier =
+    entrance(
+        kind = Entrance.FADE,
+        delayMillis = order * STAGGER_MILLIS
+    )
+
+private const val STAGGER_MILLIS = 50
