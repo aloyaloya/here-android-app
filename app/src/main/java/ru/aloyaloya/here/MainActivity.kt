@@ -2,6 +2,7 @@ package ru.aloyaloya.here
 
 import android.graphics.Color
 import android.os.Bundle
+import android.view.animation.AccelerateInterpolator
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
@@ -10,7 +11,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.CompositionLocalProvider
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -21,6 +21,7 @@ import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import ru.aloyaloya.design_system.component.celebration.Confetti
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.here.navigation.OnboardingNavHost
 import ru.aloyaloya.here.ui.HereApp
@@ -28,7 +29,8 @@ import ru.aloyaloya.here.ui.HereApp
 /**
  * Главная Activity приложения.
  *
- * При запуске показывает системный сплеш со знаком приложения.
+ * При запуске показывает системный сплеш: знак вырастает, а когда приложение готово,
+ * сжимается, и сплеш растворяется.
  * Тему берет из конфигурации: выбор в настройках применяет `SettingsRepository`.
  * По ней же подбирается вид системных баров.
  * Пока онбординг не пройден, вместо приложения показывается он.
@@ -38,34 +40,39 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen()
+        installSplashScreen().setOnExitAnimationListener { splash ->
+            val delayMillis = (splash.iconAnimationStartMillis +
+                    splash.iconAnimationDurationMillis -
+                    System.currentTimeMillis()).coerceAtLeast(0L)
+            val durationMillis = HereMotion.Duration.medium.toLong()
+
+            splash.iconView.animate()
+                .scaleX(0f)
+                .scaleY(0f)
+                .setInterpolator(AccelerateInterpolator())
+                .setStartDelay(delayMillis)
+                .setDuration(durationMillis)
+            splash.view.animate()
+                .alpha(0f)
+                .setStartDelay(delayMillis)
+                .setDuration(durationMillis)
+                .withEndAction {
+                    splash.remove()
+                    applySystemBars()
+                }
+        }
         super.onCreate(savedInstanceState)
 
         val appComponent = (application as HereApplication).appComponent
 
         viewModel = appComponent.viewModelFactory.create(MainViewModel::class.java)
 
-        enableEdgeToEdge()
+        applySystemBars()
         setContent {
             val onboardingCompleted by viewModel.onboardingCompleted.collectAsState()
             val hapticsEnabled by viewModel.hapticsEnabled.collectAsState()
             val darkTheme = isSystemInDarkTheme()
             var celebrating by remember { mutableStateOf(false) }
-
-            LaunchedEffect(darkTheme) {
-                enableEdgeToEdge(
-                    statusBarStyle = SystemBarStyle.auto(
-                        lightScrim = Color.TRANSPARENT,
-                        darkScrim = Color.TRANSPARENT,
-                        detectDarkMode = { darkTheme }
-                    ),
-                    navigationBarStyle = SystemBarStyle.auto(
-                        lightScrim = NAVIGATION_BAR_LIGHT_SCRIM,
-                        darkScrim = NAVIGATION_BAR_DARK_SCRIM,
-                        detectDarkMode = { darkTheme }
-                    )
-                )
-            }
 
             HereTheme(darkTheme = darkTheme) {
                 val haptic = LocalHapticFeedback.current
@@ -95,6 +102,20 @@ class MainActivity : AppCompatActivity() {
                 }
             }
         }
+    }
+
+    /** Рисует приложение под системными барами и подбирает их вид по теме из конфигурации. */
+    private fun applySystemBars() {
+        enableEdgeToEdge(
+            statusBarStyle = SystemBarStyle.auto(
+                lightScrim = Color.TRANSPARENT,
+                darkScrim = Color.TRANSPARENT
+            ),
+            navigationBarStyle = SystemBarStyle.auto(
+                lightScrim = NAVIGATION_BAR_LIGHT_SCRIM,
+                darkScrim = NAVIGATION_BAR_DARK_SCRIM
+            )
+        )
     }
 
     /** Отклик, который ничего не делает: тактильный отклик выключен в настройках. */
