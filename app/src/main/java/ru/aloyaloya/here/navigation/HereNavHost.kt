@@ -3,7 +3,6 @@ package ru.aloyaloya.here.navigation
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.EnterTransition
 import androidx.compose.animation.ExitTransition
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
@@ -103,31 +102,27 @@ fun HereNavHost(
     }
 }
 
-private fun <T> enterSpec() = tween<T>(
-    durationMillis = HereMotion.Duration.medium,
-    delayMillis = HereMotion.Duration.short
-)
-
-private fun <T> exitSpec() = tween<T>(durationMillis = HereMotion.Duration.short)
-
 /** Смена разделов: новый проявляется с легким приближением. */
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.enter(forward: Boolean): EnterTransition =
     if (initialState.isTopLevel && targetState.isTopLevel) {
-        fadeIn(enterSpec()) + scaleIn(enterSpec(), initialScale = FADE_THROUGH_SCALE)
+        fadeIn(HereMotion.fadeThroughEnter()) +
+                scaleIn(HereMotion.fadeThroughEnter(), initialScale = FADE_THROUGH_SCALE)
     } else {
-        fadeIn(enterSpec()) + slideInHorizontally(enterSpec()) { width ->
-            axisShift(width, forward)
-        }
+        fadeIn(HereMotion.fadeThroughEnter()) +
+                slideInHorizontally(HereMotion.fadeThroughEnter()) { width ->
+                    axisShift(width, forward)
+                }
     }
 
 /** Уход экрана: раздел растворяется, остальные уезжают в сторону, противоположную входу. */
 private fun AnimatedContentTransitionScope<NavBackStackEntry>.exit(forward: Boolean): ExitTransition =
     if (initialState.isTopLevel && targetState.isTopLevel) {
-        fadeOut(exitSpec())
+        fadeOut(HereMotion.fadeThroughExit())
     } else {
-        fadeOut(exitSpec()) + slideOutHorizontally(exitSpec()) { width ->
-            -axisShift(width, forward)
-        }
+        fadeOut(HereMotion.fadeThroughExit()) +
+                slideOutHorizontally(HereMotion.fadeThroughExit()) { width ->
+                    -axisShift(width, forward)
+                }
     }
 
 private fun axisShift(width: Int, forward: Boolean): Int {

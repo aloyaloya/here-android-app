@@ -2,7 +2,6 @@ package ru.aloyaloya.design_system.component.topbar
 
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.SizeTransform
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInVertically
@@ -16,13 +15,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereTheme
-
-private fun <T> enterSpec() = tween<T>(
-    durationMillis = HereMotion.Duration.medium,
-    delayMillis = HereMotion.Duration.short
-)
-
-private fun <T> exitSpec() = tween<T>(durationMillis = HereMotion.Duration.short)
 
 /**
  * Секция заголовка для верхней панели приложения.
@@ -41,10 +33,10 @@ fun TopAppBarTitleSection(
     AnimatedContent(
         targetState = title,
         transitionSpec = {
-            (slideInVertically(enterSpec()) { height -> height / 2 } +
-                    fadeIn(enterSpec())) togetherWith
-                    (slideOutVertically(exitSpec()) { height -> -height / 2 } +
-                            fadeOut(exitSpec())) using
+            (slideInVertically(HereMotion.fadeThroughEnter()) { height -> height / 2 } +
+                    fadeIn(HereMotion.fadeThroughEnter())) togetherWith
+                    (slideOutVertically(HereMotion.fadeThroughExit()) { height -> -height / 2 } +
+                            fadeOut(HereMotion.fadeThroughExit())) using
                     SizeTransform(clip = false)
         },
         contentAlignment = Alignment.CenterStart,
