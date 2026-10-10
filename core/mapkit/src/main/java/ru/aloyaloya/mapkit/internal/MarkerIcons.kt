@@ -5,6 +5,7 @@ import android.content.res.Configuration
 import android.graphics.Bitmap
 import android.graphics.Canvas
 import android.graphics.PointF
+import android.graphics.RectF
 import androidx.core.content.ContextCompat
 import com.yandex.runtime.image.ImageProvider
 import ru.aloyaloya.mapkit.model.MapMarkerIcon
@@ -35,6 +36,13 @@ internal object MarkerIcons {
 
     /** Точка карты на одиночной метке. */
     val anchor = PointF(0.5f, FOOT_Y)
+
+    fun bounds(x: Float, y: Float, density: Float): RectF {
+        val width = ICON_WIDTH_DP * density
+        val height = width * ICON_HEIGHT_RATIO
+        val top = y - height * FOOT_Y
+        return RectF(x - width / 2, top, x + width / 2, top + height)
+    }
 
     private val cache = mutableMapOf<Pair<MapMarkerIcon, Boolean>, ImageProvider>()
     private val stackCache = mutableMapOf<Pair<List<MapMarkerIcon>, Boolean>, StackIcon>()
@@ -93,7 +101,8 @@ internal object MarkerIcons {
     private fun Context.themed(dark: Boolean): Context {
         val configuration = Configuration(resources.configuration)
         val night = if (dark) Configuration.UI_MODE_NIGHT_YES else Configuration.UI_MODE_NIGHT_NO
-        configuration.uiMode = night or (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv())
+        configuration.uiMode =
+            night or (configuration.uiMode and Configuration.UI_MODE_NIGHT_MASK.inv())
         return createConfigurationContext(configuration)
     }
 }

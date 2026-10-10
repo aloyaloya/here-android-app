@@ -6,12 +6,15 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.geometry.Rect
 import com.yandex.mapkit.geometry.Point
 import com.yandex.mapkit.map.CameraPosition
 import com.yandex.mapkit.mapview.MapView
 import ru.aloyaloya.mapkit.internal.MarkersBinder
 import ru.aloyaloya.mapkit.internal.UserLocationBinder
+import kotlinx.coroutines.suspendCancellableCoroutine
 import ru.aloyaloya.mapkit.model.MapPoint
+import kotlin.coroutines.resume
 
 @Stable
 class YandexMapState {
@@ -33,9 +36,15 @@ class YandexMapState {
         map.move(CameraPosition(Point(point.latitude, point.longitude), zoom, 0f, 0f))
     }
 
-    fun dropMarker(id: Long, delayMillis: Long = 0) {
-        markersBinder?.drop(id, delayMillis)
+    suspend fun dropMarker(id: Long, delayMillis: Long = 0) {
+        val binder = markersBinder ?: return
+        suspendCancellableCoroutine { continuation ->
+            binder.drop(id, delayMillis) { continuation.resume(Unit) }
+        }
     }
+
+    fun markerBounds(id: Long): Rect? =
+        markersBinder?.bounds(id)?.let { Rect(it.left, it.top, it.right, it.bottom) }
 
     fun moveToUserLocation() {
         locationBinder?.moveToUserLocation()

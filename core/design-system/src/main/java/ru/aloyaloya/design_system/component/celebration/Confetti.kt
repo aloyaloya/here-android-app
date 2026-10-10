@@ -1,4 +1,4 @@
-package ru.aloyaloya.here.ui
+package ru.aloyaloya.design_system.component.celebration
 
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
@@ -7,6 +7,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.toArgb
 import nl.dionsegijn.konfetti.compose.KonfettiView
 import nl.dionsegijn.konfetti.compose.OnParticleSystemUpdateListener
@@ -22,11 +23,13 @@ import java.util.concurrent.TimeUnit
  * Залп конфетти цветами эмоций поверх экрана; без анимаций в системе не показывается.
  *
  * @param onEnded Колбэк: последняя частица исчезла.
+ * @param origin Точка залпа в пикселях или `null` — над центром экрана.
  */
 @Composable
 fun Confetti(
     onEnded: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    origin: Offset? = null
 ) {
     val currentOnEnded by rememberUpdatedState(onEnded)
 
@@ -36,7 +39,7 @@ fun Confetti(
     }
 
     val emotions = HereTheme.colors.emotions
-    val party = remember(emotions) {
+    val party = remember(emotions, origin) {
         Party(
             speed = 0f,
             maxSpeed = 30f,
@@ -50,7 +53,9 @@ fun Confetti(
                 emotions.sad,
                 emotions.angry
             ).map { it.solid.toArgb() },
-            position = Position.Relative(0.5, 0.3),
+            position = origin
+                ?.let { Position.Absolute(it.x, it.y) }
+                ?: Position.Relative(0.5, 0.3),
             emitter = Emitter(duration = 100, TimeUnit.MILLISECONDS).max(100)
         )
     }

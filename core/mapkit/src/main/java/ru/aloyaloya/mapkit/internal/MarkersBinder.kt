@@ -3,6 +3,7 @@ package ru.aloyaloya.mapkit.internal
 import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.PointF
+import android.graphics.RectF
 import android.location.Location
 import android.view.animation.OvershootInterpolator
 import androidx.core.animation.doOnEnd
@@ -118,8 +119,9 @@ internal class MarkersBinder(
      *
      * @param id [MapMarker.id] метки. Если метки еще нет, она упадет, как только появится.
      * @param delayMillis Задержка перед падением.
+     * @param onLanded Колбэк: метка встала на точку.
      */
-    fun drop(id: Long, delayMillis: Long) {
+    fun drop(id: Long, delayMillis: Long, onLanded: () -> Unit) {
         dropAnimator?.removeAllListeners()
         dropAnimator?.cancel()
         dropId = id
@@ -139,12 +141,18 @@ internal class MarkersBinder(
                 applyDrop()
                 dropId = null
                 dropAnimator = null
+                onLanded()
             }
             start()
         }
     }
 
-    /** Прячет метки, сжимая их в точку, и показывает, раздувая обратно. */
+    fun bounds(id: Long): RectF? {
+        val placemark = placemarks.find { it.markerId == id } ?: return null
+        val point = mapView.mapWindow.worldToScreen(placemark.geometry) ?: return null
+        return MarkerIcons.bounds(point.x, point.y, context.resources.displayMetrics.density)
+    }
+
     fun setVisible(visible: Boolean) {
         collection.isVisible = true
         resize.animateTo(visible) { collection.isVisible = visible }

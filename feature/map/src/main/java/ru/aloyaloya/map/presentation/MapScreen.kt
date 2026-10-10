@@ -42,7 +42,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.TransformOrigin
+import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalHapticFeedback
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.ContextCompat
 import androidx.lifecycle.compose.LifecycleResumeEffect
@@ -62,6 +64,8 @@ import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.map.R
 import ru.aloyaloya.map.model.MapUiState
+import ru.aloyaloya.map.presentation.component.FirstMemory
+import ru.aloyaloya.map.presentation.component.FirstMemoryCelebration
 import ru.aloyaloya.map.presentation.component.PlaceMemoriesSheet
 import ru.aloyaloya.mapkit.model.MapLogoPlacement
 import ru.aloyaloya.mapkit.model.MapMarker
@@ -178,7 +182,9 @@ fun MapScreen(
             var pickedPoint by remember { mutableStateOf<MapPoint?>(null) }
             var cameraMoving by remember { mutableStateOf(false) }
             var placeMemoryIds by rememberSaveable { mutableStateOf<List<Long>>(emptyList()) }
+            var firstMemory by remember { mutableStateOf<FirstMemory?>(null) }
             val mapState = rememberYandexMapState()
+            val haptic = LocalHapticFeedback.current
 
             LaunchedEffect(focus) {
                 focus ?: return@LaunchedEffect
@@ -188,6 +194,7 @@ fun MapScreen(
 
             LaunchedEffect(uiState.newMemory) {
                 val memory = uiState.newMemory ?: return@LaunchedEffect
+                val first = uiState.memories.size == 1
                 mapState.moveTo(
                     point = MapPoint(memory.latitude, memory.longitude),
                     zoom = uiState.mapConfig.userLocationZoom
@@ -196,6 +203,11 @@ fun MapScreen(
                     id = memory.id,
                     delayMillis = HereMotion.Duration.long.toLong()
                 )
+                if (first) {
+                    firstMemory = mapState.markerBounds(memory.id)
+                        ?.let { pin -> FirstMemory(memory.emotion, pin) }
+                    haptic.performHapticFeedback(HapticFeedbackType.Confirm)
+                }
                 onNewMemoryShown()
             }
 
@@ -291,6 +303,14 @@ fun MapScreen(
                                 onPickStart()
                             }
                         }
+                    )
+                }
+
+                firstMemory?.let { current ->
+                    FirstMemoryCelebration(
+                        firstMemory = current,
+                        dismissed = cameraMoving || picking,
+                        onEnded = { firstMemory = null }
                     )
                 }
             }

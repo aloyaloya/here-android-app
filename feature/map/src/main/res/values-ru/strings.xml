@@ -4,6 +4,13 @@
     <string name="map_empty_hint">Здесь пока пусто. Отметь место, где тебе было хорошо</string>
     <string name="map_screen_label">Карта</string>
 
+    <string name="first_memory_happy">Первое воспоминание! Теперь у радости есть адрес</string>
+    <string name="first_memory_tender">Первое теплое местечко. Буду его беречь</string>
+    <string name="first_memory_surprised">Ого, первое воспоминание! Что же дальше?</string>
+    <string name="first_memory_calm">Первое воспоминание на месте. Хорошее начало</string>
+    <string name="first_memory_sad">Первое воспоминание. Грустные тоже стоит помнить</string>
+    <string name="first_memory_angry">Первое воспоминание! У злости тоже есть свое место</string>
+
     <string name="emotion_picker_title">Что чувствуешь здесь?</string>
     <string name="emotion_picker_next">Дальше</string>
 

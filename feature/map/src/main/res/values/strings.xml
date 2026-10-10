@@ -4,6 +4,13 @@
     <string name="map_empty_hint">Nothing here yet. Mark a place where you felt good</string>
     <string name="map_screen_label">Map</string>
 
+    <string name="first_memory_happy">The first memory! Now joy has an address</string>
+    <string name="first_memory_tender">The first cozy spot. I\'ll keep it safe</string>
+    <string name="first_memory_surprised">Whoa, the first memory! What comes next?</string>
+    <string name="first_memory_calm">The first memory is in place. A good start</string>
+    <string name="first_memory_sad">The first memory. Sad ones are worth keeping too</string>
+    <string name="first_memory_angry">The first memory! Anger deserves a place too</string>
+
     <string name="emotion_picker_title">How do you feel here?</string>
     <string name="emotion_picker_next">Next</string>
 
