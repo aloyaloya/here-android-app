@@ -63,11 +63,7 @@ fun NavGraphBuilder.memoryScreen(
         MemoryScreen(
             uiState = uiState,
             onBackClick = onBackClick,
-            onMoreClick = viewModel::onMoreClick,
-            onEditClick = {
-                viewModel.onSheetDismiss()
-                onEditClick(route.memoryId)
-            },
+            onEditClick = { onEditClick(route.memoryId) },
             onDeleteClick = viewModel::onDeleteClick,
             onMediaClick = viewModel::onMediaClick,
             onViewerDismiss = viewModel::onViewerDismiss,

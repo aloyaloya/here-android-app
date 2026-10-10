@@ -44,8 +44,6 @@ class MemoryViewModel @Inject constructor(
         }
     }
 
-    fun onMoreClick() = showSheet(MemorySheet.ACTIONS)
-
     fun onDeleteClick() = showSheet(MemorySheet.DELETE)
 
     fun onSheetDismiss() = showSheet(null)

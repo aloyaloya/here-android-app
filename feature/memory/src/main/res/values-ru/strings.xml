@@ -43,7 +43,6 @@
         <item quantity="many">%d лет назад</item>
         <item quantity="other">%d года назад</item>
     </plurals>
-    <string name="memory_more">Действия</string>
     <string name="memory_action_edit">Редактировать</string>
     <string name="memory_action_delete">Удалить</string>
     <string name="memory_delete_title">Удалить «%1$s»?</string>

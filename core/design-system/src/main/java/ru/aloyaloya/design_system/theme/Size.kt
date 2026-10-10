@@ -237,13 +237,6 @@ object HereSize {
         val factIconSize = 20.dp
     }
 
-    /** Пункт меню в листе действий. */
-    object SheetAction {
-        val height = 60.dp
-        val iconSize = 24.dp
-        val iconSpacing = 14.dp
-    }
-
     /** Экран итогов. */
     object Summary {
         val cardSpacing = 12.dp

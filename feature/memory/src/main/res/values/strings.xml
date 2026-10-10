@@ -35,7 +35,6 @@
         <item quantity="one">%d year ago</item>
         <item quantity="other">%d years ago</item>
     </plurals>
-    <string name="memory_more">Actions</string>
     <string name="memory_action_edit">Edit</string>
     <string name="memory_action_delete">Delete</string>
     <string name="memory_delete_title">Delete “%1$s”?</string>

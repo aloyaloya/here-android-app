@@ -72,7 +72,6 @@ import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
 import ru.aloyaloya.memory.presentation.component.DeleteMemoryDialog
 import ru.aloyaloya.memory.presentation.component.MediaViewer
-import ru.aloyaloya.memory.presentation.component.MemoryActionsSheet
 import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.labelResId
@@ -95,9 +94,8 @@ private const val DAYS_IN_WEEK = 7
  *
  * @param uiState Состояние экрана.
  * @param onBackClick Колбэк возврата назад.
- * @param onMoreClick Колбэк открытия меню действий.
- * @param onEditClick Колбэк выбора редактирования в меню.
- * @param onDeleteClick Колбэк выбора удаления в меню.
+ * @param onEditClick Колбэк нажатия на «Редактировать» в шапке.
+ * @param onDeleteClick Колбэк нажатия на «Удалить» в шапке.
  * @param onMediaClick Колбэк открытия снимка на весь экран.
  * @param onViewerDismiss Колбэк закрытия просмотра снимка.
  * @param onDeleteConfirm Колбэк подтверждения удаления.
@@ -108,7 +106,6 @@ private const val DAYS_IN_WEEK = 7
 fun MemoryScreen(
     uiState: MemoryUiState,
     onBackClick: () -> Unit,
-    onMoreClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onMediaClick: (Int) -> Unit,
@@ -132,7 +129,8 @@ fun MemoryScreen(
                 memory = uiState.memory,
                 address = uiState.address,
                 onBackClick = onBackClick,
-                onMoreClick = onMoreClick,
+                onEditClick = onEditClick,
+                onDeleteClick = onDeleteClick,
                 onMediaClick = onMediaClick,
                 modifier = modifier
             )
@@ -146,12 +144,6 @@ fun MemoryScreen(
             }
 
             when (uiState.activeSheet) {
-                MemorySheet.ACTIONS -> MemoryActionsSheet(
-                    onEditClick = onEditClick,
-                    onDeleteClick = onDeleteClick,
-                    onDismissRequest = onSheetDismiss
-                )
-
                 MemorySheet.DELETE -> DeleteMemoryDialog(
                     title = uiState.memory.title,
                     onConfirmClick = onDeleteConfirm,
@@ -174,7 +166,8 @@ private fun MemoryContent(
     memory: Memory,
     address: String?,
     onBackClick: () -> Unit,
-    onMoreClick: () -> Unit,
+    onEditClick: () -> Unit,
+    onDeleteClick: () -> Unit,
     onMediaClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -192,9 +185,14 @@ private fun MemoryContent(
             onNavigateBack = onBackClick
         ) {
             TopAppBarAction(
-                icon = DesignSystemR.drawable.ic_more,
-                contentDescription = stringResource(R.string.memory_more),
-                onClick = onMoreClick
+                icon = DesignSystemR.drawable.ic_edit,
+                contentDescription = stringResource(R.string.memory_action_edit),
+                onClick = onEditClick
+            )
+            TopAppBarAction(
+                icon = DesignSystemR.drawable.ic_trash,
+                contentDescription = stringResource(R.string.memory_action_delete),
+                onClick = onDeleteClick
             )
         }
 
