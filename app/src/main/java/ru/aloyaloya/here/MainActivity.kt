@@ -6,8 +6,8 @@ import android.view.animation.AccelerateInterpolator
 import androidx.activity.SystemBarStyle
 import androidx.activity.compose.setContent
 import androidx.activity.enableEdgeToEdge
-import androidx.compose.animation.Crossfade
 import androidx.appcompat.app.AppCompatActivity
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.runtime.CompositionLocalProvider
@@ -40,27 +40,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
-        installSplashScreen().setOnExitAnimationListener { splash ->
-            val delayMillis = (splash.iconAnimationStartMillis +
-                    splash.iconAnimationDurationMillis -
-                    System.currentTimeMillis()).coerceAtLeast(0L)
-            val durationMillis = HereMotion.Duration.medium.toLong()
-
-            splash.iconView.animate()
-                .scaleX(0f)
-                .scaleY(0f)
-                .setInterpolator(AccelerateInterpolator())
-                .setStartDelay(delayMillis)
-                .setDuration(durationMillis)
-            splash.view.animate()
-                .alpha(0f)
-                .setStartDelay(delayMillis)
-                .setDuration(durationMillis)
-                .withEndAction {
-                    splash.remove()
-                    applySystemBars()
-                }
-        }
+        installAnimatedSplashScreen()
         super.onCreate(savedInstanceState)
 
         val appComponent = (application as HereApplication).appComponent
@@ -81,7 +61,10 @@ class MainActivity : AppCompatActivity() {
                     LocalHapticFeedback provides if (hapticsEnabled) haptic else NoHapticFeedback
                 ) {
                     Box {
-                        Crossfade(targetState = onboardingCompleted, label = "onboarding") { completed ->
+                        Crossfade(
+                            targetState = onboardingCompleted,
+                            label = "onboarding"
+                        ) { completed ->
                             if (completed) {
                                 HereApp(darkTheme = darkTheme)
                             } else {
@@ -101,6 +84,31 @@ class MainActivity : AppCompatActivity() {
                     }
                 }
             }
+        }
+    }
+
+    /** Показывает системный сплеш */
+    private fun installAnimatedSplashScreen() {
+        installSplashScreen().setOnExitAnimationListener { splash ->
+            val delayMillis = (splash.iconAnimationStartMillis +
+                    splash.iconAnimationDurationMillis -
+                    System.currentTimeMillis()).coerceAtLeast(0L)
+            val durationMillis = HereMotion.Duration.medium.toLong()
+
+            splash.iconView.animate()
+                .scaleX(0f)
+                .scaleY(0f)
+                .setInterpolator(AccelerateInterpolator())
+                .setStartDelay(delayMillis)
+                .setDuration(durationMillis)
+            splash.view.animate()
+                .alpha(0f)
+                .setStartDelay(delayMillis)
+                .setDuration(durationMillis)
+                .withEndAction {
+                    splash.remove()
+                    applySystemBars()
+                }
         }
     }
 
