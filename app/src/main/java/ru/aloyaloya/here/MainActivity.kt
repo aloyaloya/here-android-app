@@ -19,6 +19,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.hapticfeedback.HapticFeedback
 import androidx.compose.ui.hapticfeedback.HapticFeedbackType
 import androidx.compose.ui.platform.LocalHapticFeedback
+import androidx.core.splashscreen.SplashScreen.Companion.installSplashScreen
 import ru.aloyaloya.design_system.component.celebration.Confetti
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.here.navigation.OnboardingNavHost
@@ -27,6 +28,7 @@ import ru.aloyaloya.here.ui.HereApp
 /**
  * Главная Activity приложения.
  *
+ * При запуске показывает системный сплеш со знаком приложения.
  * Тему берет из конфигурации: выбор в настройках применяется через `AppCompatDelegate`.
  * По ней же подбирается вид системных баров.
  * Пока онбординг не пройден, вместо приложения показывается он.
@@ -36,6 +38,7 @@ class MainActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        installSplashScreen()
         super.onCreate(savedInstanceState)
 
         val appComponent = (application as HereApplication).appComponent
