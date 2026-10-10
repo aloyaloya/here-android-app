@@ -1,5 +1,11 @@
 package ru.aloyaloya.here.ui
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,6 +18,7 @@ import ru.aloyaloya.design_system.component.navigation.BottomNavigationBar
 import ru.aloyaloya.design_system.component.navigation.BottomNavigationBarItem
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.component.topbar.TopAppBar
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.here.navigation.TopLevelDestination
 import ru.aloyaloya.design_system.R as DesignSystemR
@@ -58,21 +65,39 @@ fun HereScaffold(
         content()
 
         if (currentTopLevelDestination != null) {
-            if (contextMode != null) {
-                HereContextTopAppBar(
-                    title = stringResource(contextMode.titleResId),
-                    navigationContentDescription = stringResource(
-                        DesignSystemR.string.context_bar_back_content_description
-                    ),
-                    onNavigateBack = contextMode.onExit,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
-            } else {
-                TopAppBar(
-                    title = stringResource(currentTopLevelDestination.titleResId),
-                    onSettingsClick = onSettingsClick,
-                    modifier = Modifier.align(Alignment.TopCenter)
-                )
+            AnimatedContent(
+                targetState = contextMode,
+                transitionSpec = {
+                    val forward = targetState != null
+                    (fadeIn(HereMotion.fadeThroughEnter()) +
+                            slideInHorizontally(HereMotion.fadeThroughEnter()) { width ->
+                                modeShift(width, forward)
+                            }) togetherWith
+                            (fadeOut(HereMotion.fadeThroughExit()) +
+                                    slideOutHorizontally(HereMotion.fadeThroughExit()) { width ->
+                                        -modeShift(width, forward)
+                                    })
+                },
+                contentKey = { mode -> mode != null },
+                label = "top-app-bar",
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .background(HereTheme.colors.background)
+            ) { mode ->
+                if (mode != null) {
+                    HereContextTopAppBar(
+                        title = stringResource(mode.titleResId),
+                        navigationContentDescription = stringResource(
+                            DesignSystemR.string.context_bar_back_content_description
+                        ),
+                        onNavigateBack = mode.onExit
+                    )
+                } else {
+                    TopAppBar(
+                        title = stringResource(currentTopLevelDestination.titleResId),
+                        onSettingsClick = onSettingsClick
+                    )
+                }
             }
 
             BottomNavigationBar(
@@ -91,3 +116,10 @@ fun HereScaffold(
         }
     }
 }
+
+private fun modeShift(width: Int, forward: Boolean): Int {
+    val shift = (width * MODE_SHIFT_FRACTION).toInt()
+    return if (forward) shift else -shift
+}
+
+private const val MODE_SHIFT_FRACTION = 0.1f

@@ -5,6 +5,8 @@ import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.spring
 import androidx.compose.animation.core.tween
 
+private const val FADE_THROUGH_DELAY = 100
+
 object HereMotion {
     fun <T> spatial(): FiniteAnimationSpec<T> = spring(dampingRatio = 0.9f, stiffness = 700f)
     fun <T> effects(): FiniteAnimationSpec<T> = spring(dampingRatio = 1f, stiffness = 1600f)
@@ -13,7 +15,7 @@ object HereMotion {
         spring(dampingRatio = Spring.DampingRatioMediumBouncy, stiffness = Spring.StiffnessLow)
 
     fun <T> fadeThroughEnter(): FiniteAnimationSpec<T> =
-        tween(durationMillis = Duration.medium, delayMillis = Duration.short)
+        tween(durationMillis = Duration.medium, delayMillis = FADE_THROUGH_DELAY)
 
     fun <T> fadeThroughExit(): FiniteAnimationSpec<T> = tween(durationMillis = Duration.short)
 
