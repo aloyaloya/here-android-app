@@ -1,6 +1,8 @@
 package ru.aloyaloya.data.repository
 
+import android.app.UiModeManager
 import android.content.Context
+import android.os.Build
 import androidx.appcompat.app.AppCompatDelegate
 import androidx.core.os.LocaleListCompat
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +26,8 @@ class SettingsRepositoryImpl @Inject constructor(
         PREFS_NAME,
         Context.MODE_PRIVATE
     )
+
+    private val uiModeManager = context.getSystemService(UiModeManager::class.java)
 
     private val _theme = MutableStateFlow(readTheme())
     override val theme: StateFlow<AppTheme> = _theme.asStateFlow()
@@ -95,14 +99,26 @@ class SettingsRepositoryImpl @Inject constructor(
         preferences.edit().putBoolean(KEY_NOTIFICATIONS_REQUESTED, true).apply()
     }
 
+    /** С Android 12 тему запоминает система, чтобы сплеш был в ней же; раньше ее ставит AppCompat. */
     private fun applyNightMode(theme: AppTheme) {
-        AppCompatDelegate.setDefaultNightMode(
-            when (theme) {
-                AppTheme.AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
-                AppTheme.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
-                AppTheme.DARK -> AppCompatDelegate.MODE_NIGHT_YES
-            }
-        )
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            AppCompatDelegate.setDefaultNightMode(AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM)
+            uiModeManager.setApplicationNightMode(
+                when (theme) {
+                    AppTheme.AUTO -> UiModeManager.MODE_NIGHT_AUTO
+                    AppTheme.LIGHT -> UiModeManager.MODE_NIGHT_NO
+                    AppTheme.DARK -> UiModeManager.MODE_NIGHT_YES
+                }
+            )
+        } else {
+            AppCompatDelegate.setDefaultNightMode(
+                when (theme) {
+                    AppTheme.AUTO -> AppCompatDelegate.MODE_NIGHT_FOLLOW_SYSTEM
+                    AppTheme.LIGHT -> AppCompatDelegate.MODE_NIGHT_NO
+                    AppTheme.DARK -> AppCompatDelegate.MODE_NIGHT_YES
+                }
+            )
+        }
     }
 
     private fun readTheme(): AppTheme {
