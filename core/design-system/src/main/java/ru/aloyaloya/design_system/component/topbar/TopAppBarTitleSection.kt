@@ -18,7 +18,7 @@ import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereTheme
 
 private fun <T> enterSpec() = tween<T>(
-    durationMillis = HereMotion.Duration.long,
+    durationMillis = HereMotion.Duration.medium,
     delayMillis = HereMotion.Duration.short
 )
 
