@@ -1,8 +1,11 @@
 package ru.aloyaloya.mapkit.internal
 
+import android.animation.ValueAnimator
 import android.content.Context
 import android.graphics.PointF
 import android.location.Location
+import android.view.animation.OvershootInterpolator
+import androidx.core.animation.doOnEnd
 import com.yandex.mapkit.Animation
 import com.yandex.mapkit.geometry.BoundingBox
 import com.yandex.mapkit.geometry.Geometry
@@ -44,6 +47,10 @@ internal class MarkersBinder(
     private val placemarks = mutableListOf<PlacemarkMapObject>()
     private val clusters = mutableMapOf<Cluster, PointF>()
     private val resize = IconResize { applyScale() }
+
+    private var dropId: Long? = null
+    private var dropOffset: Float? = null
+    private var dropAnimator: ValueAnimator? = null
 
     private val tapListener = MapObjectTapListener { mapObject, _ ->
         val marker = mapObject.userData as? MapMarker
@@ -99,11 +106,42 @@ internal class MarkersBinder(
                 geometry = Point(marker.point.latitude, marker.point.longitude)
                 setIcon(MarkerIcons.get(context, marker.icon, dark))
                 userData = marker
-                setIconStyle(scaled())
+                setIconStyle(markerStyle(marker.id))
             }
         }
         collection.clusterPlacemarks(CLUSTER_RADIUS, maxZoom.toInt())
         current = markers
+    }
+
+    /**
+     * Роняет метку сверху на ее точку. До падения метка спрятана.
+     *
+     * @param id [MapMarker.id] метки. Если метки еще нет, она упадет, как только появится.
+     * @param delayMillis Задержка перед падением.
+     */
+    fun drop(id: Long, delayMillis: Long) {
+        dropAnimator?.removeAllListeners()
+        dropAnimator?.cancel()
+        dropId = id
+        dropOffset = null
+        applyDrop()
+
+        dropAnimator = ValueAnimator.ofFloat(DROP_HEIGHT, 0f).apply {
+            startDelay = delayMillis
+            duration = DROP_MILLIS
+            interpolator = OvershootInterpolator()
+            addUpdateListener { animator ->
+                dropOffset = animator.animatedValue as Float
+                applyDrop()
+            }
+            doOnEnd {
+                dropOffset = 0f
+                applyDrop()
+                dropId = null
+                dropAnimator = null
+            }
+            start()
+        }
     }
 
     /** Прячет метки, сжимая их в точку, и показывает, раздувая обратно. */
@@ -113,16 +151,28 @@ internal class MarkersBinder(
     }
 
     private fun applyScale() {
-        placemarks.forEach { it.setIconStyle(scaled()) }
+        placemarks.forEach { it.setIconStyle(markerStyle(it.markerId)) }
         clusters.keys.removeAll { !it.isValid }
         clusters.forEach { (cluster, anchor) -> cluster.appearance.setIconStyle(scaled(anchor)) }
     }
 
-    /** Стиль иконки с текущим масштабом. */
+    private fun applyDrop() {
+        placemarks.find { it.markerId == dropId }?.let { it.setIconStyle(markerStyle(dropId)) }
+    }
+
+    private fun markerStyle(id: Long?): IconStyle {
+        if (id == null || id != dropId) return scaled()
+
+        val offset = dropOffset
+        val anchor = PointF(MarkerIcons.anchor.x, MarkerIcons.anchor.y + (offset ?: 0f))
+        return scaled(anchor).setVisible(offset != null)
+    }
+
+    private val PlacemarkMapObject.markerId get() = (userData as? MapMarker)?.id
+
     private fun scaled(anchor: PointF = MarkerIcons.anchor) =
         IconStyle().setAnchor(anchor).setScale(resize.scale)
 
-    /** Подводит камеру так, чтобы метки стопки поместились на экран с запасом по краям. */
     private fun zoomTo(markers: List<MapMarker>) {
         val box = BoundingBox(
             Point(markers.minOf { it.point.latitude }, markers.minOf { it.point.longitude }),
@@ -142,10 +192,6 @@ internal class MarkersBinder(
     private fun Cluster.markers(): List<MapMarker> =
         placemarks.mapNotNull { it.userData as? MapMarker }
 
-    /**
-     * Метки для стопки: сперва разные эмоции от частой к редкой, потом повторы.
-     * Так стопка из одинаковых эмоций все равно выглядит стопкой.
-     */
     private fun List<MapMarker>.stackIcons() =
         map { it.icon }
             .groupingBy { it }
@@ -173,17 +219,18 @@ internal class MarkersBinder(
     }
 
     private companion object {
-        /** Метки ближе этого расстояния на экране склеиваются. */
+
         const val CLUSTER_RADIUS = 40.0
 
-        /** Больше слоев стопка не рисует. */
         const val STACK_SIZE = 3
 
-        /** Ближе этого точки считаются одним местом. */
         const val SAME_PLACE_METERS = 15f
 
-        /** Отступ от точного вписывания, чтобы крайние метки не резались краем экрана. */
         const val FIT_ZOOM_MARGIN = 0.8f
+
+        const val DROP_HEIGHT = 1f
+
+        const val DROP_MILLIS = 500L
 
         val CAMERA_ANIMATION = Animation(Animation.Type.SMOOTH, 0.4f)
     }

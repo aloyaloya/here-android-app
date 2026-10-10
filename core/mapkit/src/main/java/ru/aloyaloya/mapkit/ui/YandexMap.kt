@@ -137,6 +137,11 @@ fun YandexMap(
         )
     }
 
+    DisposableEffect(state, markersBinder) {
+        state.markersBinder = markersBinder
+        onDispose { state.markersBinder = null }
+    }
+
     LaunchedEffect(markersBinder, markers, isDarkTheme) {
         markersBinder.apply(markers, isDarkTheme)
     }

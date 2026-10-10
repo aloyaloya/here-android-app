@@ -56,6 +56,7 @@ import ru.aloyaloya.design_system.extension.Entrance
 import ru.aloyaloya.design_system.extension.entrance
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.Memory
@@ -117,6 +118,7 @@ private fun Context.hasLocationPermission(): Boolean =
  * @param onPickCancel Колбэк выхода из режима выбора места.
  * @param focus Точка, которую нужно показать, или `null`. Приходит с других экранов.
  * @param onFocusShown Колбэк: камера встала на [focus], точку можно забыть.
+ * @param onNewMemoryShown Колбэк: пин нового воспоминания упал на карту.
  */
 @Composable
 fun MapScreen(
@@ -124,6 +126,7 @@ fun MapScreen(
     picking: Boolean,
     focus: MapPoint?,
     onFocusShown: () -> Unit,
+    onNewMemoryShown: () -> Unit,
     onEmotionConfirmed: (Emotion, MapPoint) -> Unit,
     onMemoryClick: (Long) -> Unit,
     onPickStart: () -> Unit,
@@ -181,6 +184,19 @@ fun MapScreen(
                 focus ?: return@LaunchedEffect
                 mapState.moveTo(focus, uiState.mapConfig.userLocationZoom)
                 onFocusShown()
+            }
+
+            LaunchedEffect(uiState.newMemory) {
+                val memory = uiState.newMemory ?: return@LaunchedEffect
+                mapState.moveTo(
+                    point = MapPoint(memory.latitude, memory.longitude),
+                    zoom = uiState.mapConfig.userLocationZoom
+                )
+                mapState.dropMarker(
+                    id = memory.id,
+                    delayMillis = HereMotion.Duration.long.toLong()
+                )
+                onNewMemoryShown()
             }
 
             BackHandler(enabled = picking, onBack = onPickCancel)
