@@ -97,11 +97,11 @@ fun HereScaffold(
                     val forward = targetState != null
                     (fadeIn(HereMotion.fadeThroughEnter()) +
                             slideInHorizontally(HereMotion.fadeThroughEnter()) { width ->
-                                modeShift(width, forward)
+                                HereMotion.axisShift(width, forward)
                             }) togetherWith
                             (fadeOut(HereMotion.fadeThroughExit()) +
                                     slideOutHorizontally(HereMotion.fadeThroughExit()) { width ->
-                                        -modeShift(width, forward)
+                                        -HereMotion.axisShift(width, forward)
                                     })
                 },
                 contentKey = { mode -> mode != null },
@@ -143,12 +143,5 @@ fun HereScaffold(
         }
     }
 }
-
-private fun modeShift(width: Int, forward: Boolean): Int {
-    val shift = (width * MODE_SHIFT_FRACTION).toInt()
-    return if (forward) shift else -shift
-}
-
-private const val MODE_SHIFT_FRACTION = 0.1f
 
 private const val SCROLLED_THRESHOLD = 0.5f

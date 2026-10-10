@@ -110,7 +110,7 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.enter(forward: Boo
     } else {
         fadeIn(HereMotion.fadeThroughEnter()) +
                 slideInHorizontally(HereMotion.fadeThroughEnter()) { width ->
-                    axisShift(width, forward)
+                    HereMotion.axisShift(width, forward)
                 }
     }
 
@@ -121,18 +121,11 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.exit(forward: Bool
     } else {
         fadeOut(HereMotion.fadeThroughExit()) +
                 slideOutHorizontally(HereMotion.fadeThroughExit()) { width ->
-                    -axisShift(width, forward)
+                    -HereMotion.axisShift(width, forward)
                 }
     }
-
-private fun axisShift(width: Int, forward: Boolean): Int {
-    val shift = (width * AXIS_SHIFT_FRACTION).toInt()
-    return if (forward) shift else -shift
-}
 
 private val NavBackStackEntry.isTopLevel: Boolean
     get() = TopLevelDestination.entries.any { destination.hasRoute(it.route) }
 
 private const val FADE_THROUGH_SCALE = 0.92f
-
-private const val AXIS_SHIFT_FRACTION = 0.1f
