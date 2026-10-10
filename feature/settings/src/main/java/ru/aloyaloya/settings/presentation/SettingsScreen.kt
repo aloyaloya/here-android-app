@@ -120,6 +120,7 @@ fun SettingsScreen(
         onPauseOrDispose {}
     }
     val reminderEnabled = uiState.reminder.enabled && !notificationsBlocked
+    val scrollState = rememberScrollState()
 
     Column(
         modifier = modifier
@@ -129,14 +130,15 @@ fun SettingsScreen(
         HereContextTopAppBar(
             title = stringResource(R.string.settings_title),
             navigationContentDescription = stringResource(R.string.settings_back),
-            onNavigateBack = onBackClick
+            onNavigateBack = onBackClick,
+            scrolled = scrollState.canScrollBackward
         )
 
         Column(
             verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .navigationBarsPadding()
                 .padding(
                     horizontal = HereSpacing.l,
