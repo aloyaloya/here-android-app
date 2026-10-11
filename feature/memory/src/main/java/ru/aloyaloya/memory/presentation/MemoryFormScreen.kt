@@ -5,6 +5,7 @@ import android.net.Uri
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.annotation.StringRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.scaleIn
@@ -172,7 +173,10 @@ fun MemoryFormScreen(
                 HereTextField(
                     value = uiState.description,
                     onValueChange = onDescriptionChanged,
-                    label = stringResource(R.string.memory_form_description_label),
+                    label = stringResource(
+                        uiState.emotion?.descriptionLabelResId
+                            ?: R.string.memory_form_description_label
+                    ),
                     minHeight = HereSize.TextField.multilineMinHeight
                 )
 
@@ -389,3 +393,14 @@ private fun EmotionSection(
         }
     }
 }
+
+private val Emotion.descriptionLabelResId: Int
+    @StringRes
+    get() = when (this) {
+        Emotion.HAPPY -> R.string.memory_form_description_label_happy
+        Emotion.TENDER -> R.string.memory_form_description_label_tender
+        Emotion.SURPRISED -> R.string.memory_form_description_label_surprised
+        Emotion.CALM -> R.string.memory_form_description_label_calm
+        Emotion.SAD -> R.string.memory_form_description_label_sad
+        Emotion.ANGRY -> R.string.memory_form_description_label_angry
+    }
