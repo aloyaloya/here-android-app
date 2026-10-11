@@ -102,6 +102,7 @@ object HereSize {
         val contentSpacing = 10.dp
         val selectedBorder = 2.dp
         val selectedScale = 1.05f
+        val labelMinFontSize = 11.sp
     }
 
     /** Квадратная плитка эмоции в ряду. */
