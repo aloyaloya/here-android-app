@@ -71,8 +71,8 @@ private val ZIP_OPEN_MIME_TYPES = arrayOf(ZIP_MIME_TYPE, "application/octet-stre
  * @param onThemeSelected Колбэк выбора темы.
  * @param onLanguageSelected Колбэк выбора языка.
  * @param onHapticsChange Колбэк переключения тактильного отклика.
- * @param onReminderEnabledChange Колбэк выключения напоминания о дне.
- * @param onNotificationsRequest Колбэк открытия экрана уведомлений.
+ * @param onReminderEnabledChange Колбэк переключения напоминания о дне.
+ * @param onNotificationsRequest Колбэк открытия экрана уведомлений, если они не разрешены.
  * @param onReminderTimeChange Колбэк выбора времени напоминания.
  * @param onExport Колбэк экспорта в выбранный файл.
  * @param onImport Колбэк импорта из выбранного файла.
@@ -175,7 +175,7 @@ fun SettingsScreen(
                     description = stringResource(R.string.settings_reminder_description),
                     checked = reminderEnabled,
                     onCheckedChange = { enabled ->
-                        if (enabled) {
+                        if (enabled && !context.notificationsEnabled()) {
                             onNotificationsRequest()
                         } else {
                             onReminderEnabledChange(enabled)
