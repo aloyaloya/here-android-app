@@ -1,6 +1,7 @@
 package ru.aloyaloya.summary.presentation
 
 import androidx.compose.animation.animateContentSize
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -14,7 +15,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -66,6 +66,7 @@ private const val MIN_MEMORY_COUNT = 3
  * Экран итогов: что и где чувствовалось за выбранный период.
  *
  * @param uiState Состояние экрана.
+ * @param scrollState Прокрутка экрана: ее поднимает навигация, когда раздел выбирают повторно.
  * @param onPeriodSelected Колбэк выбора периода.
  * @param onPlaceClick Колбэк нажатия на место настроения: отдает его точку.
  * @param onMemoryClick Колбэк нажатия на воспоминание в «Вспомнить».
@@ -75,6 +76,7 @@ private const val MIN_MEMORY_COUNT = 3
 @Composable
 fun SummaryScreen(
     uiState: SummaryUiState,
+    scrollState: ScrollState,
     onPeriodSelected: (SummaryPeriod) -> Unit,
     onPlaceClick: (latitude: Double, longitude: Double) -> Unit,
     onMemoryClick: (Long) -> Unit,
@@ -96,6 +98,7 @@ fun SummaryScreen(
 
             is SummaryUiState.Content -> SummaryContent(
                 uiState = uiState,
+                scrollState = scrollState,
                 onPeriodSelected = onPeriodSelected,
                 onPlaceClick = onPlaceClick,
                 onMemoryClick = onMemoryClick,
@@ -108,6 +111,7 @@ fun SummaryScreen(
 @Composable
 private fun SummaryContent(
     uiState: SummaryUiState.Content,
+    scrollState: ScrollState,
     onPeriodSelected: (SummaryPeriod) -> Unit,
     onPlaceClick: (latitude: Double, longitude: Double) -> Unit,
     onMemoryClick: (Long) -> Unit,
@@ -143,7 +147,7 @@ private fun SummaryContent(
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
         modifier = barsPadding
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
             .padding(
                 horizontal = HereSpacing.l,
                 vertical = HereSpacing.s

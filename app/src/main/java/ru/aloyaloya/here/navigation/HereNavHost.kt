@@ -14,6 +14,9 @@ import androidx.navigation.NavBackStackEntry
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import ru.aloyaloya.calendar.presentation.navigation.calendarScreen
 import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.map.presentation.navigation.MapRoute
@@ -45,6 +48,7 @@ import ru.aloyaloya.summary.presentation.navigation.summaryScreen
  * @param onShowOnMap Колбэк перехода на карту к точке: переход между разделами
  * ведет [ru.aloyaloya.here.ui.HereApp].
  * @param onMapFocusShown Колбэк: карта показала [mapFocus].
+ * @param reselections Повторные нажатия на текущий раздел в нижней навигации.
  * @param modifier Модификатор для настройки внешнего вида контейнера навигации.
  */
 @Composable
@@ -55,6 +59,7 @@ fun HereNavHost(
     mapFocus: MapPoint?,
     onShowOnMap: (MapPoint) -> Unit,
     onMapFocusShown: () -> Unit,
+    reselections: Flow<TopLevelDestination>,
     modifier: Modifier = Modifier
 ) {
     NavHost(
@@ -86,9 +91,11 @@ fun HereNavHost(
             onEditClick = { memoryId -> navController.navigateToEditMemory(memoryId) }
         )
         calendarScreen(
+            scrollToTop = reselections.of(TopLevelDestination.CALENDAR),
             onMemoryClick = { memoryId -> navController.navigateToMemory(memoryId) }
         )
         summaryScreen(
+            scrollToTop = reselections.of(TopLevelDestination.SUMMARY),
             onPlaceClick = { latitude, longitude -> onShowOnMap(MapPoint(latitude, longitude)) },
             onMemoryClick = { memoryId -> navController.navigateToMemory(memoryId) }
         )
@@ -124,6 +131,10 @@ private fun AnimatedContentTransitionScope<NavBackStackEntry>.exit(forward: Bool
                     -HereMotion.axisShift(width, forward)
                 }
     }
+
+/** Повторные выборы одного раздела. */
+private fun Flow<TopLevelDestination>.of(destination: TopLevelDestination): Flow<Unit> =
+    filter { it == destination }.map { }
 
 private val NavBackStackEntry.isTopLevel: Boolean
     get() = TopLevelDestination.entries.any { destination.hasRoute(it.route) }
