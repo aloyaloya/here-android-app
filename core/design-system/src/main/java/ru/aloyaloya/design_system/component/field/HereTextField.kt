@@ -69,8 +69,7 @@ private const val LABEL_MILLIS = 180
  * @param label Имя поля: и подсказка в пустом поле, и подпись в заполненном.
  * @param modifier [Modifier], применяемый к полю.
  * @param textStyle Стиль текста.
- * @param singleLine Запрещать ли переносы строк. В однострочном поле переносить нечего,
- * поэтому клавиатура вместо Enter предлагает закончить ввод.
+ * @param singleLine Запрещать ли переносы строк. Enter на клавиатуре в любом поле закрывает ее.
  * @param minHeight Минимальная высота карточки без учета отступов.
  */
 @OptIn(ExperimentalLayoutApi::class)
@@ -128,9 +127,7 @@ fun HereTextField(
         textStyle = textStyle.copy(color = colors.textPrimary),
         cursorBrush = SolidColor(colors.accent),
         singleLine = singleLine,
-        keyboardOptions = KeyboardOptions(
-            imeAction = if (singleLine) ImeAction.Done else ImeAction.Default
-        ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         interactionSource = interactionSource,
         modifier = modifier
