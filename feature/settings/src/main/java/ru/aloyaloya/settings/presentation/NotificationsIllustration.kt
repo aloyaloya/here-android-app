@@ -32,6 +32,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
+import ru.aloyaloya.design_system.component.character.CharacterEmotion
+import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.extension.Entrance
 import ru.aloyaloya.design_system.extension.entrance
 import ru.aloyaloya.design_system.extension.overlayShadow
@@ -165,11 +167,11 @@ private fun NotificationPreview(modifier: Modifier = Modifier) {
                 .size(sizes.avatarSize)
                 .background(color = colors.surfaceMuted, shape = CircleShape)
         ) {
-            Icon(
-                painter = painterResource(DesignR.drawable.ic_place),
-                contentDescription = null,
-                tint = colors.textPrimary,
-                modifier = Modifier.size(sizes.iconSize)
+            EmotionCharacter(
+                emotion = CharacterEmotion.YOU,
+                size = sizes.characterSize,
+                animated = false,
+                shadow = false
             )
         }
 

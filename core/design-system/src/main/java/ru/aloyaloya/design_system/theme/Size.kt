@@ -297,6 +297,7 @@ object HereSize {
     object NotificationIllustration {
         val avatarSize = 40.dp
         val iconSize = 20.dp
+        val characterSize = 28.dp
         val badgeSize = 40.dp
         val badgeBorder = 1.dp
         val mutedAlpha = 0.5f
