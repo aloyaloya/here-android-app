@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="memory_form_title_new">Новое место</string>
+    <string name="memory_form_title_new">Новое воспоминание</string>
     <string name="memory_form_title_edit">Изменить</string>
 
     <string name="memory_form_date_label">Дата</string>
     <string name="memory_form_time_label">Время</string>
 
     <string name="memory_form_emotion_label">Что чувствуешь</string>
-    <string name="memory_form_title_label">Как назовем место?</string>
+    <string name="memory_form_title_label">Как назовем воспоминание?</string>
     <string name="memory_form_description_label">Что запомнилось?</string>
+    <string name="memory_form_description_label_happy">Что тебя здесь порадовало?</string>
+    <string name="memory_form_description_label_tender">Что тебя здесь тронуло?</string>
+    <string name="memory_form_description_label_surprised">Что тебя здесь удивило?</string>
+    <string name="memory_form_description_label_calm">Что помогло здесь выдохнуть?</string>
+    <string name="memory_form_description_label_sad">Что тебя здесь расстроило?</string>
+    <string name="memory_form_description_label_angry">Что тебя здесь разозлило?</string>
     <string name="memory_form_save_new">Сохранить воспоминание</string>
     <string name="memory_form_save_edit">Сохранить изменения</string>
 

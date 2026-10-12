@@ -1,5 +1,7 @@
 package ru.aloyaloya.summary.presentation.navigation
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -8,6 +10,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import ru.aloyaloya.summary.di.SummaryComponent
 import ru.aloyaloya.summary.presentation.SummaryScreen
@@ -33,11 +36,13 @@ fun NavController.navigateToSummary(navOptions: NavOptions) =
  * Внутри функции добавляется composable-маршрут [SummaryRoute] и
  * размещается UI-контент экрана итогов.
  *
+ * @param scrollToTop Повторные выборы раздела: на каждый экран прокручивается наверх.
  * @param onPlaceClick Колбэк нажатия на место настроения: отдает его точку,
  * чтобы показать место на карте.
  * @param onMemoryClick Колбэк перехода к воспоминанию.
  */
 fun NavGraphBuilder.summaryScreen(
+    scrollToTop: Flow<Unit>,
     onPlaceClick: (latitude: Double, longitude: Double) -> Unit,
     onMemoryClick: (Long) -> Unit
 ) {
@@ -55,9 +60,15 @@ fun NavGraphBuilder.summaryScreen(
         )
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val scrollState = rememberScrollState()
+
+        LaunchedEffect(scrollState) {
+            scrollToTop.collect { scrollState.animateScrollTo(0) }
+        }
 
         SummaryScreen(
             uiState = uiState,
+            scrollState = scrollState,
             onPeriodSelected = viewModel::onPeriodSelected,
             onPlaceClick = onPlaceClick,
             onMemoryClick = onMemoryClick,

@@ -1,14 +1,20 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="memory_form_title_new">New place</string>
+    <string name="memory_form_title_new">New memory</string>
     <string name="memory_form_title_edit">Edit</string>
 
     <string name="memory_form_date_label">Date</string>
     <string name="memory_form_time_label">Time</string>
 
     <string name="memory_form_emotion_label">How do you feel</string>
-    <string name="memory_form_title_label">What do we call this place?</string>
+    <string name="memory_form_title_label">What do we call this memory?</string>
     <string name="memory_form_description_label">What do you remember?</string>
+    <string name="memory_form_description_label_happy">What made you happy here?</string>
+    <string name="memory_form_description_label_tender">What touched you here?</string>
+    <string name="memory_form_description_label_surprised">What surprised you here?</string>
+    <string name="memory_form_description_label_calm">What helped you unwind here?</string>
+    <string name="memory_form_description_label_sad">What upset you here?</string>
+    <string name="memory_form_description_label_angry">What made you angry here?</string>
     <string name="memory_form_save_new">Save memory</string>
     <string name="memory_form_save_edit">Save changes</string>
 

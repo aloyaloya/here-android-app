@@ -8,6 +8,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.TextAutoSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -95,7 +96,12 @@ fun EmotionTile(
         Text(
             text = label,
             style = MaterialTheme.typography.titleMedium,
-            color = HereTheme.colors.textPrimary
+            color = HereTheme.colors.textPrimary,
+            maxLines = 1,
+            autoSize = TextAutoSize.StepBased(
+                minFontSize = HereSize.EmotionTile.labelMinFontSize,
+                maxFontSize = MaterialTheme.typography.titleMedium.fontSize
+            )
         )
     }
 }

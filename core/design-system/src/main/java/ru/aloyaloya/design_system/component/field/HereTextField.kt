@@ -1,8 +1,13 @@
 package ru.aloyaloya.design_system.component.field
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.SizeTransform
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -39,6 +44,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.lerp
 import androidx.compose.ui.unit.takeOrElse
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -56,15 +62,14 @@ private const val LABEL_MILLIS = 180
  * месте первой строки и заменяет подсказку, а с приходом текста мельчает и всплывает
  * наверх. Так поле не теряет имя, когда заполнено. Фокус Material показывает линией
  * снизу, но она требует прямого низа у контейнера, поэтому здесь его показывает
- * обводка по контуру.
+ * обводка по контуру. Смена подписи проявляется через затухание.
  *
  * @param value Текущий текст.
  * @param onValueChange Колбэк изменения текста.
  * @param label Имя поля: и подсказка в пустом поле, и подпись в заполненном.
  * @param modifier [Modifier], применяемый к полю.
  * @param textStyle Стиль текста.
- * @param singleLine Запрещать ли переносы строк. В однострочном поле переносить нечего,
- * поэтому клавиатура вместо Enter предлагает закончить ввод.
+ * @param singleLine Запрещать ли переносы строк. Enter на клавиатуре в любом поле закрывает ее.
  * @param minHeight Минимальная высота карточки без учета отступов.
  */
 @OptIn(ExperimentalLayoutApi::class)
@@ -122,9 +127,7 @@ fun HereTextField(
         textStyle = textStyle.copy(color = colors.textPrimary),
         cursorBrush = SolidColor(colors.accent),
         singleLine = singleLine,
-        keyboardOptions = KeyboardOptions(
-            imeAction = if (singleLine) ImeAction.Done else ImeAction.Default
-        ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
         keyboardActions = KeyboardActions(onDone = { focusManager.clearFocus() }),
         interactionSource = interactionSource,
         modifier = modifier
@@ -144,18 +147,29 @@ fun HereTextField(
             }
         ) {
             Box(modifier = Modifier.height(HereSize.TextField.labelSlot)) {
-                Text(
-                    text = label,
-                    style = textStyle.copy(
-                        fontSize = lerp(restingSize, HereSize.TextField.labelSize, progress)
-                    ),
-                    color = labelColor,
+                AnimatedContent(
+                    targetState = label,
+                    transitionSpec = {
+                        fadeIn(HereMotion.fadeThroughEnter()) togetherWith
+                                fadeOut(HereMotion.fadeThroughExit()) using
+                                SizeTransform(clip = false)
+                    },
+                    contentAlignment = Alignment.TopStart,
+                    label = "text-field-label-text",
                     modifier = Modifier
                         .wrapContentHeight(align = Alignment.Top, unbounded = true)
                         .graphicsLayer {
                             translationY = (1f - progress) * restingOffset
                         }
-                )
+                ) { shownLabel ->
+                    Text(
+                        text = shownLabel,
+                        style = textStyle.copy(
+                            fontSize = lerp(restingSize, HereSize.TextField.labelSize, progress)
+                        ),
+                        color = labelColor
+                    )
+                }
             }
 
             innerTextField()

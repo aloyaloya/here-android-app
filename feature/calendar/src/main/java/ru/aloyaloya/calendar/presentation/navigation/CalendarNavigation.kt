@@ -1,5 +1,7 @@
 package ru.aloyaloya.calendar.presentation.navigation
 
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.platform.LocalContext
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -8,6 +10,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
+import kotlinx.coroutines.flow.Flow
 import kotlinx.serialization.Serializable
 import ru.aloyaloya.calendar.di.CalendarComponent
 import ru.aloyaloya.calendar.presentation.CalendarScreen
@@ -33,9 +36,13 @@ fun NavController.navigateToCalendar(navOptions: NavOptions) =
  * Внутри функции добавляется composable-маршрут [CalendarRoute] и
  * размещается UI-контент экрана календаря.
  *
+ * @param scrollToTop Повторные выборы раздела: на каждый экран прокручивается наверх.
  * @param onMemoryClick Колбэк нажатия на воспоминание дня, получает его id.
  */
-fun NavGraphBuilder.calendarScreen(onMemoryClick: (Long) -> Unit) {
+fun NavGraphBuilder.calendarScreen(
+    scrollToTop: Flow<Unit>,
+    onMemoryClick: (Long) -> Unit
+) {
     composable<CalendarRoute> { navBackStackEntry ->
 
         val context = LocalContext.current.applicationContext
@@ -50,9 +57,15 @@ fun NavGraphBuilder.calendarScreen(onMemoryClick: (Long) -> Unit) {
         )
 
         val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+        val scrollState = rememberScrollState()
+
+        LaunchedEffect(scrollState) {
+            scrollToTop.collect { scrollState.animateScrollTo(0) }
+        }
 
         CalendarScreen(
             uiState = uiState,
+            scrollState = scrollState,
             onMemoryClick = onMemoryClick
         )
     }

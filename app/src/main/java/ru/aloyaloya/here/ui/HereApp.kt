@@ -16,6 +16,7 @@ import androidx.navigation.NavGraph.Companion.findStartDestination
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import kotlinx.coroutines.flow.MutableSharedFlow
 import ru.aloyaloya.summary.presentation.navigation.navigateToSummary
 import ru.aloyaloya.calendar.presentation.navigation.navigateToCalendar
 import ru.aloyaloya.here.navigation.HereNavHost
@@ -64,6 +65,9 @@ fun HereApp(
      */
     var mapFocus by remember { mutableStateOf<MapPoint?>(null) }
 
+    /** Повторное нажатие на текущий раздел: его экран прокручивается наверх. */
+    val reselections = remember { MutableSharedFlow<TopLevelDestination>(extraBufferCapacity = 1) }
+
     val contextMode = if (placePicking) {
         HereContextMode(
             titleResId = MapR.string.place_picker_title,
@@ -85,7 +89,11 @@ fun HereApp(
                  * в раздел, которому она ничего не говорит.
                  */
                 placePicking = false
-                navigateToTopLevelDestination(navController, destination)
+                if (destination == currentTopLevelDestination) {
+                    reselections.tryEmit(destination)
+                } else {
+                    navigateToTopLevelDestination(navController, destination)
+                }
             },
             onSettingsClick = {
                 placePicking = false
@@ -102,7 +110,8 @@ fun HereApp(
                     mapFocus = point
                     navigateToTopLevelDestination(navController, TopLevelDestination.MAP)
                 },
-                onMapFocusShown = { mapFocus = null }
+                onMapFocusShown = { mapFocus = null },
+                reselections = reselections
             )
         }
     }

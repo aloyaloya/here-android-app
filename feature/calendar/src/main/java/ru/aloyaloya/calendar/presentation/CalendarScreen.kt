@@ -8,6 +8,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ScrollState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,7 +23,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.MaterialTheme
@@ -84,12 +84,14 @@ private val YearMonth.page: Int
  * Экран календаря: воспоминания по дням месяца.
  *
  * @param uiState Состояние экрана.
+ * @param scrollState Прокрутка экрана: ее поднимает навигация, когда раздел выбирают повторно.
  * @param onMemoryClick Колбэк нажатия на воспоминание дня, получает его id.
  * @param modifier Внешний [Modifier] экрана.
  */
 @Composable
 fun CalendarScreen(
     uiState: CalendarUiState,
+    scrollState: ScrollState,
     onMemoryClick: (Long) -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -108,6 +110,7 @@ fun CalendarScreen(
 
             is CalendarUiState.Content -> CalendarContent(
                 uiState = uiState,
+                scrollState = scrollState,
                 onMemoryClick = onMemoryClick
             )
         }
@@ -126,6 +129,7 @@ fun CalendarScreen(
 @Composable
 private fun CalendarContent(
     uiState: CalendarUiState.Content,
+    scrollState: ScrollState,
     onMemoryClick: (Long) -> Unit
 ) {
     val today = LocalDate.now()
@@ -151,7 +155,7 @@ private fun CalendarContent(
                 top = HereSize.TopAppBar.height,
                 bottom = HereSize.NavBar.height
             )
-            .verticalScroll(rememberScrollState())
+            .verticalScroll(scrollState)
             .padding(
                 horizontal = HereSpacing.l,
                 vertical = HereSpacing.s
