@@ -73,7 +73,10 @@ internal const val MAP_ZOOM = 15.5f
  * @param memory Воспоминание.
  * @param pagerState Состояние листания снимков.
  * @param scrollOffset Насколько обложка ушла под верх экрана, в пикселях.
+ * @param sharedPage Снимок, который перелетает в просмотр и обратно.
+ * @param hiddenPage Снимок, который сейчас в просмотре.
  * @param onMediaClick Колбэк открытия снимка на весь экран.
+ * @param onRatio Колбэк загрузки снимка: отдает его адрес и пропорции.
  * @param modifier [Modifier], применяемый к обложке.
  */
 @Composable
@@ -81,7 +84,10 @@ fun MemoryCover(
     memory: Memory,
     pagerState: PagerState,
     scrollOffset: () -> Int,
+    sharedPage: Int?,
+    hiddenPage: Int?,
     onMediaClick: (Int) -> Unit,
+    onRatio: (String, Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val photos = memory.media.isNotEmpty()
@@ -101,7 +107,10 @@ fun MemoryCover(
                 PhotoPager(
                     media = memory.media,
                     pagerState = pagerState,
-                    onMediaClick = onMediaClick
+                    sharedPage = sharedPage,
+                    hiddenPage = hiddenPage,
+                    onMediaClick = onMediaClick,
+                    onRatio = onRatio
                 )
             } else {
                 MapCover(memory = memory)
@@ -157,7 +166,10 @@ fun coverHeight(photos: Boolean): Dp {
 private fun PhotoPager(
     media: List<MemoryMedia>,
     pagerState: PagerState,
-    onMediaClick: (Int) -> Unit
+    sharedPage: Int?,
+    hiddenPage: Int?,
+    onMediaClick: (Int) -> Unit,
+    onRatio: (String, Float) -> Unit
 ) {
     val openLabel = stringResource(R.string.memory_cover_open)
 
@@ -168,21 +180,29 @@ private fun PhotoPager(
         val item = media[page]
         val video = item.type == MediaType.VIDEO
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .fillMaxSize()
-                .clickable(onClickLabel = openLabel) { onMediaClick(page) }
+        MediaSource(
+            index = page,
+            shared = sharedPage == page,
+            hidden = hiddenPage == page,
+            modifier = Modifier.fillMaxSize()
         ) {
-            MediaPhoto(
-                uri = item.uri,
-                video = video,
-                shape = RectangleShape,
-                modifier = Modifier.fillMaxSize()
-            )
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clickable(onClickLabel = openLabel) { onMediaClick(page) }
+            ) {
+                MediaPhoto(
+                    uri = item.uri,
+                    video = video,
+                    shape = RectangleShape,
+                    onRatio = { onRatio(item.uri, it) },
+                    modifier = Modifier.fillMaxSize()
+                )
 
-            if (video) {
-                MediaPlayBadge()
+                if (video) {
+                    MediaPlayBadge()
+                }
             }
         }
     }
