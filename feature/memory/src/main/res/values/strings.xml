@@ -18,7 +18,6 @@
     <string name="memory_form_save_new">Save memory</string>
     <string name="memory_form_save_edit">Save changes</string>
 
-    <string name="memory_title">Memory</string>
     <string name="memory_back">Back</string>
     <string name="memory_media_title">Photos and videos</string>
     <string name="memory_media_close">Close viewer</string>
@@ -43,6 +42,9 @@
     </plurals>
     <string name="memory_action_edit">Edit</string>
     <string name="memory_action_delete">Delete</string>
+    <string name="memory_action_more">More</string>
+    <string name="memory_cover_page">Photo %1$d of %2$d</string>
+    <string name="memory_cover_open">Open photo</string>
     <string name="memory_delete_title">Delete “%1$s”?</string>
     <string name="memory_delete_message">The memory and its photos will disappear from the map forever.</string>
     <string name="memory_delete_confirm">Delete</string>

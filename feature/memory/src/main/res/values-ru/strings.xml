@@ -18,7 +18,6 @@
     <string name="memory_form_save_new">Сохранить воспоминание</string>
     <string name="memory_form_save_edit">Сохранить изменения</string>
 
-    <string name="memory_title">Воспоминание</string>
     <string name="memory_back">Назад</string>
     <string name="memory_media_title">Фото и видео</string>
     <string name="memory_media_close">Закрыть просмотр</string>
@@ -49,8 +48,11 @@
         <item quantity="many">%d лет назад</item>
         <item quantity="other">%d года назад</item>
     </plurals>
-    <string name="memory_action_edit">Редактировать</string>
+    <string name="memory_action_edit">Изменить</string>
     <string name="memory_action_delete">Удалить</string>
+    <string name="memory_action_more">Ещё</string>
+    <string name="memory_cover_page">Фото %1$d из %2$d</string>
+    <string name="memory_cover_open">Открыть фото</string>
     <string name="memory_delete_title">Удалить «%1$s»?</string>
     <string name="memory_delete_message">Воспоминание и его фотографии исчезнут с карты навсегда.</string>
     <string name="memory_delete_confirm">Удалить</string>
