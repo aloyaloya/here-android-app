@@ -50,7 +50,6 @@
     </plurals>
     <string name="memory_action_edit">Изменить</string>
     <string name="memory_action_delete">Удалить</string>
-    <string name="memory_action_more">Ещё</string>
     <string name="memory_cover_page">Фото %1$d из %2$d</string>
     <string name="memory_cover_open">Открыть фото</string>
     <string name="memory_when_where_title">Когда и где</string>

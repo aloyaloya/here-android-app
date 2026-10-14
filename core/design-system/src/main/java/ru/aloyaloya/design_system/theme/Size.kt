@@ -237,7 +237,6 @@ object HereSize {
         val haloTopPadding = 150.dp
         val characterSize = 92.dp
         val barPlateSize = 40.dp
-        val moreIconSize = 22.dp
         val contentTopPadding = 16.dp
         val headerSpacing = 10.dp
         val textSpacing = 12.dp

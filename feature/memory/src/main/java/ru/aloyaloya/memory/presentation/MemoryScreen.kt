@@ -57,8 +57,8 @@ import ru.aloyaloya.ui.theme.LocalAppDarkTheme
  *
  * @param uiState Состояние экрана.
  * @param onBackClick Колбэк возврата назад.
- * @param onEditClick Колбэк пункта «Изменить» в меню шапки.
- * @param onDeleteClick Колбэк пункта «Удалить» в меню шапки.
+ * @param onEditClick Колбэк кнопки «Изменить» в шапке.
+ * @param onDeleteClick Колбэк кнопки «Удалить» в шапке.
  * @param onMediaClick Колбэк открытия снимка на весь экран.
  * @param onNearbyClick Колбэк нажатия на воспоминание рядом, отдает его идентификатор.
  * @param onViewerDismiss Колбэк закрытия просмотра снимка.
