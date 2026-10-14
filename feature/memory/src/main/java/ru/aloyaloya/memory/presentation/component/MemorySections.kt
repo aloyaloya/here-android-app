@@ -29,6 +29,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextOverflow
 import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.media.MediaPhoto
@@ -264,7 +265,10 @@ fun MemoryAddPhoto(
                     )
                 }
                 .clip(HereShape.tile)
-                .clickable(onClick = onClick)
+                .clickable(
+                    role = Role.Button,
+                    onClick = onClick
+                )
         ) {
             Icon(
                 painter = painterResource(DesignSystemR.drawable.ic_add),
@@ -327,7 +331,10 @@ private fun NearbyRow(
         horizontalArrangement = Arrangement.spacedBy(HereSize.CardRow.spacing),
         modifier = Modifier
             .fillMaxWidth()
-            .clickable(onClick = onClick)
+            .clickable(
+                role = Role.Button,
+                onClick = onClick
+            )
             .then(modifier)
             .padding(horizontal = HereSpacing.l)
     ) {
