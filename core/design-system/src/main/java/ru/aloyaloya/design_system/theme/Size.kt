@@ -243,9 +243,21 @@ object HereSize {
         val textSpacing = 12.dp
         val sectionSpacing = 20.dp
         val bottomPadding = 24.dp
-        val mediaSpacing = 10.dp
-        val mediaSize = 107.dp
-        val factIconSize = 20.dp
+        val rowSpacing = 14.dp
+        val miniMapHeight = 120.dp
+        val miniMapHaloSize = 80.dp
+        val miniMapCharacterSize = 44.dp
+        val gridSpacing = 4.dp
+        val gridBadgeSize = 24.dp
+        val gridBadgeIconSize = 14.dp
+        val gridBadgeInset = 6.dp
+        val addPhotoHeight = 52.dp
+        val addPhotoIconSize = 20.dp
+        val dashWidth = 1.5.dp
+        val dashLength = 6.dp
+        val dashGap = 4.dp
+        val nearbyThumbSize = 40.dp
+        val nearbyCharacterSize = 30.dp
     }
 
     /** Экран итогов. */

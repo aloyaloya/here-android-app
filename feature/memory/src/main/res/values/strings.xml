@@ -45,6 +45,13 @@
     <string name="memory_action_more">More</string>
     <string name="memory_cover_page">Photo %1$d of %2$d</string>
     <string name="memory_cover_open">Open photo</string>
+    <string name="memory_when_where_title">When and where</string>
+    <string name="memory_media_count_title">Photos and videos · %1$d</string>
+    <string name="memory_add_photo">Add photo</string>
+    <string name="memory_place_unknown">Place on the map</string>
+    <string name="memory_nearby_title">Nearby</string>
+    <string name="memory_date_time">%1$s, %2$s</string>
+    <string name="memory_dot_pair">%1$s · %2$s</string>
     <string name="memory_delete_title">Delete “%1$s”?</string>
     <string name="memory_delete_message">The memory and its photos will disappear from the map forever.</string>
     <string name="memory_delete_confirm">Delete</string>

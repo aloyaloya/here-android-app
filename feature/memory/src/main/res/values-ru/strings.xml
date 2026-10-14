@@ -53,6 +53,13 @@
     <string name="memory_action_more">Ещё</string>
     <string name="memory_cover_page">Фото %1$d из %2$d</string>
     <string name="memory_cover_open">Открыть фото</string>
+    <string name="memory_when_where_title">Когда и где</string>
+    <string name="memory_media_count_title">Фото и видео · %1$d</string>
+    <string name="memory_add_photo">Добавить фото</string>
+    <string name="memory_place_unknown">Место на карте</string>
+    <string name="memory_nearby_title">Здесь же</string>
+    <string name="memory_date_time">%1$s, %2$s</string>
+    <string name="memory_dot_pair">%1$s · %2$s</string>
     <string name="memory_delete_title">Удалить «%1$s»?</string>
     <string name="memory_delete_message">Воспоминание и его фотографии исчезнут с карты навсегда.</string>
     <string name="memory_delete_confirm">Удалить</string>

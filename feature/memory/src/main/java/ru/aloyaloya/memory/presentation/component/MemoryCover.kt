@@ -65,7 +65,7 @@ private const val TOP_SHADE_ALPHA = 0.42f
 private const val BOTTOM_SHADE_ALPHA = 0.30f
 private const val INACTIVE_DOT_ALPHA = 0.55f
 private const val HALO_ALPHA = 0.6f
-private const val MAP_ZOOM = 15.5f
+internal const val MAP_ZOOM = 15.5f
 
 /**
  * Обложка воспоминания: снимки листаются, без снимков — карта с персонажем.

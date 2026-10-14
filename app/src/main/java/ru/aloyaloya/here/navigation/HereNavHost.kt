@@ -88,7 +88,8 @@ fun HereNavHost(
         memoryFormScreen(onClose = { navController.popBackStack() })
         memoryScreen(
             onBackClick = { navController.popBackStack() },
-            onEditClick = { memoryId -> navController.navigateToEditMemory(memoryId) }
+            onEditClick = { memoryId -> navController.navigateToEditMemory(memoryId) },
+            onMemoryClick = { memoryId -> navController.navigateToMemory(memoryId) }
         )
         calendarScreen(
             scrollToTop = reselections.of(TopLevelDestination.CALENDAR),
