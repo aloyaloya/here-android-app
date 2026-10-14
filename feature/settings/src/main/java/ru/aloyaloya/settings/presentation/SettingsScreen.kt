@@ -40,7 +40,7 @@ import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.lifecycle.compose.LifecycleResumeEffect
-import ru.aloyaloya.design_system.component.text.HereSectionLabel
+import ru.aloyaloya.design_system.component.section.HereSection
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereShape
@@ -145,7 +145,7 @@ fun SettingsScreen(
                     vertical = HereSpacing.s
                 )
         ) {
-            SettingsSection(title = stringResource(R.string.settings_section_appearance)) {
+            HereSection(title = stringResource(R.string.settings_section_appearance)) {
                 OptionSelector(
                     title = stringResource(R.string.settings_theme),
                     options = ThemeOptions,
@@ -160,7 +160,7 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection(title = stringResource(R.string.settings_section_feedback)) {
+            HereSection(title = stringResource(R.string.settings_section_feedback)) {
                 SwitchRow(
                     title = stringResource(R.string.settings_haptics),
                     description = stringResource(R.string.settings_haptics_description),
@@ -169,7 +169,7 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection(title = stringResource(R.string.settings_section_reminder)) {
+            HereSection(title = stringResource(R.string.settings_section_reminder)) {
                 SwitchRow(
                     title = stringResource(R.string.settings_reminder),
                     description = stringResource(R.string.settings_reminder_description),
@@ -193,7 +193,7 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection(title = stringResource(R.string.settings_section_data)) {
+            HereSection(title = stringResource(R.string.settings_section_data)) {
                 ActionRow(
                     title = stringResource(R.string.settings_export),
                     description = exportDescription(status),
@@ -225,7 +225,7 @@ fun SettingsScreen(
                 )
             }
 
-            SettingsSection(title = stringResource(R.string.settings_section_about)) {
+            HereSection(title = stringResource(R.string.settings_section_about)) {
                 ActionRow(
                     title = stringResource(R.string.settings_version),
                     description = appVersionName(),
@@ -264,31 +264,6 @@ fun SettingsScreen(
             },
             onDismissRequest = { deleteAllDialogVisible = false }
         )
-    }
-}
-
-/**
- * Секция настроек: подпись и плитка с содержимым под ней.
- */
-@Composable
-private fun SettingsSection(
-    title: String,
-    content: @Composable () -> Unit
-) {
-    Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
-        HereSectionLabel(
-            text = title,
-            modifier = Modifier.padding(horizontal = HereSpacing.xs)
-        )
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(HereShape.tile)
-                .background(HereTheme.colors.surface)
-        ) {
-            content()
-        }
     }
 }
 

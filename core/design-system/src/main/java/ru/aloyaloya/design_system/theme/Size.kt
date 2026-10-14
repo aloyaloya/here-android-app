@@ -254,6 +254,13 @@ object HereSize {
         val disabledContentAlpha = 0.38f
     }
 
+    /** Строка карточки с иконкой на плашке. */
+    object CardRow {
+        val plateSize = 40.dp
+        val iconSize = 20.dp
+        val spacing = 12.dp
+    }
+
     /** Индикатор страниц пейджера. */
     object PagerIndicator {
         val dotSize = 8.dp
