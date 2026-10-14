@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.aloyaloya.domain.model.Memory
@@ -13,6 +14,9 @@ import ru.aloyaloya.domain.repository.MemoryRepository
 import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
 import javax.inject.Inject
+
+/** Радиус «здесь же»: как у мест в итогах. */
+private const val NEARBY_RADIUS_METERS = 150f
 
 class MemoryViewModel @Inject constructor(
     private val memoryRepository: MemoryRepository,
@@ -31,12 +35,15 @@ class MemoryViewModel @Inject constructor(
         this.memoryId = memoryId
 
         viewModelScope.launch {
-            memoryRepository.observeById(memoryId).collect { memory ->
+            combine(
+                memoryRepository.observeById(memoryId),
+                memoryRepository.observeNearby(memoryId, NEARBY_RADIUS_METERS)
+            ) { memory, nearby -> memory to nearby }.collect { (memory, nearby) ->
                 _uiState.update { state ->
                     when {
                         memory == null -> MemoryUiState.NotFound
-                        state is MemoryUiState.Content -> state.copy(memory = memory)
-                        else -> MemoryUiState.Content(memory = memory)
+                        state is MemoryUiState.Content -> state.copy(memory = memory, nearby = nearby)
+                        else -> MemoryUiState.Content(memory = memory, nearby = nearby)
                     }
                 }
                 if (memory != null) resolveAddress(memory)

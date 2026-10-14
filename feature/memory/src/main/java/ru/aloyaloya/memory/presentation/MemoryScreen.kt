@@ -127,7 +127,7 @@ fun MemoryScreen(
         is MemoryUiState.Content -> {
             MemoryContent(
                 memory = uiState.memory,
-                address = uiState.address,
+                address = uiState.address?.line,
                 onBackClick = onBackClick,
                 onEditClick = onEditClick,
                 onDeleteClick = onDeleteClick,

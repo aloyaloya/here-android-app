@@ -1,5 +1,7 @@
 package ru.aloyaloya.domain.repository
 
+import ru.aloyaloya.domain.model.PlaceAddress
+
 /**
  * Репозиторий адресов.
  *
@@ -11,8 +13,8 @@ interface AddressRepository {
     /**
      * Определяет адрес точки.
      *
-     * @return Короткий адрес вида «улица, дом» или `null`, если определить не вышло:
+     * @return Короткий адрес вида «улица, дом» с населенным пунктом или `null`, если определить не вышло:
      * что показать в этом случае, решает экран.
      */
-    suspend fun resolve(latitude: Double, longitude: Double): String?
+    suspend fun resolve(latitude: Double, longitude: Double): PlaceAddress?
 }

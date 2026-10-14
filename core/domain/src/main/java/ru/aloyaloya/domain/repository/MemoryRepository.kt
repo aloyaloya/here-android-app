@@ -16,6 +16,12 @@ interface MemoryRepository {
     /** Возвращает воспоминание по [id], или `null` если не найдено. */
     fun observeById(id: Long): Flow<Memory?>
 
+    /**
+     * Возвращает другие воспоминания не дальше [radiusMeters] от воспоминания [id],
+     * от недавних событий к давним.
+     */
+    fun observeNearby(id: Long, radiusMeters: Float): Flow<List<Memory>>
+
     /** Создаёт воспоминание и возвращает присвоенный идентификатор. */
     suspend fun create(memory: Memory): Long
 

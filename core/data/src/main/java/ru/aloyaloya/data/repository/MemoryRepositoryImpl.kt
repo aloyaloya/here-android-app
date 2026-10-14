@@ -1,5 +1,6 @@
 package ru.aloyaloya.data.repository
 
+import android.location.Location
 import kotlinx.coroutines.NonCancellable
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -30,6 +31,13 @@ class MemoryRepositoryImpl @Inject constructor(
 
     override fun observeById(id: Long): Flow<Memory?> =
         memoryDao.observeById(id).map { it?.toDomain() }
+
+    override fun observeNearby(id: Long, radiusMeters: Float): Flow<List<Memory>> =
+        observeAll().map { memories ->
+            val origin = memories.firstOrNull { it.id == id } ?: return@map emptyList()
+
+            memories.filter { it.id != id && origin.distanceTo(it) <= radiusMeters }
+        }
 
     override suspend fun create(memory: Memory): Long {
         val memoryId = memoryDao.insert(memory.toEntity())
@@ -63,6 +71,12 @@ class MemoryRepositoryImpl @Inject constructor(
     override suspend fun deleteAll() = withContext(NonCancellable) {
         memoryDao.deleteAll()
         mediaStorage.clear()
+    }
+
+    private fun Memory.distanceTo(other: Memory): Float {
+        val distance = FloatArray(1)
+        Location.distanceBetween(latitude, longitude, other.latitude, other.longitude, distance)
+        return distance.first()
     }
 
     private suspend fun persist(media: List<MemoryMedia>): List<MemoryMedia> =

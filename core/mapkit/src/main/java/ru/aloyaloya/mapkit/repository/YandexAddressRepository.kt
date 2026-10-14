@@ -15,6 +15,7 @@ import com.yandex.runtime.Error
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.suspendCancellableCoroutine
 import kotlinx.coroutines.withContext
+import ru.aloyaloya.domain.model.PlaceAddress
 import ru.aloyaloya.domain.repository.AddressRepository
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -42,9 +43,9 @@ class YandexAddressRepository @Inject constructor() : AddressRepository {
         SearchFactory.getInstance().createSearchManager(SearchManagerType.COMBINED)
     }
 
-    override suspend fun resolve(latitude: Double, longitude: Double): String? =
+    override suspend fun resolve(latitude: Double, longitude: Double): PlaceAddress? =
         withContext(Dispatchers.Main) {
-            requestToponym(Point(latitude, longitude))?.address?.toShortAddress()
+            requestToponym(Point(latitude, longitude))?.address?.toPlaceAddress()
         }
 
     /**
@@ -86,6 +87,15 @@ class YandexAddressRepository @Inject constructor() : AddressRepository {
  */
 private val GeoObject.address: Address?
     get() = metadataContainer.getItem(ToponymObjectMetadata::class.java)?.address
+
+/** Короткий адрес и населенный пункт из ответа. */
+private fun Address.toPlaceAddress(): PlaceAddress? =
+    toShortAddress()?.let { line ->
+        PlaceAddress(
+            line = line,
+            locality = nameOf(Address.Component.Kind.LOCALITY)
+        )
+    }
 
 /**
  * Собирает из ответа строку вида «Малая Бронная, 22».
