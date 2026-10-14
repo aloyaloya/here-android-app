@@ -29,6 +29,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.core.view.WindowCompat
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
 import ru.aloyaloya.design_system.theme.HereSize
@@ -99,16 +100,10 @@ fun MemoryScreen(
                 onDeleteClick = onDeleteClick,
                 onMediaClick = onMediaClick,
                 onNearbyClick = onNearbyClick,
+                viewedMedia = uiState.viewedMedia,
+                onViewerDismiss = onViewerDismiss,
                 modifier = modifier
             )
-
-            uiState.viewedMedia?.let { index ->
-                MediaViewer(
-                    media = uiState.memory.media,
-                    initialIndex = index,
-                    onDismissRequest = onViewerDismiss
-                )
-            }
 
             when (uiState.activeSheet) {
                 MemorySheet.DELETE -> DeleteMemoryDialog(
@@ -125,7 +120,7 @@ fun MemoryScreen(
     }
 }
 
-/** Обложка, рассказ под ней и шапка поверх. */
+/** Обложка, рассказ под ней, шапка поверх и просмотр снимков над всем. */
 @Composable
 private fun MemoryContent(
     memory: Memory,
@@ -136,8 +131,11 @@ private fun MemoryContent(
     onDeleteClick: () -> Unit,
     onMediaClick: (Int) -> Unit,
     onNearbyClick: (Long) -> Unit,
+    viewedMedia: Int?,
+    onViewerDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val viewerOpen = viewedMedia != null
     val photos = memory.media.isNotEmpty()
     val listState = rememberLazyListState()
     val pagerState = rememberPagerState { memory.media.size }
@@ -155,7 +153,10 @@ private fun MemoryContent(
         }
     }
 
-    StatusBarIcons(light = (photos && !collapsed) || LocalAppDarkTheme.current)
+    SystemBarIcons(
+        lightStatus = viewerOpen || (photos && !collapsed) || LocalAppDarkTheme.current,
+        lightNavigation = viewerOpen || LocalAppDarkTheme.current
+    )
 
     Box(
         modifier = modifier
@@ -164,7 +165,9 @@ private fun MemoryContent(
     ) {
         LazyColumn(
             state = listState,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .hiddenUnder(viewerOpen)
         ) {
             item(key = "cover") {
                 MemoryCover(
@@ -238,26 +241,48 @@ private fun MemoryContent(
             overPhotos = photos,
             onBackClick = onBackClick,
             onEditClick = onEditClick,
-            onDeleteClick = onDeleteClick
+            onDeleteClick = onDeleteClick,
+            modifier = Modifier.hiddenUnder(viewerOpen)
         )
+
+        viewedMedia?.let { index ->
+            MediaViewer(
+                media = memory.media,
+                initialIndex = index,
+                onDismissRequest = onViewerDismiss
+            )
+        }
     }
 }
 
+/** Прячет слой от TalkBack, пока поверх открыт просмотр. */
+private fun Modifier.hiddenUnder(viewerOpen: Boolean): Modifier =
+    if (viewerOpen) clearAndSetSemantics {} else this
+
 /**
- * Цвет значков статус-бара, пока экран открыт: при уходе с экрана возвращается прежний.
+ * Цвет значков системных панелей, пока экран открыт: при уходе с экрана возвращается прежний.
  *
- * @param light Значки светлые.
+ * @param lightStatus Значки статус-бара светлые.
+ * @param lightNavigation Значки панели навигации светлые.
  */
 @Composable
-private fun StatusBarIcons(light: Boolean) {
+private fun SystemBarIcons(
+    lightStatus: Boolean,
+    lightNavigation: Boolean
+) {
     val window = LocalActivity.current?.window ?: return
     val view = LocalView.current
 
-    DisposableEffect(window, light) {
+    DisposableEffect(window, lightStatus, lightNavigation) {
         val controller = WindowCompat.getInsetsController(window, view)
-        val previous = controller.isAppearanceLightStatusBars
-        controller.isAppearanceLightStatusBars = !light
-        onDispose { controller.isAppearanceLightStatusBars = previous }
+        val previousStatus = controller.isAppearanceLightStatusBars
+        val previousNavigation = controller.isAppearanceLightNavigationBars
+        controller.isAppearanceLightStatusBars = !lightStatus
+        controller.isAppearanceLightNavigationBars = !lightNavigation
+        onDispose {
+            controller.isAppearanceLightStatusBars = previousStatus
+            controller.isAppearanceLightNavigationBars = previousNavigation
+        }
     }
 }
 

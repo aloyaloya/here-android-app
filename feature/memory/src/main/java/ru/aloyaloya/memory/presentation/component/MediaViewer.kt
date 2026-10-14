@@ -1,5 +1,6 @@
 package ru.aloyaloya.memory.presentation.component
 
+import androidx.activity.compose.BackHandler
 import androidx.compose.animation.core.Animatable
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
@@ -26,8 +27,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.window.Dialog
-import androidx.compose.ui.window.DialogProperties
 import kotlinx.coroutines.launch
 import ru.aloyaloya.design_system.component.button.HereIconButton
 import ru.aloyaloya.design_system.theme.HereShape
@@ -45,7 +44,7 @@ private val ViewerBackground = Color.Black
 private val CounterBackground = Color.White.copy(alpha = 0.18f)
 
 /**
- * Полноэкранный просмотр медиа воспоминания.
+ * Полноэкранный просмотр медиа воспоминания поверх экрана: «назад» закрывает сначала его.
  *
  * @param media Медиа воспоминания.
  * @param initialIndex Файл, с которого открылся просмотр.
@@ -73,93 +72,87 @@ fun MediaViewer(
         scope.launch { shift.snapTo(shift.value + delta) }
     }
 
-    Dialog(
-        onDismissRequest = onDismissRequest,
-        properties = DialogProperties(
-            usePlatformDefaultWidth = false,
-            decorFitsSystemWindows = false
-        )
-    ) {
-        Box(
-            modifier = modifier
-                .fillMaxSize()
-                .background(
-                    ViewerBackground.copy(
-                        alpha = backgroundAlpha(
-                            shift.value,
-                            dismissDistance
-                        )
+    BackHandler(onBack = onDismissRequest)
+
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(
+                ViewerBackground.copy(
+                    alpha = backgroundAlpha(
+                        shift.value,
+                        dismissDistance
                     )
                 )
-                .draggable(
-                    state = dragState,
-                    orientation = Orientation.Vertical,
-                    enabled = !zoomed,
-                    onDragStopped = {
-                        if (abs(shift.value) > dismissDistance) {
-                            onDismissRequest()
-                        } else {
-                            shift.animateTo(0f)
-                        }
-                    }
-                )
-        ) {
-            HorizontalPager(
-                state = pagerState,
-                userScrollEnabled = !zoomed,
-                modifier = Modifier
-                    .fillMaxSize()
-                    .graphicsLayer { translationY = shift.value }
-            ) { page ->
-                val item = media[page]
-
-                if (item.type == MediaType.VIDEO) {
-                    VideoPage(
-                        uri = item.uri,
-                        playing = pagerState.currentPage == page,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    ZoomablePhoto(
-                        uri = item.uri,
-                        active = pagerState.currentPage == page,
-                        onZoomChange = { zoomed = it },
-                        modifier = Modifier.fillMaxSize()
-                    )
-                }
-            }
-
-            HereIconButton(
-                icon = DesignSystemR.drawable.ic_close,
-                contentDescription = stringResource(R.string.memory_media_close),
-                onClick = onDismissRequest,
-                modifier = Modifier
-                    .align(Alignment.TopEnd)
-                    .statusBarsPadding()
-                    .padding(HereSize.MediaViewer.actionsPadding)
             )
+            .draggable(
+                state = dragState,
+                orientation = Orientation.Vertical,
+                enabled = !zoomed,
+                onDragStopped = {
+                    if (abs(shift.value) > dismissDistance) {
+                        onDismissRequest()
+                    } else {
+                        shift.animateTo(0f)
+                    }
+                }
+            )
+    ) {
+        HorizontalPager(
+            state = pagerState,
+            userScrollEnabled = !zoomed,
+            modifier = Modifier
+                .fillMaxSize()
+                .graphicsLayer { translationY = shift.value }
+        ) { page ->
+            val item = media[page]
 
-            if (media.size > 1) {
-                Text(
-                    text = stringResource(
-                        R.string.memory_media_counter,
-                        pagerState.currentPage + 1,
-                        media.size
-                    ),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = Color.White,
-                    modifier = Modifier
-                        .align(Alignment.TopCenter)
-                        .statusBarsPadding()
-                        .padding(HereSize.MediaViewer.counterMargin)
-                        .clip(HereShape.pill)
-                        .background(CounterBackground)
-                        .padding(
-                            vertical = HereSize.MediaViewer.counterVerticalPadding,
-                            horizontal = HereSize.MediaViewer.counterHorizontalPadding
-                        )
+            if (item.type == MediaType.VIDEO) {
+                VideoPage(
+                    uri = item.uri,
+                    playing = pagerState.currentPage == page,
+                    modifier = Modifier.fillMaxSize()
+                )
+            } else {
+                ZoomablePhoto(
+                    uri = item.uri,
+                    active = pagerState.currentPage == page,
+                    onZoomChange = { zoomed = it },
+                    modifier = Modifier.fillMaxSize()
                 )
             }
+        }
+
+        HereIconButton(
+            icon = DesignSystemR.drawable.ic_close,
+            contentDescription = stringResource(R.string.memory_media_close),
+            onClick = onDismissRequest,
+            modifier = Modifier
+                .align(Alignment.TopEnd)
+                .statusBarsPadding()
+                .padding(HereSize.MediaViewer.actionsPadding)
+        )
+
+        if (media.size > 1) {
+            Text(
+                text = stringResource(
+                    R.string.memory_media_counter,
+                    pagerState.currentPage + 1,
+                    media.size
+                ),
+                style = MaterialTheme.typography.bodyMedium,
+                color = Color.White,
+                modifier = Modifier
+                    .align(Alignment.TopCenter)
+                    .statusBarsPadding()
+                    .padding(HereSize.MediaViewer.counterMargin)
+                    .clip(HereShape.pill)
+                    .background(CounterBackground)
+                    .padding(
+                        vertical = HereSize.MediaViewer.counterVerticalPadding,
+                        horizontal = HereSize.MediaViewer.counterHorizontalPadding
+                    )
+            )
         }
     }
 }
