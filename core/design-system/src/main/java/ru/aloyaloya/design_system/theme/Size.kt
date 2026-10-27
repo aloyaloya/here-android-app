@@ -142,16 +142,23 @@ object HereSize {
         val focusBorder = 2.dp
     }
 
-    /** Плитка медиа: превью снимка и кнопка добавления. */
+    /** Плитка медиа: превью снимка с кнопкой удаления. */
     object MediaTile {
         val size = 87.dp
         val spacing = 12.dp
-        val addBorder = 2.dp
-        val addDash = 6.dp
-        val addGap = 5.dp
         val removeSize = 26.dp
         val removeIconSize = 11.dp
         val removeTouchSize = 38.dp
+    }
+
+    /** Пунктирная кнопка добавления медиа. */
+    object MediaAdd {
+        val height = 52.dp
+        val iconSize = 20.dp
+        val spacing = 12.dp
+        val dashWidth = 1.5.dp
+        val dashLength = 6.dp
+        val dashGap = 4.dp
     }
 
     /** Круглая кнопка с иконкой поверх карты или фотографии. */
@@ -217,11 +224,6 @@ object HereSize {
         val gridBadgeSize = 24.dp
         val gridBadgeIconSize = 14.dp
         val gridBadgeInset = 6.dp
-        val addPhotoHeight = 52.dp
-        val addPhotoIconSize = 20.dp
-        val dashWidth = 1.5.dp
-        val dashLength = 6.dp
-        val dashGap = 4.dp
         val nearbyThumbSize = 40.dp
         val nearbyCharacterSize = 30.dp
     }

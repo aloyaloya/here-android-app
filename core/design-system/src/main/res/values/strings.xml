@@ -3,7 +3,6 @@
     <string name="settings_content_description">Settings</string>
     <string name="fab_add_memory_content_description">Add a memory</string>
     <string name="fab_location_content_description">Show my location</string>
-    <string name="media_add">+ media</string>
     <string name="media_remove">Remove media</string>
     <string name="media_video">Video</string>
     <string name="media_play">Play</string>

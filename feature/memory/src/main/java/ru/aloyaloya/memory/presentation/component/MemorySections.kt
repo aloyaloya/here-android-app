@@ -21,11 +21,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.drawOutline
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -300,19 +296,16 @@ private fun gridRows(from: Int, until: Int): List<List<Int>> {
 }
 
 /**
- * Секция «Фото и видео» без снимков: пунктирная кнопка, ведущая в редактирование.
+ * Секция «Фото и видео» без снимков: кнопки галереи и камеры.
  *
- * @param onClick Колбэк нажатия.
+ * @param onMediaPicked Колбэк выбранных или снятых файлов.
  * @param modifier [Modifier], применяемый к секции.
  */
 @Composable
-fun MemoryAddPhoto(
-    onClick: () -> Unit,
+fun MemoryAddMedia(
+    onMediaPicked: (List<MemoryMedia>) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = HereTheme.colors
-    val sizes = HereSize.Memory
-
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
         modifier = modifier
@@ -322,43 +315,7 @@ fun MemoryAddPhoto(
             modifier = Modifier.padding(horizontal = HereSpacing.xs)
         )
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(HereSpacing.s, Alignment.CenterHorizontally),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(sizes.addPhotoHeight)
-                .drawBehind {
-                    drawOutline(
-                        outline = HereShape.tile.createOutline(size, layoutDirection, this),
-                        color = colors.outlineStrong,
-                        style = Stroke(
-                            width = sizes.dashWidth.toPx(),
-                            pathEffect = PathEffect.dashPathEffect(
-                                floatArrayOf(sizes.dashLength.toPx(), sizes.dashGap.toPx())
-                            )
-                        )
-                    )
-                }
-                .clip(HereShape.tile)
-                .clickable(
-                    role = Role.Button,
-                    onClick = onClick
-                )
-        ) {
-            Icon(
-                painter = painterResource(DesignSystemR.drawable.ic_add),
-                contentDescription = null,
-                tint = colors.textPrimary,
-                modifier = Modifier.size(sizes.addPhotoIconSize)
-            )
-
-            Text(
-                text = stringResource(R.string.memory_add_photo),
-                style = MaterialTheme.typography.titleMedium,
-                color = colors.textPrimary
-            )
-        }
+        MediaAddButtons(onMediaPicked = onMediaPicked)
     }
 }
 

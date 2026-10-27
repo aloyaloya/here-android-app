@@ -21,6 +21,10 @@
     <string name="memory_form_save_edit">Save changes</string>
 
     <string name="memory_back">Back</string>
+    <string name="memory_media_gallery">Gallery</string>
+    <string name="memory_media_camera">Camera</string>
+    <string name="memory_camera_photo">Take a photo</string>
+    <string name="memory_camera_video">Record a video</string>
     <string name="memory_media_title">Photos and videos</string>
     <string name="memory_media_close">Close viewer</string>
     <string name="memory_video_show_controls">Show controls</string>
@@ -52,7 +56,6 @@
     <string name="memory_cover_open">Open photo</string>
     <string name="memory_when_where_title">When and where</string>
     <string name="memory_media_count_title">Photos and videos · %1$d</string>
-    <string name="memory_add_photo">Add photo</string>
     <string name="memory_place_unknown">Place on the map</string>
     <string name="memory_nearby_title">Nearby</string>
     <string name="memory_date_time">%1$s, %2$s</string>

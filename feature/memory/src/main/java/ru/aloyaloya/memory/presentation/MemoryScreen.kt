@@ -43,12 +43,13 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.domain.model.PlaceAddress
 import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
 import ru.aloyaloya.memory.presentation.component.DeleteMemoryDialog
 import ru.aloyaloya.memory.presentation.component.MediaViewer
-import ru.aloyaloya.memory.presentation.component.MemoryAddPhoto
+import ru.aloyaloya.memory.presentation.component.MemoryAddMedia
 import ru.aloyaloya.memory.presentation.component.MemoryCover
 import ru.aloyaloya.memory.presentation.component.MemoryMediaGrid
 import ru.aloyaloya.memory.presentation.component.MemoryNearby
@@ -69,6 +70,7 @@ import ru.aloyaloya.design_system.R as DesignSystemR
  * @param onEditClick Колбэк кнопки «Изменить» в шапке.
  * @param onDeleteClick Колбэк кнопки «Удалить» в шапке.
  * @param onMediaClick Колбэк открытия снимка на весь экран.
+ * @param onMediaPicked Колбэк файлов, добавленных кнопками галереи и камеры.
  * @param onNearbyClick Колбэк нажатия на воспоминание рядом, отдает его идентификатор.
  * @param onViewerDismiss Колбэк закрытия просмотра снимка.
  * @param onDeleteConfirm Колбэк подтверждения удаления.
@@ -82,6 +84,7 @@ fun MemoryScreen(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onMediaClick: (Int) -> Unit,
+    onMediaPicked: (List<MemoryMedia>) -> Unit,
     onNearbyClick: (Long) -> Unit,
     onViewerDismiss: () -> Unit,
     onDeleteConfirm: () -> Unit,
@@ -107,6 +110,7 @@ fun MemoryScreen(
                 onEditClick = onEditClick,
                 onDeleteClick = onDeleteClick,
                 onMediaClick = onMediaClick,
+                onMediaPicked = onMediaPicked,
                 onNearbyClick = onNearbyClick,
                 viewedMedia = uiState.viewedMedia,
                 onViewerDismiss = onViewerDismiss,
@@ -138,6 +142,7 @@ private fun MemoryContent(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onMediaClick: (Int) -> Unit,
+    onMediaPicked: (List<MemoryMedia>) -> Unit,
     onNearbyClick: (Long) -> Unit,
     viewedMedia: Int?,
     onViewerDismiss: () -> Unit,
@@ -217,8 +222,8 @@ private fun MemoryContent(
                         modifier = Modifier.sectionPadding()
                     )
                 } else {
-                    MemoryAddPhoto(
-                        onClick = onEditClick,
+                    MemoryAddMedia(
+                        onMediaPicked = onMediaPicked,
                         modifier = Modifier.sectionPadding()
                     )
                 }

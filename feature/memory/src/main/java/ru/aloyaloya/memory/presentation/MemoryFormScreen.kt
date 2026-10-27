@@ -1,10 +1,5 @@
 package ru.aloyaloya.memory.presentation
 
-import android.content.ContentResolver
-import android.net.Uri
-import androidx.activity.compose.rememberLauncherForActivityResult
-import androidx.activity.result.PickVisualMediaRequest
-import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -21,13 +16,13 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.emotion.EmotionChip
 import ru.aloyaloya.design_system.component.field.HereTextField
-import ru.aloyaloya.design_system.component.media.MediaAddTile
 import ru.aloyaloya.design_system.component.media.MediaTile
 import ru.aloyaloya.design_system.component.section.HereCardRow
 import ru.aloyaloya.design_system.component.section.HereSection
@@ -48,6 +43,8 @@ import ru.aloyaloya.memory.R
 import ru.aloyaloya.memory.model.MemoryFormSheet
 import ru.aloyaloya.memory.model.MemoryFormUiState
 import ru.aloyaloya.memory.presentation.component.DateSheet
+import ru.aloyaloya.memory.presentation.component.MEDIA_LIMIT
+import ru.aloyaloya.memory.presentation.component.MediaAddButtons
 import ru.aloyaloya.memory.presentation.component.MemoryMiniMap
 import ru.aloyaloya.memory.presentation.component.TimeSheet
 import ru.aloyaloya.memory.presentation.component.dayCaption
@@ -61,11 +58,6 @@ import ru.aloyaloya.design_system.R as DesignSystemR
 /** Половина зазора между строками: вторая половина у соседней строки. */
 private val RowVerticalPadding = HereSize.Memory.rowSpacing / 2
 private val SectionVerticalPadding = HereSpacing.l - RowVerticalPadding
-
-/** Сколько файлов можно прикрепить к одному воспоминанию. */
-private const val MEDIA_LIMIT = 10
-
-private const val VIDEO_MIME_PREFIX = "video/"
 
 /**
  * Форма воспоминания: и нового, и уже записанного.
@@ -135,7 +127,7 @@ fun MemoryFormScreen(
                 .verticalScroll(scrollState)
                 .imePadding()
                 .padding(horizontal = HereSpacing.screenHorizontal)
-                .padding(vertical = HereSpacing.s)
+                .padding(top = HereSpacing.s, bottom = HereSpacing.xl)
         ) {
             Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.m)) {
                 HereTextField(
@@ -213,62 +205,44 @@ fun MemoryFormScreen(
     }
 }
 
-/** Секция «Фото и видео»: ряд выбранных файлов и плитка добавления. */
+/** Секция «Фото и видео»: ряд выбранных файлов, под ним кнопки галереи и камеры. */
 @Composable
 private fun MediaSection(
     media: List<MemoryMedia>,
     onMediaPicked: (List<MemoryMedia>) -> Unit,
     onMediaRemove: (Int) -> Unit
 ) {
-    val resolver = LocalContext.current.contentResolver
-
-    val picker = rememberLauncherForActivityResult(
-        contract = ActivityResultContracts.PickMultipleVisualMedia(MEDIA_LIMIT)
-    ) { uris ->
-        onMediaPicked(uris.map { uri ->
-            MemoryMedia(
-                uri = uri.toString(),
-                type = resolver.mediaType(uri)
-            )
-        })
-    }
-
     Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
         HereSectionLabel(
             text = stringResource(R.string.memory_media_title),
             modifier = Modifier.padding(horizontal = HereSpacing.xs)
         )
 
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(HereSize.MediaTile.spacing),
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-        ) {
-            media.forEachIndexed { index, item ->
-                MediaTile(
-                    uri = item.uri,
-                    onRemoveClick = { onMediaRemove(index) },
-                    video = item.type == MediaType.VIDEO
-                )
+        if (media.isNotEmpty()) {
+            Row(
+                horizontalArrangement = Arrangement.spacedBy(HereSize.MediaTile.spacing),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState())
+            ) {
+                media.forEachIndexed { index, item ->
+                    MediaTile(
+                        uri = item.uri,
+                        onRemoveClick = { onMediaRemove(index) },
+                        video = item.type == MediaType.VIDEO
+                    )
+                }
             }
+        }
 
-            if (media.size < MEDIA_LIMIT) {
-                MediaAddTile(
-                    onClick = {
-                        picker.launch(
-                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)
-                        )
-                    }
-                )
-            }
+        if (media.size < MEDIA_LIMIT) {
+            MediaAddButtons(
+                onMediaPicked = onMediaPicked,
+                maxItems = MEDIA_LIMIT - media.size
+            )
         }
     }
 }
-
-/** Что именно выбрали в пикере: адрес о типе файла не говорит, а MIME говорит. */
-private fun ContentResolver.mediaType(uri: Uri): MediaType =
-    if (getType(uri)?.startsWith(VIDEO_MIME_PREFIX) == true) MediaType.VIDEO else MediaType.PHOTO
 
 /**
  * Секция «Когда»: дата и время открывают свой лист выбора.
