@@ -22,7 +22,6 @@ import ru.aloyaloya.design_system.theme.HereTheme
  * @param video Файл — видео: показывается первый кадр.
  * @param shape Форма снимка.
  * @param contentScale Как снимок вписан в отведенное место.
- * @param onRatio Колбэк загрузки: отдает отношение ширины снимка к высоте.
  */
 @Composable
 fun MediaPhoto(
@@ -30,17 +29,12 @@ fun MediaPhoto(
     modifier: Modifier = Modifier,
     video: Boolean = false,
     shape: Shape = HereShape.tile,
-    contentScale: ContentScale = ContentScale.Crop,
-    onRatio: (Float) -> Unit = {}
+    contentScale: ContentScale = ContentScale.Crop
 ) {
     AsyncImage(
         model = rememberMediaRequest(uri, video),
         contentDescription = null,
         contentScale = contentScale,
-        onSuccess = { state ->
-            val size = state.painter.intrinsicSize
-            if (size.height > 0f) onRatio(size.width / size.height)
-        },
         modifier = modifier
             .clip(shape)
             .background(HereTheme.colors.surfaceMuted)

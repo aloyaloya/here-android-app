@@ -159,19 +159,13 @@ private fun MiniMap(memory: Memory) {
  * Секция «Фото и видео · N»: сетка в три колонки.
  *
  * @param media Снимки и ролики воспоминания.
- * @param sharedIndex Ячейка, которая перелетает в просмотр и обратно.
- * @param hiddenIndex Ячейка, чей снимок сейчас в просмотре.
  * @param onMediaClick Колбэк открытия снимка на весь экран.
- * @param onRatio Колбэк загрузки снимка: отдает его адрес и пропорции.
  * @param modifier [Modifier], применяемый к секции.
  */
 @Composable
 fun MemoryMediaGrid(
     media: List<MemoryMedia>,
-    sharedIndex: Int?,
-    hiddenIndex: Int?,
     onMediaClick: (Int) -> Unit,
-    onRatio: (String, Float) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val openLabel = stringResource(R.string.memory_cover_open)
@@ -195,36 +189,27 @@ fun MemoryMediaGrid(
                         val index = rowIndex * GRID_COLUMNS + columnIndex
                         val video = item.type == MediaType.VIDEO
 
-                        MediaSource(
-                            index = index,
-                            shared = sharedIndex == index,
-                            hidden = hiddenIndex == index,
+                        Box(
                             modifier = Modifier
                                 .weight(1f)
                                 .aspectRatio(1f)
+                                .clickable(onClickLabel = openLabel) { onMediaClick(index) }
                         ) {
-                            Box(
-                                modifier = Modifier
-                                    .fillMaxSize()
-                                    .clickable(onClickLabel = openLabel) { onMediaClick(index) }
-                            ) {
-                                MediaPhoto(
-                                    uri = item.uri,
-                                    video = video,
-                                    shape = RectangleShape,
-                                    onRatio = { onRatio(item.uri, it) },
-                                    modifier = Modifier.fillMaxSize()
-                                )
+                            MediaPhoto(
+                                uri = item.uri,
+                                video = video,
+                                shape = RectangleShape,
+                                modifier = Modifier.fillMaxSize()
+                            )
 
-                                if (video) {
-                                    MediaPlayBadge(
-                                        size = HereSize.Memory.gridBadgeSize,
-                                        iconSize = HereSize.Memory.gridBadgeIconSize,
-                                        modifier = Modifier
-                                            .align(Alignment.BottomEnd)
-                                            .padding(HereSize.Memory.gridBadgeInset)
-                                    )
-                                }
+                            if (video) {
+                                MediaPlayBadge(
+                                    size = HereSize.Memory.gridBadgeSize,
+                                    iconSize = HereSize.Memory.gridBadgeIconSize,
+                                    modifier = Modifier
+                                        .align(Alignment.BottomEnd)
+                                        .padding(HereSize.Memory.gridBadgeInset)
+                                )
                             }
                         }
                     }

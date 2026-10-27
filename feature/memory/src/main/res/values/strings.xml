@@ -21,6 +21,8 @@
     <string name="memory_back">Back</string>
     <string name="memory_media_title">Photos and videos</string>
     <string name="memory_media_close">Close viewer</string>
+    <string name="memory_video_show_controls">Show controls</string>
+    <string name="memory_video_hide_controls">Hide controls</string>
     <string name="memory_elapsed_today">today</string>
     <string name="memory_elapsed_yesterday">yesterday</string>
     <plurals name="memory_elapsed_days">

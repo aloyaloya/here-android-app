@@ -1,9 +1,10 @@
 package ru.aloyaloya.memory.presentation.component
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.animation.AnimatedVisibilityScope
-import androidx.compose.animation.EnterExitState
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.Animatable
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.Orientation
 import androidx.compose.foundation.gestures.draggable
@@ -15,6 +16,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -23,13 +25,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.platform.LocalAccessibilityManager
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
-import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.MemoryMedia
@@ -38,6 +41,7 @@ import kotlin.math.abs
 
 private const val FADE_DISTANCE_RATIO = 4f
 private const val MIN_BACKGROUND_ALPHA = 0.35f
+private const val CONTROLS_HIDE_MILLIS = 3000L
 
 private val ViewerBackground = Color.Black
 
@@ -46,20 +50,14 @@ private val ViewerBackground = Color.Black
  *
  * @param media Медиа воспоминания.
  * @param initialIndex Файл, с которого открылся просмотр.
- * @param ratios Пропорции уже загруженных снимков по их адресам.
- * @param onRatio Колбэк загрузки снимка: отдает его адрес и пропорции.
- * @param visibilityScope Появление и исчезновение просмотра: по нему снимок перелетает.
- * @param onDismissRequest Колбэк закрытия просмотра, отдает индекс открытого файла.
+ * @param onDismissRequest Колбэк закрытия просмотра.
  * @param modifier [Modifier], применяемый к просмотру.
  */
 @Composable
 fun MediaViewer(
     media: List<MemoryMedia>,
     initialIndex: Int,
-    ratios: Map<String, Float>,
-    onRatio: (String, Float) -> Unit,
-    visibilityScope: AnimatedVisibilityScope,
-    onDismissRequest: (Int) -> Unit,
+    onDismissRequest: () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val pagerState = rememberPagerState(initialPage = initialIndex) { media.size }
@@ -76,12 +74,28 @@ fun MediaViewer(
         scope.launch { shift.snapTo(shift.value + delta) }
     }
 
-    val transition = visibilityScope.transition
-    val settled = transition.currentState == EnterExitState.Visible &&
-        transition.targetState == EnterExitState.Visible
-    val dismiss = { onDismissRequest(pagerState.currentPage) }
+    var playingPage by remember { mutableStateOf<Int?>(null) }
+    var controlsShown by remember { mutableStateOf(true) }
+    val videoPlaying = playingPage == pagerState.currentPage
+    val controlsVisible = controlsShown || !videoPlaying
+    val accessibility = LocalAccessibilityManager.current
 
-    BackHandler(onBack = dismiss)
+    LaunchedEffect(videoPlaying, controlsShown) {
+        if (!videoPlaying) {
+            controlsShown = true
+        } else if (controlsShown) {
+            delay(
+                accessibility?.calculateRecommendedTimeoutMillis(
+                    originalTimeoutMillis = CONTROLS_HIDE_MILLIS,
+                    containsIcons = true,
+                    containsControls = true
+                ) ?: CONTROLS_HIDE_MILLIS
+            )
+            controlsShown = false
+        }
+    }
+
+    BackHandler(onBack = onDismissRequest)
 
     Box(
         modifier = modifier
@@ -100,7 +114,7 @@ fun MediaViewer(
                 enabled = !zoomed,
                 onDragStopped = {
                     if (abs(shift.value) > dismissDistance) {
-                        dismiss()
+                        onDismissRequest()
                     } else {
                         shift.animateTo(0f)
                     }
@@ -115,63 +129,56 @@ fun MediaViewer(
                 .graphicsLayer { translationY = shift.value }
         ) { page ->
             val item = media[page]
-            val ratio = ratios[item.uri]
-            val shared = if (pagerState.currentPage == page) {
-                Modifier.sharedMedia(index = page, visibilityScope = visibilityScope)
-            } else {
-                Modifier
-            }
 
             if (item.type == MediaType.VIDEO) {
-                if (settled) {
-                    VideoPage(
-                        uri = item.uri,
-                        playing = pagerState.currentPage == page,
-                        modifier = Modifier.fillMaxSize()
-                    )
-                } else {
-                    Box(
-                        contentAlignment = Alignment.Center,
-                        modifier = Modifier.fillMaxSize()
-                    ) {
-                        MediaPhoto(
-                            uri = item.uri,
-                            video = true,
-                            shape = RectangleShape,
-                            onRatio = { onRatio(item.uri, it) },
-                            modifier = shared.fitRatio(ratio)
-                        )
-                    }
-                }
+                VideoPage(
+                    uri = item.uri,
+                    playing = pagerState.currentPage == page,
+                    controlsVisible = controlsVisible,
+                    onPlaybackChange = { started ->
+                        playingPage = if (started) page else playingPage?.takeIf { it != page }
+                    },
+                    onTap = { controlsShown = !controlsShown },
+                    modifier = Modifier.fillMaxSize()
+                )
             } else {
                 ZoomablePhoto(
                     uri = item.uri,
                     active = pagerState.currentPage == page,
-                    ratio = ratio,
-                    onRatio = { onRatio(item.uri, it) },
                     onZoomChange = { zoomed = it },
-                    modifier = Modifier.fillMaxSize(),
-                    photoModifier = shared
+                    modifier = Modifier.fillMaxSize()
                 )
             }
         }
 
-        HereContextTopAppBar(
-            title = "",
-            navigationContentDescription = stringResource(R.string.memory_media_close),
-            onNavigateBack = dismiss,
-            overMedia = true
-        )
+        AnimatedVisibility(
+            visible = controlsVisible,
+            enter = fadeIn(HereMotion.fadeThroughEnter()),
+            exit = fadeOut(HereMotion.fadeThroughExit())
+        ) {
+            HereContextTopAppBar(
+                title = "",
+                navigationContentDescription = stringResource(R.string.memory_media_close),
+                onNavigateBack = onDismissRequest,
+                overMedia = true
+            )
+        }
 
         if (media.size > 1) {
-            CoverIndicator(
-                pageCount = media.size,
-                currentPage = pagerState.currentPage,
+            AnimatedVisibility(
+                visible = controlsVisible,
+                enter = fadeIn(HereMotion.fadeThroughEnter()),
+                exit = fadeOut(HereMotion.fadeThroughExit()),
                 modifier = Modifier
                     .align(Alignment.BottomCenter)
                     .navigationBarsPadding()
                     .padding(bottom = HereSize.Memory.indicatorBottomPadding)
-            )
+            ) {
+                CoverIndicator(
+                    pageCount = media.size,
+                    currentPage = pagerState.currentPage
+                )
+            }
         }
     }
 }

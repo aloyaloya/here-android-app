@@ -2,7 +2,6 @@ package ru.aloyaloya.memory.presentation
 
 import androidx.activity.compose.LocalActivity
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.SharedTransitionLayout
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
@@ -24,17 +23,11 @@ import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableIntStateOf
-import androidx.compose.runtime.mutableStateMapOf
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -45,6 +38,7 @@ import androidx.core.view.WindowCompat
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.component.topbar.TopAppBarAction
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -53,8 +47,6 @@ import ru.aloyaloya.domain.model.PlaceAddress
 import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
 import ru.aloyaloya.memory.presentation.component.DeleteMemoryDialog
-import ru.aloyaloya.memory.presentation.component.LocalSharedTransitionScope
-import ru.aloyaloya.memory.presentation.component.MediaOrigin
 import ru.aloyaloya.memory.presentation.component.MediaViewer
 import ru.aloyaloya.memory.presentation.component.MemoryAddPhoto
 import ru.aloyaloya.memory.presentation.component.MemoryCover
@@ -151,19 +143,7 @@ private fun MemoryContent(
     onViewerDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    var origin by rememberSaveable { mutableStateOf(MediaOrigin.GRID) }
-    var returnIndex by rememberSaveable { mutableIntStateOf(0) }
-    var closing by remember { mutableStateOf(false) }
-    val ratios = remember { mutableStateMapOf<String, Float>() }
-
-    LaunchedEffect(viewedMedia) {
-        if (viewedMedia == null) closing = false
-    }
-
-    val viewerOpen = viewedMedia != null && !closing
-    val coverShared = returnIndex.takeIf { origin == MediaOrigin.COVER }
-    val gridShared = returnIndex.takeIf { origin == MediaOrigin.GRID }
-    val onRatio = { uri: String, ratio: Float -> ratios[uri] = ratio }
+    val viewerOpen = viewedMedia != null
     val photos = memory.media.isNotEmpty()
     val listState = rememberLazyListState()
     val pagerState = rememberPagerState { memory.media.size }
@@ -186,141 +166,115 @@ private fun MemoryContent(
         lightNavigation = viewerOpen || LocalAppDarkTheme.current
     )
 
-    SharedTransitionLayout {
-        CompositionLocalProvider(LocalSharedTransitionScope provides this) {
-            Box(
-                modifier = modifier
-                    .fillMaxSize()
-                    .background(HereTheme.colors.background)
-            ) {
-                LazyColumn(
-                    state = listState,
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .hiddenUnder(viewerOpen)
-                ) {
-                    item(key = "cover") {
-                        MemoryCover(
-                            memory = memory,
-                            pagerState = pagerState,
-                            scrollOffset = {
-                                if (listState.firstVisibleItemIndex == 0) {
-                                    listState.firstVisibleItemScrollOffset
-                                } else {
-                                    0
-                                }
-                            },
-                            sharedPage = coverShared,
-                            hiddenPage = coverShared?.takeIf { viewerOpen },
-                            onMediaClick = { page ->
-                                origin = MediaOrigin.COVER
-                                returnIndex = page
-                                onMediaClick(page)
-                            },
-                            onRatio = onRatio
-                        )
-                    }
-
-                    item(key = "header") {
-                        MemoryHeader(
-                            memory = memory,
-                            modifier = Modifier
-                                .padding(horizontal = HereSpacing.l)
-                                .padding(top = HereSize.Memory.contentTopPadding)
-                        )
-                    }
-
-                    item(key = "when-where") {
-                        MemoryWhenWhere(
-                            memory = memory,
-                            address = address,
-                            modifier = Modifier.sectionPadding()
-                        )
-                    }
-
-                    item(key = "media") {
-                        if (photos) {
-                            MemoryMediaGrid(
-                                media = memory.media,
-                                sharedIndex = gridShared,
-                                hiddenIndex = gridShared?.takeIf { viewerOpen },
-                                onMediaClick = { index ->
-                                    origin = MediaOrigin.GRID
-                                    returnIndex = index
-                                    onMediaClick(index)
-                                },
-                                onRatio = onRatio,
-                                modifier = Modifier.sectionPadding()
-                            )
+    Box(
+        modifier = modifier
+            .fillMaxSize()
+            .background(HereTheme.colors.background)
+    ) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .hiddenUnder(viewerOpen)
+        ) {
+            item(key = "cover") {
+                MemoryCover(
+                    memory = memory,
+                    pagerState = pagerState,
+                    scrollOffset = {
+                        if (listState.firstVisibleItemIndex == 0) {
+                            listState.firstVisibleItemScrollOffset
                         } else {
-                            MemoryAddPhoto(
-                                onClick = onEditClick,
-                                modifier = Modifier.sectionPadding()
-                            )
+                            0
                         }
-                    }
+                    },
+                    onMediaClick = onMediaClick
+                )
+            }
 
-                    if (nearby.isNotEmpty()) {
-                        item(key = "nearby") {
-                            MemoryNearby(
-                                memories = nearby,
-                                onMemoryClick = onNearbyClick,
-                                modifier = Modifier.sectionPadding()
-                            )
-                        }
-                    }
+            item(key = "header") {
+                MemoryHeader(
+                    memory = memory,
+                    modifier = Modifier
+                        .padding(horizontal = HereSpacing.l)
+                        .padding(top = HereSize.Memory.contentTopPadding)
+                )
+            }
 
-                    item(key = "bottom") {
-                        Spacer(
-                            modifier = Modifier
-                                .navigationBarsPadding()
-                                .height(HereSize.Memory.bottomPadding)
-                        )
-                    }
-                }
+            item(key = "when-where") {
+                MemoryWhenWhere(
+                    memory = memory,
+                    address = address,
+                    modifier = Modifier.sectionPadding()
+                )
+            }
 
-                HereContextTopAppBar(
-                    title = if (collapsed) memory.title else "",
-                    navigationContentDescription = stringResource(R.string.memory_back),
-                    onNavigateBack = onBackClick,
-                    scrolled = collapsed,
-                    overMedia = photos,
-                    modifier = Modifier.hiddenUnder(viewerOpen)
-                ) {
-                    TopAppBarAction(
-                        icon = DesignSystemR.drawable.ic_edit,
-                        contentDescription = stringResource(R.string.memory_action_edit),
-                        onClick = onEditClick,
-                        tint = LocalContentColor.current
-                    )
-                    TopAppBarAction(
-                        icon = DesignSystemR.drawable.ic_trash,
-                        contentDescription = stringResource(R.string.memory_action_delete),
-                        onClick = onDeleteClick,
-                        tint = LocalContentColor.current
-                    )
-                }
-
-                AnimatedVisibility(
-                    visible = viewerOpen,
-                    enter = fadeIn(),
-                    exit = fadeOut()
-                ) {
-                    MediaViewer(
+            item(key = "media") {
+                if (photos) {
+                    MemoryMediaGrid(
                         media = memory.media,
-                        initialIndex = returnIndex,
-                        ratios = ratios,
-                        onRatio = onRatio,
-                        visibilityScope = this,
-                        onDismissRequest = { page ->
-                            returnIndex = page
-                            closing = true
-                            if (origin == MediaOrigin.COVER) pagerState.requestScrollToPage(page)
-                            onViewerDismiss()
-                        }
+                        onMediaClick = onMediaClick,
+                        modifier = Modifier.sectionPadding()
+                    )
+                } else {
+                    MemoryAddPhoto(
+                        onClick = onEditClick,
+                        modifier = Modifier.sectionPadding()
                     )
                 }
             }
+
+            if (nearby.isNotEmpty()) {
+                item(key = "nearby") {
+                    MemoryNearby(
+                        memories = nearby,
+                        onMemoryClick = onNearbyClick,
+                        modifier = Modifier.sectionPadding()
+                    )
+                }
+            }
+
+            item(key = "bottom") {
+                Spacer(
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .height(HereSize.Memory.bottomPadding)
+                )
+            }
+        }
+
+        HereContextTopAppBar(
+            title = if (collapsed) memory.title else "",
+            navigationContentDescription = stringResource(R.string.memory_back),
+            onNavigateBack = onBackClick,
+            scrolled = collapsed,
+            overMedia = photos,
+            modifier = Modifier.hiddenUnder(viewerOpen)
+        ) {
+            TopAppBarAction(
+                icon = DesignSystemR.drawable.ic_edit,
+                contentDescription = stringResource(R.string.memory_action_edit),
+                onClick = onEditClick,
+                tint = LocalContentColor.current
+            )
+            TopAppBarAction(
+                icon = DesignSystemR.drawable.ic_trash,
+                contentDescription = stringResource(R.string.memory_action_delete),
+                onClick = onDeleteClick,
+                tint = LocalContentColor.current
+            )
+        }
+
+        AnimatedVisibility(
+            visible = viewerOpen,
+            enter = fadeIn(HereMotion.fadeThroughEnter()),
+            exit = fadeOut(HereMotion.fadeThroughExit())
+        ) {
+            MediaViewer(
+                media = memory.media,
+                initialIndex = viewedMedia ?: 0,
+                onDismissRequest = onViewerDismiss
+            )
         }
     }
 }
