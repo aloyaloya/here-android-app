@@ -216,11 +216,7 @@ object HereSize {
 
     /** Полноэкранный просмотр снимков. */
     object MediaViewer {
-        val actionsPadding = 16.dp
-        val counterMargin = 24.dp
         val dismissDistance = 120.dp
-        val counterVerticalPadding = 7.dp
-        val counterHorizontalPadding = 14.dp
     }
 
     /** Экран воспоминания. */
@@ -236,7 +232,6 @@ object HereSize {
         val haloSize = 140.dp
         val haloTopPadding = 150.dp
         val characterSize = 92.dp
-        val barPlateSize = 40.dp
         val contentTopPadding = 16.dp
         val headerSpacing = 10.dp
         val textSpacing = 12.dp

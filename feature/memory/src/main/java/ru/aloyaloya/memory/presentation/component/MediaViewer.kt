@@ -10,12 +10,10 @@ import androidx.compose.foundation.gestures.draggable
 import androidx.compose.foundation.gestures.rememberDraggableState
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -24,28 +22,24 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.launch
-import ru.aloyaloya.design_system.component.button.HereIconButton
 import ru.aloyaloya.design_system.component.media.MediaPhoto
-import ru.aloyaloya.design_system.theme.HereShape
+import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.memory.R
 import kotlin.math.abs
-import ru.aloyaloya.design_system.R as DesignSystemR
 
 private const val FADE_DISTANCE_RATIO = 4f
 private const val MIN_BACKGROUND_ALPHA = 0.35f
 
 private val ViewerBackground = Color.Black
-private val CounterBackground = Color.White.copy(alpha = 0.18f)
 
 /**
  * Полноэкранный просмотр медиа воспоминания поверх экрана: «назад» закрывает сначала его.
@@ -162,35 +156,21 @@ fun MediaViewer(
             }
         }
 
-        HereIconButton(
-            icon = DesignSystemR.drawable.ic_close,
-            contentDescription = stringResource(R.string.memory_media_close),
-            onClick = dismiss,
-            modifier = Modifier
-                .align(Alignment.TopEnd)
-                .statusBarsPadding()
-                .padding(HereSize.MediaViewer.actionsPadding)
+        HereContextTopAppBar(
+            title = "",
+            navigationContentDescription = stringResource(R.string.memory_media_close),
+            onNavigateBack = dismiss,
+            overMedia = true
         )
 
         if (media.size > 1) {
-            Text(
-                text = stringResource(
-                    R.string.memory_media_counter,
-                    pagerState.currentPage + 1,
-                    media.size
-                ),
-                style = MaterialTheme.typography.bodyMedium,
-                color = Color.White,
+            CoverIndicator(
+                pageCount = media.size,
+                currentPage = pagerState.currentPage,
                 modifier = Modifier
-                    .align(Alignment.TopCenter)
-                    .statusBarsPadding()
-                    .padding(HereSize.MediaViewer.counterMargin)
-                    .clip(HereShape.pill)
-                    .background(CounterBackground)
-                    .padding(
-                        vertical = HereSize.MediaViewer.counterVerticalPadding,
-                        horizontal = HereSize.MediaViewer.counterHorizontalPadding
-                    )
+                    .align(Alignment.BottomCenter)
+                    .navigationBarsPadding()
+                    .padding(bottom = HereSize.Memory.indicatorBottomPadding)
             )
         }
     }

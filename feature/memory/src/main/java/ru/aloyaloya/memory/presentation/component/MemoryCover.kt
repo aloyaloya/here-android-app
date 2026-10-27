@@ -245,7 +245,7 @@ private fun BoxScope.PhotoShades(scrollOffset: () -> Int) {
  * @param modifier [Modifier], применяемый к индикатору.
  */
 @Composable
-private fun CoverIndicator(
+internal fun CoverIndicator(
     pageCount: Int,
     currentPage: Int,
     modifier: Modifier = Modifier

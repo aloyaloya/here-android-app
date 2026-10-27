@@ -20,6 +20,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -42,6 +43,8 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.clearAndSetSemantics
 import androidx.core.view.WindowCompat
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
+import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
+import ru.aloyaloya.design_system.component.topbar.TopAppBarAction
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -57,13 +60,14 @@ import ru.aloyaloya.memory.presentation.component.MemoryAddPhoto
 import ru.aloyaloya.memory.presentation.component.MemoryCover
 import ru.aloyaloya.memory.presentation.component.MemoryMediaGrid
 import ru.aloyaloya.memory.presentation.component.MemoryNearby
-import ru.aloyaloya.memory.presentation.component.MemoryTopBar
 import ru.aloyaloya.memory.presentation.component.MemoryWhenWhere
 import ru.aloyaloya.memory.presentation.component.coverHeight
 import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.labelResId
+import ru.aloyaloya.memory.R
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
+import ru.aloyaloya.design_system.R as DesignSystemR
 
 /**
  * Экран воспоминания.
@@ -275,15 +279,27 @@ private fun MemoryContent(
                     }
                 }
 
-                MemoryTopBar(
-                    title = memory.title,
-                    collapsed = collapsed,
-                    overPhotos = photos,
-                    onBackClick = onBackClick,
-                    onEditClick = onEditClick,
-                    onDeleteClick = onDeleteClick,
+                HereContextTopAppBar(
+                    title = if (collapsed) memory.title else "",
+                    navigationContentDescription = stringResource(R.string.memory_back),
+                    onNavigateBack = onBackClick,
+                    scrolled = collapsed,
+                    overMedia = photos,
                     modifier = Modifier.hiddenUnder(viewerOpen)
-                )
+                ) {
+                    TopAppBarAction(
+                        icon = DesignSystemR.drawable.ic_edit,
+                        contentDescription = stringResource(R.string.memory_action_edit),
+                        onClick = onEditClick,
+                        tint = LocalContentColor.current
+                    )
+                    TopAppBarAction(
+                        icon = DesignSystemR.drawable.ic_trash,
+                        contentDescription = stringResource(R.string.memory_action_delete),
+                        onClick = onDeleteClick,
+                        tint = LocalContentColor.current
+                    )
+                }
 
                 AnimatedVisibility(
                     visible = viewerOpen,

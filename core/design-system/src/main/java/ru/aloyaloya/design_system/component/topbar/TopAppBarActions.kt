@@ -11,6 +11,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.R
@@ -46,13 +47,15 @@ fun TopAppBarActions(
  * @param contentDescription Описание действия для программ чтения с экрана.
  * @param onClick Колбэк нажатия.
  * @param modifier [Modifier], применяемый к кнопке.
+ * @param tint Цвет значка.
  */
 @Composable
 fun TopAppBarAction(
     @DrawableRes icon: Int,
     contentDescription: String?,
     onClick: () -> Unit,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    tint: Color = HereTheme.colors.textPrimary
 ) {
     Box(
         contentAlignment = Alignment.Center,
@@ -63,7 +66,7 @@ fun TopAppBarAction(
     ) {
         Icon(
             painter = painterResource(icon),
-            tint = HereTheme.colors.textPrimary,
+            tint = tint,
             contentDescription = contentDescription,
             modifier = Modifier.size(HereSize.TopAppBar.actionIconSize)
         )
