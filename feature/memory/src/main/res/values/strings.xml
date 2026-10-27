@@ -18,11 +18,14 @@
     <string name="memory_form_save_new">Save memory</string>
     <string name="memory_form_save_edit">Save changes</string>
 
-    <string name="memory_title">Memory</string>
     <string name="memory_back">Back</string>
     <string name="memory_media_title">Photos and videos</string>
     <string name="memory_media_close">Close viewer</string>
-    <string name="memory_media_counter">%1$d of %2$d</string>
+    <string name="memory_video_show_controls">Show controls</string>
+    <string name="memory_video_hide_controls">Hide controls</string>
+    <string name="memory_video_mute">Mute</string>
+    <string name="memory_video_unmute">Unmute</string>
+    <string name="memory_video_position">Playback position</string>
     <string name="memory_elapsed_today">today</string>
     <string name="memory_elapsed_yesterday">yesterday</string>
     <plurals name="memory_elapsed_days">
@@ -43,6 +46,15 @@
     </plurals>
     <string name="memory_action_edit">Edit</string>
     <string name="memory_action_delete">Delete</string>
+    <string name="memory_cover_page">Photo %1$d of %2$d</string>
+    <string name="memory_cover_open">Open photo</string>
+    <string name="memory_when_where_title">When and where</string>
+    <string name="memory_media_count_title">Photos and videos · %1$d</string>
+    <string name="memory_add_photo">Add photo</string>
+    <string name="memory_place_unknown">Place on the map</string>
+    <string name="memory_nearby_title">Nearby</string>
+    <string name="memory_date_time">%1$s, %2$s</string>
+    <string name="memory_dot_pair">%1$s · %2$s</string>
     <string name="memory_delete_title">Delete “%1$s”?</string>
     <string name="memory_delete_message">The memory and its photos will disappear from the map forever.</string>
     <string name="memory_delete_confirm">Delete</string>

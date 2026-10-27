@@ -6,6 +6,8 @@
     <string name="media_add">+ media</string>
     <string name="media_remove">Remove media</string>
     <string name="media_video">Video</string>
+    <string name="media_play">Play</string>
+    <string name="media_pause">Pause</string>
     <string name="modal_close_content_description">Close</string>
     <string name="context_bar_back_content_description">Exit mode</string>
     <string name="calendar_previous_month">Previous month</string>

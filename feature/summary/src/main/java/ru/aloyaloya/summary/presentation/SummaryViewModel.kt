@@ -101,7 +101,7 @@ class SummaryViewModel @Inject constructor(
 
         addresses.update { it + (point to null) }
         viewModelScope.launch {
-            val address = addressRepository.resolve(place.latitude, place.longitude)
+            val address = addressRepository.resolve(place.latitude, place.longitude)?.line
             addresses.update { it + (point to address) }
         }
     }

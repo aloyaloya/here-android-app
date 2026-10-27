@@ -45,7 +45,7 @@ dependencies {
     implementation(project(":core:mapkit"))
 
     implementation(libs.media3.exoplayer)
-    implementation(libs.media3.ui)
+    implementation(libs.media3.ui.compose)
 
     implementation(libs.dagger)
     ksp(libs.dagger.compiler)

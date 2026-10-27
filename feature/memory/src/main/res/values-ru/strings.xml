@@ -18,11 +18,14 @@
     <string name="memory_form_save_new">Сохранить воспоминание</string>
     <string name="memory_form_save_edit">Сохранить изменения</string>
 
-    <string name="memory_title">Воспоминание</string>
     <string name="memory_back">Назад</string>
     <string name="memory_media_title">Фото и видео</string>
     <string name="memory_media_close">Закрыть просмотр</string>
-    <string name="memory_media_counter">%1$d из %2$d</string>
+    <string name="memory_video_show_controls">Показать управление</string>
+    <string name="memory_video_hide_controls">Скрыть управление</string>
+    <string name="memory_video_mute">Выключить звук</string>
+    <string name="memory_video_unmute">Включить звук</string>
+    <string name="memory_video_position">Позиция в ролике</string>
     <string name="memory_elapsed_today">сегодня</string>
     <string name="memory_elapsed_yesterday">вчера</string>
     <plurals name="memory_elapsed_days">
@@ -49,8 +52,17 @@
         <item quantity="many">%d лет назад</item>
         <item quantity="other">%d года назад</item>
     </plurals>
-    <string name="memory_action_edit">Редактировать</string>
+    <string name="memory_action_edit">Изменить</string>
     <string name="memory_action_delete">Удалить</string>
+    <string name="memory_cover_page">Фото %1$d из %2$d</string>
+    <string name="memory_cover_open">Открыть фото</string>
+    <string name="memory_when_where_title">Когда и где</string>
+    <string name="memory_media_count_title">Фото и видео · %1$d</string>
+    <string name="memory_add_photo">Добавить фото</string>
+    <string name="memory_place_unknown">Место на карте</string>
+    <string name="memory_nearby_title">Здесь же</string>
+    <string name="memory_date_time">%1$s, %2$s</string>
+    <string name="memory_dot_pair">%1$s · %2$s</string>
     <string name="memory_delete_title">Удалить «%1$s»?</string>
     <string name="memory_delete_message">Воспоминание и его фотографии исчезнут с карты навсегда.</string>
     <string name="memory_delete_confirm">Удалить</string>

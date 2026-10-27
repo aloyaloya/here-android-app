@@ -34,10 +34,12 @@ fun NavController.navigateToMemory(memoryId: Long) =
  *
  * @param onBackClick Колбэк возврата назад.
  * @param onEditClick Колбэк перехода на редактирование воспоминания.
+ * @param onMemoryClick Колбэк перехода на другое воспоминание.
  */
 fun NavGraphBuilder.memoryScreen(
     onBackClick: () -> Unit,
-    onEditClick: (Long) -> Unit
+    onEditClick: (Long) -> Unit,
+    onMemoryClick: (Long) -> Unit
 ) {
     composable<MemoryRoute> { navBackStackEntry ->
 
@@ -66,6 +68,7 @@ fun NavGraphBuilder.memoryScreen(
             onEditClick = { onEditClick(route.memoryId) },
             onDeleteClick = viewModel::onDeleteClick,
             onMediaClick = viewModel::onMediaClick,
+            onNearbyClick = onMemoryClick,
             onViewerDismiss = viewModel::onViewerDismiss,
             onDeleteConfirm = viewModel::onDeleteConfirm,
             onSheetDismiss = viewModel::onSheetDismiss

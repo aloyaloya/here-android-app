@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.style.TextOverflow
 import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -24,11 +25,13 @@ import ru.aloyaloya.design_system.theme.HereTheme
  *
  * @param title Текст заголовка экрана.
  * @param modifier [Modifier], применяемый к тексту.
+ * @param color Цвет заголовка.
  */
 @Composable
 fun TopAppBarTitleSection(
     title: String,
-    modifier: Modifier = Modifier
+    modifier: Modifier = Modifier,
+    color: Color = HereTheme.colors.textPrimary
 ) {
     AnimatedContent(
         targetState = title,
@@ -45,7 +48,7 @@ fun TopAppBarTitleSection(
     ) { shownTitle ->
         Text(
             text = shownTitle,
-            color = HereTheme.colors.textPrimary,
+            color = color,
             style = MaterialTheme.typography.titleLarge,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis

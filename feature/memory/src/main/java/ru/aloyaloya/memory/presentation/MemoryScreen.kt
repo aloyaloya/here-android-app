@@ -1,102 +1,75 @@
 package ru.aloyaloya.memory.presentation
 
-import androidx.annotation.DrawableRes
+import androidx.activity.compose.LocalActivity
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.rememberScrollState
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.layout.statusBars
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material3.CircularProgressIndicator
-import androidx.compose.material3.Icon
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.SideEffect
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.text.SpanStyle
-import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.withStyle
-import androidx.compose.ui.unit.Dp
-import androidx.compose.ui.unit.dp
-import ru.aloyaloya.design_system.component.character.EmotionCharacter
+import androidx.compose.ui.semantics.clearAndSetSemantics
+import androidx.core.view.WindowCompat
 import ru.aloyaloya.design_system.component.emotion.EmotionTag
-import ru.aloyaloya.design_system.component.media.MediaPhoto
-import ru.aloyaloya.design_system.component.media.MediaPlayBadge
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.component.topbar.TopAppBarAction
-import ru.aloyaloya.design_system.extension.Entrance
-import ru.aloyaloya.design_system.extension.entrance
-import ru.aloyaloya.design_system.format.FullDateFormat
-import ru.aloyaloya.design_system.format.TimeFormat
-import ru.aloyaloya.design_system.format.currentLocale
 import ru.aloyaloya.design_system.theme.HereMotion
-import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
-import ru.aloyaloya.domain.model.Emotion
-import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.Memory
-import ru.aloyaloya.domain.model.MemoryMedia
-import ru.aloyaloya.mapkit.model.MapLogoPlacement
-import ru.aloyaloya.mapkit.model.MapPoint
-import ru.aloyaloya.mapkit.ui.YandexMap
-import ru.aloyaloya.memory.R
+import ru.aloyaloya.domain.model.PlaceAddress
 import ru.aloyaloya.memory.model.MemorySheet
 import ru.aloyaloya.memory.model.MemoryUiState
 import ru.aloyaloya.memory.presentation.component.DeleteMemoryDialog
 import ru.aloyaloya.memory.presentation.component.MediaViewer
+import ru.aloyaloya.memory.presentation.component.MemoryAddPhoto
+import ru.aloyaloya.memory.presentation.component.MemoryCover
+import ru.aloyaloya.memory.presentation.component.MemoryMediaGrid
+import ru.aloyaloya.memory.presentation.component.MemoryNearby
+import ru.aloyaloya.memory.presentation.component.MemoryWhenWhere
+import ru.aloyaloya.memory.presentation.component.coverHeight
 import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
 import ru.aloyaloya.ui.emotion.labelResId
+import ru.aloyaloya.memory.R
 import ru.aloyaloya.ui.theme.LocalAppDarkTheme
-import java.time.Instant
-import java.time.LocalDate
-import java.time.ZoneId
-import java.time.temporal.ChronoUnit
 import ru.aloyaloya.design_system.R as DesignSystemR
-
-private const val HALO_ALPHA = 0.42f
-private const val SHEET_MAX_HEIGHT_FRACTION = 0.6f
-private const val MAP_ZOOM = 15.5f
-
-private const val SEPARATOR = " · "
-private const val DAYS_IN_WEEK = 7
 
 /**
  * Экран воспоминания.
  *
  * @param uiState Состояние экрана.
  * @param onBackClick Колбэк возврата назад.
- * @param onEditClick Колбэк нажатия на «Редактировать» в шапке.
- * @param onDeleteClick Колбэк нажатия на «Удалить» в шапке.
+ * @param onEditClick Колбэк кнопки «Изменить» в шапке.
+ * @param onDeleteClick Колбэк кнопки «Удалить» в шапке.
  * @param onMediaClick Колбэк открытия снимка на весь экран.
+ * @param onNearbyClick Колбэк нажатия на воспоминание рядом, отдает его идентификатор.
  * @param onViewerDismiss Колбэк закрытия просмотра снимка.
  * @param onDeleteConfirm Колбэк подтверждения удаления.
  * @param onSheetDismiss Колбэк закрытия открытого листа.
@@ -109,6 +82,7 @@ fun MemoryScreen(
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onMediaClick: (Int) -> Unit,
+    onNearbyClick: (Long) -> Unit,
     onViewerDismiss: () -> Unit,
     onDeleteConfirm: () -> Unit,
     onSheetDismiss: () -> Unit,
@@ -128,20 +102,16 @@ fun MemoryScreen(
             MemoryContent(
                 memory = uiState.memory,
                 address = uiState.address,
+                nearby = uiState.nearby,
                 onBackClick = onBackClick,
                 onEditClick = onEditClick,
                 onDeleteClick = onDeleteClick,
                 onMediaClick = onMediaClick,
+                onNearbyClick = onNearbyClick,
+                viewedMedia = uiState.viewedMedia,
+                onViewerDismiss = onViewerDismiss,
                 modifier = modifier
             )
-
-            uiState.viewedMedia?.let { index ->
-                MediaViewer(
-                    media = uiState.memory.media,
-                    initialIndex = index,
-                    onDismissRequest = onViewerDismiss
-                )
-            }
 
             when (uiState.activeSheet) {
                 MemorySheet.DELETE -> DeleteMemoryDialog(
@@ -158,147 +128,199 @@ fun MemoryScreen(
     }
 }
 
-/**
- * Место на карте под листом с рассказом о воспоминании.
- */
+/** Обложка, рассказ под ней, шапка поверх и просмотр снимков над всем. */
 @Composable
 private fun MemoryContent(
     memory: Memory,
-    address: String?,
+    address: PlaceAddress?,
+    nearby: List<Memory>,
     onBackClick: () -> Unit,
     onEditClick: () -> Unit,
     onDeleteClick: () -> Unit,
     onMediaClick: (Int) -> Unit,
+    onNearbyClick: (Long) -> Unit,
+    viewedMedia: Int?,
+    onViewerDismiss: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val density = LocalDensity.current
-    var sheetHeight by remember { mutableStateOf(0.dp) }
+    val viewerOpen = viewedMedia != null
+    val photos = memory.media.isNotEmpty()
+    val listState = rememberLazyListState()
+    val pagerState = rememberPagerState { memory.media.size }
 
-    Column(
+    val density = LocalDensity.current
+    val statusBarHeight = WindowInsets.statusBars.getTop(density)
+    val collapseOffset = with(density) {
+        (coverHeight(photos) - HereSize.TopAppBar.height).roundToPx()
+    } - statusBarHeight
+
+    val collapsed by remember(collapseOffset) {
+        derivedStateOf {
+            listState.firstVisibleItemIndex > 0 ||
+                listState.firstVisibleItemScrollOffset >= collapseOffset
+        }
+    }
+
+    SystemBarIcons(
+        lightStatus = viewerOpen || (photos && !collapsed) || LocalAppDarkTheme.current,
+        lightNavigation = viewerOpen || LocalAppDarkTheme.current
+    )
+
+    Box(
         modifier = modifier
             .fillMaxSize()
             .background(HereTheme.colors.background)
     ) {
+        LazyColumn(
+            state = listState,
+            modifier = Modifier
+                .fillMaxSize()
+                .hiddenUnder(viewerOpen)
+        ) {
+            item(key = "cover") {
+                MemoryCover(
+                    memory = memory,
+                    pagerState = pagerState,
+                    scrollOffset = {
+                        if (listState.firstVisibleItemIndex == 0) {
+                            listState.firstVisibleItemScrollOffset
+                        } else {
+                            0
+                        }
+                    },
+                    onMediaClick = onMediaClick
+                )
+            }
+
+            item(key = "header") {
+                MemoryHeader(
+                    memory = memory,
+                    modifier = Modifier
+                        .padding(horizontal = HereSpacing.l)
+                        .padding(top = HereSize.Memory.contentTopPadding)
+                )
+            }
+
+            item(key = "when-where") {
+                MemoryWhenWhere(
+                    memory = memory,
+                    address = address,
+                    modifier = Modifier.sectionPadding()
+                )
+            }
+
+            item(key = "media") {
+                if (photos) {
+                    MemoryMediaGrid(
+                        media = memory.media,
+                        onMediaClick = onMediaClick,
+                        modifier = Modifier.sectionPadding()
+                    )
+                } else {
+                    MemoryAddPhoto(
+                        onClick = onEditClick,
+                        modifier = Modifier.sectionPadding()
+                    )
+                }
+            }
+
+            if (nearby.isNotEmpty()) {
+                item(key = "nearby") {
+                    MemoryNearby(
+                        memories = nearby,
+                        onMemoryClick = onNearbyClick,
+                        modifier = Modifier.sectionPadding()
+                    )
+                }
+            }
+
+            item(key = "bottom") {
+                Spacer(
+                    modifier = Modifier
+                        .navigationBarsPadding()
+                        .height(HereSize.Memory.bottomPadding)
+                )
+            }
+        }
+
         HereContextTopAppBar(
-            title = stringResource(R.string.memory_title),
+            title = if (collapsed) memory.title else "",
             navigationContentDescription = stringResource(R.string.memory_back),
-            onNavigateBack = onBackClick
+            onNavigateBack = onBackClick,
+            scrolled = collapsed,
+            overMedia = photos,
+            modifier = Modifier.hiddenUnder(viewerOpen)
         ) {
             TopAppBarAction(
                 icon = DesignSystemR.drawable.ic_edit,
                 contentDescription = stringResource(R.string.memory_action_edit),
-                onClick = onEditClick
+                onClick = onEditClick,
+                tint = LocalContentColor.current
             )
             TopAppBarAction(
                 icon = DesignSystemR.drawable.ic_trash,
                 contentDescription = stringResource(R.string.memory_action_delete),
-                onClick = onDeleteClick
+                onClick = onDeleteClick,
+                tint = LocalContentColor.current
             )
         }
 
-        BoxWithConstraints(
-            modifier = Modifier
-                .fillMaxWidth()
-                .weight(1f)
+        AnimatedVisibility(
+            visible = viewerOpen,
+            enter = fadeIn(HereMotion.fadeThroughEnter()),
+            exit = fadeOut(HereMotion.fadeThroughExit())
         ) {
-            Box(
-                modifier = Modifier
-                    .fillMaxSize()
-                    .padding(bottom = mapBottomPadding(sheetHeight))
-            ) {
-                YandexMap(
-                    modifier = Modifier.fillMaxSize(),
-                    interactive = false,
-                    locationEnabled = false,
-                    isDarkTheme = LocalAppDarkTheme.current,
-                    startPosition = MapPoint(memory.latitude, memory.longitude),
-                    startZoom = MAP_ZOOM,
-                    logoPlacement = MapLogoPlacement.BelowTopBar
-                )
-
-                MemoryCharacter(
-                    emotion = memory.emotion,
-                    modifier = Modifier.align(Alignment.Center)
-                )
-            }
-
-            MemoryDetailSheet(
-                memory = memory,
-                address = address,
-                onMediaClick = onMediaClick,
-                modifier = Modifier
-                    .align(Alignment.BottomCenter)
-                    .heightIn(max = maxHeight * SHEET_MAX_HEIGHT_FRACTION)
-                    .onSizeChanged { size ->
-                        sheetHeight = with(density) { size.height.toDp() }
-                    }
+            MediaViewer(
+                media = memory.media,
+                initialIndex = viewedMedia ?: 0,
+                onDismissRequest = onViewerDismiss
             )
         }
     }
 }
+
+/** Прячет слой от TalkBack, пока поверх открыт просмотр. */
+private fun Modifier.hiddenUnder(viewerOpen: Boolean): Modifier =
+    if (viewerOpen) clearAndSetSemantics {} else this
 
 /**
- * Отступ карты снизу: высота листа без его скругления.
+ * Цвет значков системных панелей, пока экран открыт: при уходе с экрана возвращается прежний.
+ *
+ * @param lightStatus Значки статус-бара светлые.
+ * @param lightNavigation Значки панели навигации светлые.
  */
-private fun mapBottomPadding(sheetHeight: Dp): Dp =
-    (sheetHeight - HereSize.Memory.sheetCornerOverlap).coerceAtLeast(0.dp)
-
-/** Персонаж воспоминания с ореолом: падает в него при первом показе экрана. */
 @Composable
-private fun MemoryCharacter(
-    emotion: Emotion,
-    modifier: Modifier = Modifier
+private fun SystemBarIcons(
+    lightStatus: Boolean,
+    lightNavigation: Boolean
 ) {
-    val color = emotion.color.solid
-    var firstShow by rememberSaveable { mutableStateOf(true) }
-    val dropping = remember { firstShow }
+    val window = LocalActivity.current?.window ?: return
+    val view = LocalView.current
 
-    SideEffect { firstShow = false }
-
-    Box(
-        contentAlignment = Alignment.Center,
-        modifier = modifier
-            .size(HereSize.Memory.haloSize)
-            .background(color = color.copy(alpha = HALO_ALPHA), shape = CircleShape)
-    ) {
-        EmotionCharacter(
-            emotion = emotion.character,
-            size = HereSize.EmotionCharacter.large,
-            modifier = if (dropping) {
-                Modifier.entrance(
-                    kind = Entrance.DROP,
-                    delayMillis = HereMotion.Duration.medium
-                )
-            } else {
-                Modifier
-            }
-        )
+    DisposableEffect(window, lightStatus, lightNavigation) {
+        val controller = WindowCompat.getInsetsController(window, view)
+        val previousStatus = controller.isAppearanceLightStatusBars
+        val previousNavigation = controller.isAppearanceLightNavigationBars
+        controller.isAppearanceLightStatusBars = !lightStatus
+        controller.isAppearanceLightNavigationBars = !lightNavigation
+        onDispose {
+            controller.isAppearanceLightStatusBars = previousStatus
+            controller.isAppearanceLightNavigationBars = previousNavigation
+        }
     }
 }
 
-/** Лист с рассказом: эмоция, заголовок, когда и где это было, текст и медиа, если они есть. */
+/** Эмоция, заголовок и текст воспоминания. */
 @Composable
-private fun MemoryDetailSheet(
+private fun MemoryHeader(
     memory: Memory,
-    address: String?,
-    onMediaClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
     val colors = HereTheme.colors
 
     Column(
-        verticalArrangement = Arrangement.spacedBy(HereSize.Memory.sheetSpacing),
+        verticalArrangement = Arrangement.spacedBy(HereSize.Memory.textSpacing),
         modifier = modifier
-            .fillMaxWidth()
-            .clip(HereShape.sheet)
-            .background(colors.background)
-            .verticalScroll(rememberScrollState())
-            .navigationBarsPadding()
-            .padding(horizontal = HereSize.Memory.sheetHorizontalPadding)
-            .padding(
-                top = HereSize.Memory.sheetTopPadding,
-                bottom = HereSize.Memory.sheetBottomPadding
-            )
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(HereSize.Memory.headerSpacing)) {
             EmotionTag(
@@ -309,152 +331,22 @@ private fun MemoryDetailSheet(
 
             Text(
                 text = memory.title,
-                style = MaterialTheme.typography.titleLarge,
+                style = MaterialTheme.typography.headlineSmall,
                 color = colors.textPrimary
             )
         }
-
-        MemoryFacts(happenedAt = memory.happenedAt, address = address)
 
         if (memory.description.isNotBlank()) {
             Text(
                 text = memory.description,
                 style = MaterialTheme.typography.bodyLarge,
-                color = colors.textPrimary
-            )
-        }
-
-        if (memory.media.isNotEmpty()) {
-            Box(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(HereSize.Memory.dividerThickness)
-                    .background(colors.outline)
-            )
-
-            MediaSection(media = memory.media, onMediaClick = onMediaClick)
-        }
-    }
-}
-
-@Composable
-private fun MediaSection(
-    media: List<MemoryMedia>,
-    onMediaClick: (Int) -> Unit
-) {
-    val colors = HereTheme.colors
-
-    Column(verticalArrangement = Arrangement.spacedBy(HereSize.Memory.mediaSpacing)) {
-        Text(
-            text = stringResource(R.string.memory_media_title),
-            style = MaterialTheme.typography.titleMedium,
-            color = colors.textPrimary
-        )
-
-        Row(
-            horizontalArrangement = Arrangement.spacedBy(HereSize.Memory.mediaSpacing),
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState())
-        ) {
-            media.forEachIndexed { index, item ->
-                Box(contentAlignment = Alignment.Center) {
-                    MediaPhoto(
-                        uri = item.uri,
-                        video = item.type == MediaType.VIDEO,
-                        modifier = Modifier
-                            .size(HereSize.Memory.mediaSize)
-                            .clickable { onMediaClick(index) }
-                    )
-
-                    if (item.type == MediaType.VIDEO) {
-                        MediaPlayBadge()
-                    }
-                }
-            }
-        }
-    }
-}
-
-/** Когда и где это было: дата и сколько прошло, время и адрес, если он известен. */
-@Composable
-private fun MemoryFacts(
-    happenedAt: Long,
-    address: String?
-) {
-    val dateFormat = FullDateFormat.withLocale(currentLocale())
-    val moment = Instant.ofEpochMilli(happenedAt).atZone(ZoneId.systemDefault())
-
-    Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
-        MemoryFact(
-            icon = DesignSystemR.drawable.ic_calendar_outline,
-            text = dateFormat.format(moment),
-            hint = elapsedText(moment.toLocalDate())
-        )
-
-        MemoryFact(
-            icon = DesignSystemR.drawable.ic_clock_outline,
-            text = TimeFormat.format(moment)
-        )
-
-        address?.let { place ->
-            MemoryFact(
-                icon = DesignSystemR.drawable.ic_place,
-                text = place
+                color = colors.textBody
             )
         }
     }
 }
 
-@Composable
-private fun MemoryFact(
-    @DrawableRes icon: Int,
-    text: String,
-    hint: String? = null
-) {
-    val colors = HereTheme.colors
-
-    Row(horizontalArrangement = Arrangement.spacedBy(HereSpacing.m)) {
-        Icon(
-            painter = painterResource(icon),
-            contentDescription = null,
-            tint = colors.textSecondary,
-            modifier = Modifier.size(HereSize.Memory.factIconSize)
-        )
-
-        Text(
-            text = buildAnnotatedString {
-                append(text)
-                hint?.let {
-                    withStyle(SpanStyle(color = colors.textSecondary)) {
-                        append(SEPARATOR + it)
-                    }
-                }
-            },
-            style = MaterialTheme.typography.bodyMedium,
-            color = colors.textPrimary
-        )
-    }
-}
-
-/** Сколько прошло с [date]: «вчера», «3 месяца назад»; `null` для дня в будущем. */
-@Composable
-private fun elapsedText(date: LocalDate): String? {
-    val today = LocalDate.now()
-    val days = ChronoUnit.DAYS.between(date, today).toInt()
-    val months = ChronoUnit.MONTHS.between(date, today).toInt()
-    val years = ChronoUnit.YEARS.between(date, today).toInt()
-
-    return when {
-        years > 0 -> pluralStringResource(R.plurals.memory_elapsed_years, years, years)
-        months > 0 -> pluralStringResource(R.plurals.memory_elapsed_months, months, months)
-        days >= DAYS_IN_WEEK -> {
-            val weeks = days / DAYS_IN_WEEK
-            pluralStringResource(R.plurals.memory_elapsed_weeks, weeks, weeks)
-        }
-        days > 1 -> pluralStringResource(R.plurals.memory_elapsed_days, days, days)
-        days == 1 -> stringResource(R.string.memory_elapsed_yesterday)
-        days == 0 -> stringResource(R.string.memory_elapsed_today)
-        else -> null
-    }
-}
+/** Отступы секции под рассказом. */
+private fun Modifier.sectionPadding(): Modifier =
+    padding(horizontal = HereSpacing.l)
+        .padding(top = HereSize.Memory.sectionSpacing)

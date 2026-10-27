@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.Dp
 import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.theme.HereSize
 
-private val BadgeBackground = Color.Black.copy(alpha = 0.45f)
+internal val BadgeBackground = Color.Black.copy(alpha = 0.45f)
 
 /**
  * Значок видео поверх кадра: без него ролик не отличить от снимка.

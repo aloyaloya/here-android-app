@@ -216,26 +216,45 @@ object HereSize {
 
     /** Полноэкранный просмотр снимков. */
     object MediaViewer {
-        val actionsPadding = 16.dp
-        val counterMargin = 24.dp
         val dismissDistance = 120.dp
-        val counterVerticalPadding = 7.dp
-        val counterHorizontalPadding = 14.dp
+        val progressBottomPadding = 40.dp
+        val progressTrackHeight = 4.dp
+        val progressThumbSize = 14.dp
     }
 
     /** Экран воспоминания. */
     object Memory {
-        val haloSize = 143.dp
-        val sheetCornerOverlap = 28.dp
-        val sheetHorizontalPadding = 27.dp
-        val sheetTopPadding = 22.dp
-        val sheetBottomPadding = 32.dp
-        val sheetSpacing = 17.dp
-        val headerSpacing = 6.dp
-        val mediaSpacing = 10.dp
-        val mediaSize = 107.dp
-        val dividerThickness = 1.dp
-        val factIconSize = 20.dp
+        val mapCoverHeight = 400.dp
+        val coverTopShadeHeight = 120.dp
+        val coverBottomShadeHeight = 80.dp
+        val mapFadeHeight = 60.dp
+        val indicatorBottomPadding = 14.dp
+        val indicatorDotSize = 6.dp
+        val indicatorActiveWidth = 18.dp
+        val indicatorSpacing = 6.dp
+        val haloSize = 140.dp
+        val haloTopPadding = 150.dp
+        val characterSize = 92.dp
+        val contentTopPadding = 16.dp
+        val headerSpacing = 10.dp
+        val textSpacing = 12.dp
+        val sectionSpacing = 20.dp
+        val bottomPadding = 24.dp
+        val rowSpacing = 14.dp
+        val miniMapHeight = 120.dp
+        val miniMapHaloSize = 80.dp
+        val miniMapCharacterSize = 44.dp
+        val gridSpacing = 4.dp
+        val gridBadgeSize = 24.dp
+        val gridBadgeIconSize = 14.dp
+        val gridBadgeInset = 6.dp
+        val addPhotoHeight = 52.dp
+        val addPhotoIconSize = 20.dp
+        val dashWidth = 1.5.dp
+        val dashLength = 6.dp
+        val dashGap = 4.dp
+        val nearbyThumbSize = 40.dp
+        val nearbyCharacterSize = 30.dp
     }
 
     /** Экран итогов. */
@@ -252,6 +271,13 @@ object HereSize {
         val height = 56.dp
         val disabledContainerAlpha = 0.12f
         val disabledContentAlpha = 0.38f
+    }
+
+    /** Строка карточки с иконкой на плашке. */
+    object CardRow {
+        val plateSize = 40.dp
+        val iconSize = 20.dp
+        val spacing = 12.dp
     }
 
     /** Индикатор страниц пейджера. */
