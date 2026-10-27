@@ -1,10 +1,14 @@
 package ru.aloyaloya.memory.presentation
 
 import androidx.annotation.StringRes
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -16,10 +20,17 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
+import java.time.LocalDate
+import java.time.LocalDateTime
+import java.time.LocalTime
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.emotion.EmotionChip
 import ru.aloyaloya.design_system.component.field.HereTextField
@@ -30,6 +41,7 @@ import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.format.FullDateFormat
 import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.format.currentLocale
+import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -43,15 +55,13 @@ import ru.aloyaloya.memory.model.MemoryFormUiState
 import ru.aloyaloya.memory.presentation.component.DateSheet
 import ru.aloyaloya.memory.presentation.component.MEDIA_LIMIT
 import ru.aloyaloya.memory.presentation.component.MediaAddButtons
-import ru.aloyaloya.memory.presentation.component.MediaCollage
+import ru.aloyaloya.memory.presentation.component.MediaStrip
+import ru.aloyaloya.memory.presentation.component.MediaViewer
 import ru.aloyaloya.memory.presentation.component.MemoryMiniMap
 import ru.aloyaloya.memory.presentation.component.TimeSheet
 import ru.aloyaloya.memory.presentation.component.dayCaption
 import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
 import ru.aloyaloya.design_system.R as DesignSystemR
 
 /** Половина зазора между строками: вторая половина у соседней строки. */
@@ -102,88 +112,104 @@ fun MemoryFormScreen(
     modifier: Modifier = Modifier
 ) {
     val scrollState = rememberScrollState()
+    var viewedMedia by rememberSaveable { mutableStateOf<Int?>(null) }
 
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(HereTheme.colors.background)
-    ) {
-        HereContextTopAppBar(
-            title = stringResource(
-                if (uiState.editing) R.string.memory_form_title_edit
-                else R.string.memory_form_title_new
-            ),
-            navigationContentDescription = stringResource(DesignSystemR.string.modal_close_content_description),
-            onNavigateBack = onCancelClick,
-            navigationIcon = DesignSystemR.drawable.ic_close,
-            scrolled = scrollState.canScrollBackward
-        )
-
+    Box(modifier = modifier.fillMaxSize()) {
         Column(
-            verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
             modifier = Modifier
-                .weight(1f)
-                .verticalScroll(scrollState)
-                .imePadding()
-                .padding(horizontal = HereSpacing.screenHorizontal)
-                .padding(top = HereSpacing.s, bottom = HereSpacing.xl)
+                .fillMaxSize()
+                .background(HereTheme.colors.background)
         ) {
-            Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.m)) {
-                HereTextField(
-                    value = uiState.title,
-                    onValueChange = onTitleChanged,
-                    label = stringResource(R.string.memory_form_title_label),
-                    textStyle = MaterialTheme.typography.titleSmall,
-                    singleLine = true
+            HereContextTopAppBar(
+                title = stringResource(
+                    if (uiState.editing) R.string.memory_form_title_edit
+                    else R.string.memory_form_title_new
+                ),
+                navigationContentDescription = stringResource(DesignSystemR.string.modal_close_content_description),
+                onNavigateBack = onCancelClick,
+                navigationIcon = DesignSystemR.drawable.ic_close,
+                scrolled = scrollState.canScrollBackward
+            )
+
+            Column(
+                verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
+                modifier = Modifier
+                    .weight(1f)
+                    .verticalScroll(scrollState)
+                    .imePadding()
+                    .padding(horizontal = HereSpacing.screenHorizontal)
+                    .padding(top = HereSpacing.s, bottom = HereSpacing.xl)
+            ) {
+                Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.m)) {
+                    HereTextField(
+                        value = uiState.title,
+                        onValueChange = onTitleChanged,
+                        label = stringResource(R.string.memory_form_title_label),
+                        textStyle = MaterialTheme.typography.titleSmall,
+                        singleLine = true
+                    )
+
+                    HereTextField(
+                        value = uiState.description,
+                        onValueChange = onDescriptionChanged,
+                        label = stringResource(
+                            uiState.emotion?.descriptionLabelResId
+                                ?: R.string.memory_form_description_label
+                        ),
+                        minHeight = HereSize.TextField.multilineMinHeight
+                    )
+                }
+
+                EmotionSection(
+                    selectedEmotion = uiState.emotion,
+                    onEmotionSelected = onEmotionSelected
                 )
 
-                HereTextField(
-                    value = uiState.description,
-                    onValueChange = onDescriptionChanged,
-                    label = stringResource(
-                        uiState.emotion?.descriptionLabelResId
-                            ?: R.string.memory_form_description_label
-                    ),
-                    minHeight = HereSize.TextField.multilineMinHeight
+                WhenSection(
+                    happenedAt = uiState.happenedAt,
+                    onDateClick = onDateFieldClick,
+                    onTimeClick = onTimeFieldClick
+                )
+
+                WhereSection(
+                    point = uiState.point,
+                    emotion = uiState.emotion,
+                    address = uiState.address
+                )
+
+                MediaSection(
+                    media = uiState.media,
+                    onMediaClick = { viewedMedia = it },
+                    onMediaPicked = onMediaPicked,
+                    onMediaRemove = onMediaRemove
                 )
             }
 
-            EmotionSection(
-                selectedEmotion = uiState.emotion,
-                onEmotionSelected = onEmotionSelected
-            )
-
-            WhenSection(
-                happenedAt = uiState.happenedAt,
-                onDateClick = onDateFieldClick,
-                onTimeClick = onTimeFieldClick
-            )
-
-            WhereSection(
-                point = uiState.point,
-                emotion = uiState.emotion,
-                address = uiState.address
-            )
-
-            MediaSection(
-                media = uiState.media,
-                onMediaPicked = onMediaPicked,
-                onMediaRemove = onMediaRemove
+            HerePrimaryButton(
+                text = stringResource(
+                    if (uiState.editing) R.string.memory_form_save_edit
+                    else R.string.memory_form_save_new
+                ),
+                onClick = onSaveClick,
+                enabled = uiState.saveEnabled,
+                modifier = Modifier
+                    .navigationBarsPadding()
+                    .padding(horizontal = HereSpacing.screenHorizontal)
+                    .padding(bottom = HereSpacing.xl)
             )
         }
 
-        HerePrimaryButton(
-            text = stringResource(
-                if (uiState.editing) R.string.memory_form_save_edit
-                else R.string.memory_form_save_new
-            ),
-            onClick = onSaveClick,
-            enabled = uiState.saveEnabled,
-            modifier = Modifier
-                .navigationBarsPadding()
-                .padding(horizontal = HereSpacing.screenHorizontal)
-                .padding(bottom = HereSpacing.xl)
-        )
+        AnimatedVisibility(
+            visible = viewedMedia != null,
+            enter = fadeIn(HereMotion.fadeThroughEnter()),
+            exit = fadeOut(HereMotion.fadeThroughExit())
+        ) {
+            MediaViewer(
+                media = uiState.media,
+                initialIndex = viewedMedia ?: 0,
+                onDismissRequest = { viewedMedia = null }
+            )
+        }
     }
 
     when (uiState.activeSheet) {
@@ -204,10 +230,11 @@ fun MemoryFormScreen(
     }
 }
 
-/** Секция «Фото и видео»: коллаж выбранных файлов, как на экране воспоминания, под ним кнопки галереи и камеры. */
+/** Секция «Фото и видео»: лента выбранных файлов, как на экране воспоминания, под ней кнопки галереи и камеры. */
 @Composable
 private fun MediaSection(
     media: List<MemoryMedia>,
+    onMediaClick: (Int) -> Unit,
     onMediaPicked: (List<MemoryMedia>) -> Unit,
     onMediaRemove: (Int) -> Unit
 ) {
@@ -221,18 +248,21 @@ private fun MediaSection(
             modifier = Modifier.padding(horizontal = HereSpacing.xs)
         )
 
-        if (media.isNotEmpty()) {
-            MediaCollage(
-                media = media,
-                onMediaRemove = onMediaRemove
-            )
-        }
+        Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.m)) {
+            if (media.isNotEmpty()) {
+                MediaStrip(
+                    media = media,
+                    onMediaClick = onMediaClick,
+                    onMediaRemove = onMediaRemove
+                )
+            }
 
-        if (media.size < MEDIA_LIMIT) {
-            MediaAddButtons(
-                onMediaPicked = onMediaPicked,
-                maxItems = MEDIA_LIMIT - media.size
-            )
+            if (media.size < MEDIA_LIMIT) {
+                MediaAddButtons(
+                    onMediaPicked = onMediaPicked,
+                    maxItems = MEDIA_LIMIT - media.size
+                )
+            }
         }
     }
 }

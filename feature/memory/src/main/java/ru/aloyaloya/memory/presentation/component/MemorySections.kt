@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,16 +11,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -61,8 +60,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import ru.aloyaloya.design_system.R as DesignSystemR
 
-private const val GRID_COLUMNS = 3
-private const val HERO_COUNT = 3
 private const val DAYS_IN_WEEK = 7
 private const val MINI_MAP_HALO_ALPHA = 0.55f
 private val WeekdayFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("cccc")
@@ -168,7 +165,7 @@ internal fun MemoryMiniMap(
 }
 
 /**
- * Секция «Фото и видео · N»: первый снимок крупно, остальные рядами по три и по два без пустот.
+ * Секция «Фото и видео · N»: лента снимков, листается вбок.
  *
  * @param media Снимки и ролики воспоминания.
  * @param onMediaClick Колбэк открытия снимка на весь экран.
@@ -189,7 +186,7 @@ fun MemoryMediaGrid(
             modifier = Modifier.padding(horizontal = HereSpacing.xs)
         )
 
-        MediaCollage(
+        MediaStrip(
             media = media,
             onMediaClick = onMediaClick
         )
@@ -197,102 +194,71 @@ fun MemoryMediaGrid(
 }
 
 /**
- * Коллаж снимков: три первых крупным блоком, остальные рядами по три и по два без пустот.
+ * Лента квадратных снимков с прокруткой вбок.
  *
  * @param media Снимки и ролики.
- * @param modifier [Modifier], применяемый к коллажу.
- * @param onMediaClick Колбэк нажатия на снимок, без него снимки не нажимаются.
+ * @param onMediaClick Колбэк открытия снимка на весь экран.
+ * @param modifier [Modifier], применяемый к ленте.
  * @param onMediaRemove Колбэк кнопки «убрать», без него кнопки нет.
  */
 @Composable
-internal fun MediaCollage(
+internal fun MediaStrip(
     media: List<MemoryMedia>,
+    onMediaClick: (Int) -> Unit,
     modifier: Modifier = Modifier,
-    onMediaClick: ((Int) -> Unit)? = null,
     onMediaRemove: ((Int) -> Unit)? = null
 ) {
-    val spacing = HereSize.Memory.gridSpacing
-    val heroCount = if (media.size >= HERO_COUNT) HERO_COUNT else 0
-    val rows = remember(media.size, heroCount) { gridRows(from = heroCount, until = media.size) }
-
-    @Composable
-    fun Tile(index: Int, tileModifier: Modifier) {
-        MediaGridTile(
-            item = media[index],
-            onClick = onMediaClick?.let { { it(index) } },
-            onRemoveClick = onMediaRemove?.let { { it(index) } },
-            modifier = tileModifier
-        )
-    }
-
-    BoxWithConstraints(modifier = modifier.clip(HereShape.tile)) {
-        val gridWidth = maxWidth
-        val cell = (gridWidth - spacing * (GRID_COLUMNS - 1)) / GRID_COLUMNS
-
-        Column(verticalArrangement = Arrangement.spacedBy(spacing)) {
-            if (heroCount > 0) {
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
-                    Tile(0, Modifier.size(cell * 2 + spacing))
-
-                    Column(verticalArrangement = Arrangement.spacedBy(spacing)) {
-                        for (index in 1 until HERO_COUNT) {
-                            Tile(index, Modifier.size(cell))
-                        }
-                    }
-                }
-            }
-
-            rows.forEach { row ->
-                val width = (gridWidth - spacing * (row.size - 1)) / row.size
-                val height = if (row.size == 1) (gridWidth - spacing) / 2 else width
-
-                Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
-                    row.forEach { index ->
-                        Tile(index, Modifier.size(width = width, height = height))
-                    }
-                }
-            }
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(HereSpacing.s),
+        modifier = modifier.fillMaxWidth()
+    ) {
+        itemsIndexed(media) { index, item ->
+            MediaStripTile(
+                item = item,
+                onClick = { onMediaClick(index) },
+                onRemoveClick = onMediaRemove?.let { { it(index) } }
+            )
         }
     }
 }
 
 /**
- * Ячейка сетки: снимок или кадр ролика со значком play.
+ * Снимок ленты или кадр ролика со значком play.
  *
  * @param item Снимок или ролик.
  * @param onClick Колбэк открытия на весь экран.
  * @param onRemoveClick Колбэк кнопки «убрать».
- * @param modifier [Modifier] с размером ячейки.
  */
 @Composable
-private fun MediaGridTile(
+private fun MediaStripTile(
     item: MemoryMedia,
-    onClick: (() -> Unit)?,
-    onRemoveClick: (() -> Unit)?,
-    modifier: Modifier = Modifier
+    onClick: () -> Unit,
+    onRemoveClick: (() -> Unit)?
 ) {
     val video = item.type == MediaType.VIDEO
 
     Box(
-        modifier = if (onClick == null) modifier else modifier.clickable(
-            onClickLabel = stringResource(R.string.memory_cover_open),
-            onClick = onClick
-        )
+        modifier = Modifier
+            .size(HereSize.Memory.stripTileSize)
+            .clip(HereShape.tile)
+            .clickable(
+                onClickLabel = stringResource(R.string.memory_cover_open),
+                onClick = onClick
+            )
     ) {
         MediaPhoto(
             uri = item.uri,
             video = video,
-            shape = RectangleShape,
             modifier = Modifier.fillMaxSize()
         )
 
         if (video) {
             MediaPlayBadge(
-                size = HereSize.Memory.gridBadgeSize,
-                iconSize = HereSize.Memory.gridBadgeIconSize,
+                size = HereSize.Memory.mediaBadgeSize,
+                iconSize = HereSize.Memory.mediaBadgeIconSize,
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
-                    .padding(HereSize.Memory.gridBadgeInset)
+                    .padding(HereSize.Memory.mediaBadgeInset)
             )
         }
 
@@ -303,25 +269,6 @@ private fun MediaGridTile(
             )
         }
     }
-}
-
-/**
- * Индексы снимков по рядам из трех и двух без пустот, одинокий снимок — на всю ширину.
- *
- * @param from Первый индекс.
- * @param until Индекс после последнего.
- */
-private fun gridRows(from: Int, until: Int): List<List<Int>> {
-    val count = until - from
-    val sizes = when {
-        count <= 0 -> emptyList()
-        count == 1 -> listOf(1)
-        count % GRID_COLUMNS == 1 -> List(count / GRID_COLUMNS - 1) { GRID_COLUMNS } + listOf(2, 2)
-        count % GRID_COLUMNS == 2 -> List(count / GRID_COLUMNS) { GRID_COLUMNS } + 2
-        else -> List(count / GRID_COLUMNS) { GRID_COLUMNS }
-    }
-    var next = from
-    return sizes.map { size -> List(size) { next++ } }
 }
 
 /**

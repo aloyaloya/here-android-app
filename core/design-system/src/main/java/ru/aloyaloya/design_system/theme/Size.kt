@@ -218,10 +218,10 @@ object HereSize {
         val miniMapHeight = 120.dp
         val miniMapHaloSize = 80.dp
         val miniMapCharacterSize = 44.dp
-        val gridSpacing = 4.dp
-        val gridBadgeSize = 24.dp
-        val gridBadgeIconSize = 14.dp
-        val gridBadgeInset = 6.dp
+        val stripTileSize = 96.dp
+        val mediaBadgeSize = 24.dp
+        val mediaBadgeIconSize = 14.dp
+        val mediaBadgeInset = 6.dp
         val nearbyThumbSize = 40.dp
         val nearbyCharacterSize = 30.dp
     }
