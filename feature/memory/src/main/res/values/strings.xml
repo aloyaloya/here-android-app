@@ -3,8 +3,10 @@
     <string name="memory_form_title_new">New memory</string>
     <string name="memory_form_title_edit">Edit</string>
 
-    <string name="memory_form_date_label">Date</string>
-    <string name="memory_form_time_label">Time</string>
+    <string name="memory_form_when_title">When</string>
+    <string name="memory_form_where_title">Where</string>
+    <string name="memory_form_change_date">Change date</string>
+    <string name="memory_form_change_time">Change time</string>
 
     <string name="memory_form_emotion_label">How do you feel</string>
     <string name="memory_form_title_label">What do we call this memory?</string>

@@ -3,8 +3,10 @@
     <string name="memory_form_title_new">Новое воспоминание</string>
     <string name="memory_form_title_edit">Изменить</string>
 
-    <string name="memory_form_date_label">Дата</string>
-    <string name="memory_form_time_label">Время</string>
+    <string name="memory_form_when_title">Когда</string>
+    <string name="memory_form_where_title">Где</string>
+    <string name="memory_form_change_date">Изменить дату</string>
+    <string name="memory_form_change_time">Изменить время</string>
 
     <string name="memory_form_emotion_label">Что чувствуешь</string>
     <string name="memory_form_title_label">Как назовем воспоминание?</string>

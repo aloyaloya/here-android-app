@@ -6,74 +6,61 @@ import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.PickVisualMediaRequest
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.annotation.StringRes
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.scaleIn
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.TransformOrigin
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
-import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.emotion.EmotionChip
-import ru.aloyaloya.design_system.component.field.HereDateTimeField
 import ru.aloyaloya.design_system.component.field.HereTextField
 import ru.aloyaloya.design_system.component.media.MediaAddTile
 import ru.aloyaloya.design_system.component.media.MediaTile
+import ru.aloyaloya.design_system.component.section.HereCardRow
+import ru.aloyaloya.design_system.component.section.HereSection
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
-import ru.aloyaloya.design_system.component.topbar.HereModalTopBar
+import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
 import ru.aloyaloya.design_system.format.FullDateFormat
 import ru.aloyaloya.design_system.format.TimeFormat
 import ru.aloyaloya.design_system.format.currentLocale
-import ru.aloyaloya.design_system.theme.HereMotion
-import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.MemoryMedia
-import ru.aloyaloya.mapkit.model.MapLogoPlacement
+import ru.aloyaloya.domain.model.PlaceAddress
 import ru.aloyaloya.mapkit.model.MapPoint
-import ru.aloyaloya.mapkit.ui.YandexMap
 import ru.aloyaloya.memory.R
 import ru.aloyaloya.memory.model.MemoryFormSheet
 import ru.aloyaloya.memory.model.MemoryFormUiState
 import ru.aloyaloya.memory.presentation.component.DateSheet
+import ru.aloyaloya.memory.presentation.component.MemoryMiniMap
 import ru.aloyaloya.memory.presentation.component.TimeSheet
+import ru.aloyaloya.memory.presentation.component.dayCaption
 import ru.aloyaloya.ui.emotion.character
 import ru.aloyaloya.ui.emotion.color
-import ru.aloyaloya.ui.theme.LocalAppDarkTheme
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import ru.aloyaloya.design_system.R as DesignSystemR
 
-/** Масштаб, с которого плашка адреса вырастает до полного размера. */
-private const val ADDRESS_INITIAL_SCALE = 0.8f
-
-/** Дата занимает больше места, чем время: «15 июля 2026» против «19:30». */
-private const val DATE_WEIGHT = 1.8f
-private const val TIME_WEIGHT = 1f
+/** Половина зазора между строками: вторая половина у соседней строки. */
+private val RowVerticalPadding = HereSize.Memory.rowSpacing / 2
+private val SectionVerticalPadding = HereSpacing.l - RowVerticalPadding
 
 /** Сколько файлов можно прикрепить к одному воспоминанию. */
 private const val MEDIA_LIMIT = 10
@@ -86,6 +73,7 @@ private const val VIDEO_MIME_PREFIX = "video/"
  * Открывается поверх карты после выбора эмоции или с экрана воспоминания, поэтому
  * у нее своя панель сверху и нет нижней навигации. Панель только закрывает форму,
  * сохранение живет в кнопке внизу — одно действие, один орган управления.
+ * Секции и строки карточек те же, что на экране воспоминания.
  *
  * Чем форма занята, она узнает по [MemoryFormUiState.editing]: меняются только
  * заголовок панели и подпись кнопки, поля везде одни и те же.
@@ -122,46 +110,34 @@ fun MemoryFormScreen(
     onCancelClick: () -> Unit,
     modifier: Modifier = Modifier
 ) {
+    val scrollState = rememberScrollState()
+
     Column(
         modifier = modifier
             .fillMaxSize()
             .background(HereTheme.colors.background)
     ) {
-        HereModalTopBar(
+        HereContextTopAppBar(
             title = stringResource(
                 if (uiState.editing) R.string.memory_form_title_edit
                 else R.string.memory_form_title_new
             ),
-            onCloseClick = onCancelClick
+            navigationContentDescription = stringResource(DesignSystemR.string.modal_close_content_description),
+            onNavigateBack = onCancelClick,
+            navigationIcon = DesignSystemR.drawable.ic_close,
+            scrolled = scrollState.canScrollBackward
         )
 
         Column(
             verticalArrangement = Arrangement.spacedBy(HereSpacing.xl),
             modifier = Modifier
                 .weight(1f)
-                .verticalScroll(rememberScrollState())
+                .verticalScroll(scrollState)
                 .imePadding()
                 .padding(horizontal = HereSpacing.screenHorizontal)
                 .padding(vertical = HereSpacing.s)
         ) {
-            PlacePreview(
-                point = uiState.point,
-                emotion = uiState.emotion,
-                address = uiState.address
-            )
-
-            EmotionSection(
-                selectedEmotion = uiState.emotion,
-                onEmotionSelected = onEmotionSelected
-            )
-
             Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.m)) {
-                DateTimeSection(
-                    happenedAt = uiState.happenedAt,
-                    onDateClick = onDateFieldClick,
-                    onTimeClick = onTimeFieldClick
-                )
-
                 HereTextField(
                     value = uiState.title,
                     onValueChange = onTitleChanged,
@@ -179,13 +155,30 @@ fun MemoryFormScreen(
                     ),
                     minHeight = HereSize.TextField.multilineMinHeight
                 )
-
-                MediaSection(
-                    media = uiState.media,
-                    onMediaPicked = onMediaPicked,
-                    onMediaRemove = onMediaRemove
-                )
             }
+
+            EmotionSection(
+                selectedEmotion = uiState.emotion,
+                onEmotionSelected = onEmotionSelected
+            )
+
+            WhenSection(
+                happenedAt = uiState.happenedAt,
+                onDateClick = onDateFieldClick,
+                onTimeClick = onTimeFieldClick
+            )
+
+            WhereSection(
+                point = uiState.point,
+                emotion = uiState.emotion,
+                address = uiState.address
+            )
+
+            MediaSection(
+                media = uiState.media,
+                onMediaPicked = onMediaPicked,
+                onMediaRemove = onMediaRemove
+            )
         }
 
         HerePrimaryButton(
@@ -220,9 +213,7 @@ fun MemoryFormScreen(
     }
 }
 
-/**
- * Ряд выбранных файлов и плитка добавления.
- */
+/** Секция «Фото и видео»: ряд выбранных файлов и плитка добавления. */
 @Composable
 private fun MediaSection(
     media: List<MemoryMedia>,
@@ -242,28 +233,35 @@ private fun MediaSection(
         })
     }
 
-    Row(
-        horizontalArrangement = Arrangement.spacedBy(HereSize.MediaTile.spacing),
-        modifier = Modifier
-            .fillMaxWidth()
-            .horizontalScroll(rememberScrollState())
-    ) {
-        media.forEachIndexed { index, item ->
-            MediaTile(
-                uri = item.uri,
-                onRemoveClick = { onMediaRemove(index) },
-                video = item.type == MediaType.VIDEO
-            )
-        }
+    Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
+        HereSectionLabel(
+            text = stringResource(R.string.memory_media_title),
+            modifier = Modifier.padding(horizontal = HereSpacing.xs)
+        )
 
-        if (media.size < MEDIA_LIMIT) {
-            MediaAddTile(
-                onClick = {
-                    picker.launch(
-                        PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)
-                    )
-                }
-            )
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(HereSize.MediaTile.spacing),
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState())
+        ) {
+            media.forEachIndexed { index, item ->
+                MediaTile(
+                    uri = item.uri,
+                    onRemoveClick = { onMediaRemove(index) },
+                    video = item.type == MediaType.VIDEO
+                )
+            }
+
+            if (media.size < MEDIA_LIMIT) {
+                MediaAddTile(
+                    onClick = {
+                        picker.launch(
+                            PickVisualMediaRequest(ActivityResultContracts.PickVisualMedia.ImageAndVideo)
+                        )
+                    }
+                )
+            }
         }
     }
 }
@@ -273,99 +271,81 @@ private fun ContentResolver.mediaType(uri: Uri): MediaType =
     if (getType(uri)?.startsWith(VIDEO_MIME_PREFIX) == true) MediaType.VIDEO else MediaType.PHOTO
 
 /**
- * Превью выбранного места: пин эмоции и адрес.
-
+ * Секция «Когда»: дата и время открывают свой лист выбора.
+ *
+ * @param happenedAt Когда событие произошло.
+ * @param onDateClick Колбэк нажатия на дату.
+ * @param onTimeClick Колбэк нажатия на время.
  */
 @Composable
-private fun PlacePreview(
-    point: MapPoint?,
-    emotion: Emotion?,
-    address: String?
-) {
-    val colors = HereTheme.colors
-
-    Box(
-        modifier = Modifier
-            .fillMaxWidth()
-            .height(HereSize.PlacePreview.height)
-            .clip(HereShape.tile)
-            .background(colors.surfaceMuted)
-    ) {
-        if (point != null) {
-            YandexMap(
-                modifier = Modifier.fillMaxSize(),
-                movable = true,
-                interactive = false,
-                locationEnabled = false,
-                isDarkTheme = LocalAppDarkTheme.current,
-                startPosition = point,
-                startZoom = 16f,
-                logoPlacement = MapLogoPlacement.Card
-            )
-        }
-
-        if (emotion != null && point != null) {
-            EmotionCharacter(
-                emotion = emotion.character,
-                size = HereSize.EmotionCharacter.small,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-
-        AnimatedVisibility(
-            visible = address != null,
-            enter = scaleIn(
-                animationSpec = HereMotion.bouncy(),
-                initialScale = ADDRESS_INITIAL_SCALE,
-                transformOrigin = TransformOrigin(0f, 1f)
-            ) + fadeIn(),
-            modifier = Modifier
-                .align(Alignment.BottomStart)
-                .padding(HereSize.PlacePreview.addressMargin)
-        ) {
-            Text(
-                text = address.orEmpty(),
-                style = MaterialTheme.typography.titleMedium,
-                color = colors.textPrimary,
-                modifier = Modifier
-                    .clip(HereShape.tile)
-                    .background(colors.surface)
-                    .padding(
-                        vertical = HereSize.PlacePreview.addressVerticalPadding,
-                        horizontal = HereSize.PlacePreview.addressHorizontalPadding
-                    )
-            )
-        }
-    }
-}
-
-/** Дата и время события: обе плашки открывают свой лист выбора. */
-@Composable
-private fun DateTimeSection(
+private fun WhenSection(
     happenedAt: LocalDateTime,
     onDateClick: () -> Unit,
     onTimeClick: () -> Unit
 ) {
-    val dateFormat = FullDateFormat.withLocale(currentLocale())
+    HereSection(title = stringResource(R.string.memory_form_when_title)) {
+        Column(modifier = Modifier.padding(vertical = SectionVerticalPadding)) {
+            HereCardRow(
+                icon = DesignSystemR.drawable.ic_calendar_outline,
+                title = FullDateFormat.withLocale(currentLocale()).format(happenedAt),
+                description = dayCaption(happenedAt.toLocalDate()),
+                modifier = Modifier
+                    .clickable(
+                        onClickLabel = stringResource(R.string.memory_form_change_date),
+                        onClick = onDateClick
+                    )
+                    .rowPadding()
+            )
 
-    Row(horizontalArrangement = Arrangement.spacedBy(HereSize.DateTimeField.spacing)) {
-        HereDateTimeField(
-            label = stringResource(R.string.memory_form_date_label),
-            value = dateFormat.format(happenedAt),
-            icon = DesignSystemR.drawable.ic_calendar_outline,
-            onClick = onDateClick,
-            modifier = Modifier.weight(DATE_WEIGHT)
-        )
-
-        HereDateTimeField(
-            label = stringResource(R.string.memory_form_time_label),
-            value = TimeFormat.format(happenedAt),
-            icon = DesignSystemR.drawable.ic_clock_outline,
-            onClick = onTimeClick,
-            modifier = Modifier.weight(TIME_WEIGHT)
-        )
+            HereCardRow(
+                icon = DesignSystemR.drawable.ic_clock_outline,
+                title = TimeFormat.format(happenedAt),
+                description = null,
+                modifier = Modifier
+                    .clickable(
+                        onClickLabel = stringResource(R.string.memory_form_change_time),
+                        onClick = onTimeClick
+                    )
+                    .rowPadding()
+            )
+        }
     }
 }
+
+/**
+ * Секция «Где»: адрес и мини-карта с персонажем.
+ *
+ * @param point Точка воспоминания или `null`, пока она не загружена.
+ * @param emotion Выбранная эмоция.
+ * @param address Адрес точки или `null`, пока он не найден.
+ */
+@Composable
+private fun WhereSection(
+    point: MapPoint?,
+    emotion: Emotion?,
+    address: PlaceAddress?
+) {
+    HereSection(title = stringResource(R.string.memory_form_where_title)) {
+        Column(
+            verticalArrangement = Arrangement.spacedBy(HereSize.Memory.rowSpacing),
+            modifier = Modifier.padding(HereSpacing.l)
+        ) {
+            HereCardRow(
+                icon = DesignSystemR.drawable.ic_place,
+                title = address?.line ?: stringResource(R.string.memory_place_unknown),
+                description = address?.locality
+            )
+
+            if (point != null) {
+                MemoryMiniMap(point = point, emotion = emotion)
+            }
+        }
+    }
+}
+
+/** Отступы строки внутри карточки: нажатие подсвечивает ее во всю ширину. */
+private fun Modifier.rowPadding(): Modifier =
+    padding(horizontal = HereSpacing.l, vertical = RowVerticalPadding)
 
 /** Ряд эмоций с подписью секции. */
 @Composable

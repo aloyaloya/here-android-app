@@ -113,14 +113,6 @@ object HereSize {
         val characterSize = 44.dp
     }
 
-    /** Превью выбранного места. */
-    object PlacePreview {
-        val height = 180.dp
-        val addressMargin = 14.dp
-        val addressVerticalPadding = 8.dp
-        val addressHorizontalPadding = 14.dp
-    }
-
     /** Строка воспоминания и отступ между строками в списке. */
     object MemoryRow {
         val padding = 14.dp
@@ -140,16 +132,6 @@ object HereSize {
         val pinLift = 10.dp
     }
 
-    /** Панель модального экрана. */
-    object ModalTopBar {
-        val horizontalPadding = 8.dp
-        val topPadding = 8.dp
-        val bottomPadding = 8.dp
-        val closeSize = 48.dp
-        val closeIconSize = 24.dp
-        val titleSpacing = 16.dp
-    }
-
     /** Поле ввода. */
     object TextField {
         val verticalPadding = 12.dp
@@ -158,19 +140,6 @@ object HereSize {
         val labelSlot = 16.dp
         val labelSize = 12.sp
         val focusBorder = 2.dp
-    }
-
-    /** Плашка даты или времени события. */
-    object DateTimeField {
-        val border = 1.5.dp
-        val verticalPadding = 12.dp
-        val horizontalPadding = 14.dp
-        val labelSpacing = 1.dp
-        val iconSize = 24.dp
-        val spacing = 8.dp
-
-        /** Кегль подписи общий с полем ввода: это одна и та же подпись над значением. */
-        val labelSize = 12.sp
     }
 
     /** Плитка медиа: превью снимка и кнопка добавления. */

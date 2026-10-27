@@ -44,6 +44,7 @@ import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
+import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.model.MemoryMedia
@@ -84,8 +85,6 @@ fun MemoryWhenWhere(
 ) {
     val locale = currentLocale()
     val moment = Instant.ofEpochMilli(memory.happenedAt).atZone(ZoneId.systemDefault())
-    val weekday = WeekdayFormat.withLocale(locale).format(moment).replaceFirstChar { it.titlecase(locale) }
-    val elapsed = elapsedText(moment.toLocalDate())
 
     HereSection(
         title = stringResource(R.string.memory_when_where_title),
@@ -102,7 +101,7 @@ fun MemoryWhenWhere(
                     FullDateFormat.withLocale(locale).format(moment),
                     TimeFormat.format(moment)
                 ),
-                description = elapsed?.let { stringResource(R.string.memory_dot_pair, weekday, it) } ?: weekday
+                description = dayCaption(moment.toLocalDate())
             )
 
             HereCardRow(
@@ -112,18 +111,31 @@ fun MemoryWhenWhere(
             )
 
             if (memory.media.isNotEmpty()) {
-                MiniMap(memory = memory)
+                MemoryMiniMap(
+                    point = MapPoint(memory.latitude, memory.longitude),
+                    emotion = memory.emotion
+                )
             }
         }
     }
 }
 
-/** Карта места с персонажем: только смотреть, без нажатий. */
+/**
+ * Карта места с персонажем: только смотреть, без нажатий.
+ *
+ * @param point Точка воспоминания.
+ * @param emotion Эмоция персонажа или `null`, пока ее не выбрали.
+ * @param modifier [Modifier], применяемый к карте.
+ */
 @Composable
-private fun MiniMap(memory: Memory) {
+internal fun MemoryMiniMap(
+    point: MapPoint,
+    emotion: Emotion?,
+    modifier: Modifier = Modifier
+) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(HereSize.Memory.miniMapHeight)
             .clip(HereShape.bubble)
@@ -134,24 +146,26 @@ private fun MiniMap(memory: Memory) {
             interactive = false,
             locationEnabled = false,
             isDarkTheme = LocalAppDarkTheme.current,
-            startPosition = MapPoint(memory.latitude, memory.longitude),
+            startPosition = point,
             startZoom = MAP_ZOOM,
             logoPlacement = MapLogoPlacement.Card
         )
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(HereSize.Memory.miniMapHaloSize)
-                .background(
-                    color = memory.emotion.color.solid.copy(alpha = MINI_MAP_HALO_ALPHA),
-                    shape = CircleShape
+        if (emotion != null) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(HereSize.Memory.miniMapHaloSize)
+                    .background(
+                        color = emotion.color.solid.copy(alpha = MINI_MAP_HALO_ALPHA),
+                        shape = CircleShape
+                    )
+            ) {
+                EmotionCharacter(
+                    emotion = emotion.character,
+                    size = HereSize.Memory.miniMapCharacterSize
                 )
-        ) {
-            EmotionCharacter(
-                emotion = memory.emotion.character,
-                size = HereSize.Memory.miniMapCharacterSize
-            )
+            }
         }
     }
 }
@@ -454,6 +468,14 @@ private fun NearbyThumb(memory: Memory) {
             )
         }
     }
+}
+
+/** Подпись дня: «Среда · 3 дня назад». */
+@Composable
+internal fun dayCaption(date: LocalDate): String {
+    val locale = currentLocale()
+    val weekday = WeekdayFormat.withLocale(locale).format(date).replaceFirstChar { it.titlecase(locale) }
+    return elapsedText(date)?.let { stringResource(R.string.memory_dot_pair, weekday, it) } ?: weekday
 }
 
 /** Сколько прошло с [date]: «вчера», «3 месяца назад»; `null` для дня в будущем. */
