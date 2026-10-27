@@ -8,6 +8,8 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.navigationBarsPadding
+import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
@@ -32,6 +34,8 @@ import androidx.media3.ui.compose.state.rememberPresentationState
 import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayButton
 import ru.aloyaloya.design_system.theme.HereMotion
+import ru.aloyaloya.design_system.theme.HereSize
+import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.memory.R
 import java.io.File
 import ru.aloyaloya.design_system.R as DesignSystemR
@@ -44,9 +48,11 @@ import ru.aloyaloya.design_system.R as DesignSystemR
  * Видео выводится в TextureView, чтобы на него действовала прозрачность просмотра.
  *
  * @param uri Путь к файлу во внутреннем хранилище.
- * @param playing Страница открыта: с уходом на соседнюю ролик встает на паузу.
- * @param controlsVisible Кнопка воспроизведения видна.
+ * @param playing Страница открыта: ролик запускается сам, с уходом на соседнюю встает на паузу.
+ * @param muted Звук выключен.
+ * @param controlsVisible Кнопка воспроизведения и полоса прогресса видны.
  * @param onPlaybackChange Колбэк запуска и остановки ролика.
+ * @param onSeekingChange Колбэк начала и конца перемотки.
  * @param onTap Колбэк тапа по играющему ролику, на паузе тап запускает его.
  * @param modifier [Modifier], применяемый к странице.
  */
@@ -55,8 +61,10 @@ import ru.aloyaloya.design_system.R as DesignSystemR
 fun VideoPage(
     uri: String,
     playing: Boolean,
+    muted: Boolean,
     controlsVisible: Boolean,
     onPlaybackChange: (Boolean) -> Unit,
+    onSeekingChange: (Boolean) -> Unit,
     onTap: () -> Unit,
     modifier: Modifier = Modifier
 ) {
@@ -73,8 +81,12 @@ fun VideoPage(
         onDispose { player.release() }
     }
 
-    LaunchedEffect(playing) {
-        if (!playing) player.pause()
+    LaunchedEffect(player, playing) {
+        if (playing) player.play() else player.pause()
+    }
+
+    LaunchedEffect(player, muted) {
+        player.volume = if (muted) 0f else 1f
     }
 
     LifecycleResumeEffect(player) {
@@ -134,6 +146,22 @@ fun VideoPage(
             MediaPlayButton(
                 playing = videoPlaying,
                 onClick = playPause::onClick
+            )
+        }
+
+        AnimatedVisibility(
+            visible = controlsVisible,
+            enter = fadeIn(HereMotion.fadeThroughEnter()),
+            exit = fadeOut(HereMotion.fadeThroughExit()),
+            modifier = Modifier
+                .align(Alignment.BottomCenter)
+                .navigationBarsPadding()
+                .padding(horizontal = HereSpacing.screenHorizontal)
+                .padding(bottom = HereSize.MediaViewer.progressBottomPadding)
+        ) {
+            VideoProgress(
+                player = player,
+                onSeekingChange = onSeekingChange
             )
         }
     }

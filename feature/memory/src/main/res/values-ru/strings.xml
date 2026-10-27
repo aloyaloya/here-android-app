@@ -23,6 +23,9 @@
     <string name="memory_media_close">Закрыть просмотр</string>
     <string name="memory_video_show_controls">Показать управление</string>
     <string name="memory_video_hide_controls">Скрыть управление</string>
+    <string name="memory_video_mute">Выключить звук</string>
+    <string name="memory_video_unmute">Включить звук</string>
+    <string name="memory_video_position">Позиция в ролике</string>
     <string name="memory_elapsed_today">сегодня</string>
     <string name="memory_elapsed_yesterday">вчера</string>
     <plurals name="memory_elapsed_days">

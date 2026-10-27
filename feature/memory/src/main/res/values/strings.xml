@@ -23,6 +23,9 @@
     <string name="memory_media_close">Close viewer</string>
     <string name="memory_video_show_controls">Show controls</string>
     <string name="memory_video_hide_controls">Hide controls</string>
+    <string name="memory_video_mute">Mute</string>
+    <string name="memory_video_unmute">Unmute</string>
+    <string name="memory_video_position">Playback position</string>
     <string name="memory_elapsed_today">today</string>
     <string name="memory_elapsed_yesterday">yesterday</string>
     <plurals name="memory_elapsed_days">

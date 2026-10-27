@@ -15,12 +15,14 @@ import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -32,12 +34,14 @@ import androidx.compose.ui.res.stringResource
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.launch
 import ru.aloyaloya.design_system.component.topbar.HereContextTopAppBar
+import ru.aloyaloya.design_system.component.topbar.TopAppBarAction
 import ru.aloyaloya.design_system.theme.HereMotion
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.memory.R
 import kotlin.math.abs
+import ru.aloyaloya.design_system.R as DesignSystemR
 
 private const val FADE_DISTANCE_RATIO = 4f
 private const val MIN_BACKGROUND_ALPHA = 0.35f
@@ -76,14 +80,17 @@ fun MediaViewer(
 
     var playingPage by remember { mutableStateOf<Int?>(null) }
     var controlsShown by remember { mutableStateOf(true) }
+    var seeking by remember { mutableStateOf(false) }
+    var muted by rememberSaveable { mutableStateOf(false) }
     val videoPlaying = playingPage == pagerState.currentPage
+    val videoPage = media.getOrNull(pagerState.currentPage)?.type == MediaType.VIDEO
     val controlsVisible = controlsShown || !videoPlaying
     val accessibility = LocalAccessibilityManager.current
 
-    LaunchedEffect(videoPlaying, controlsShown) {
+    LaunchedEffect(videoPlaying, controlsShown, seeking) {
         if (!videoPlaying) {
             controlsShown = true
-        } else if (controlsShown) {
+        } else if (controlsShown && !seeking) {
             delay(
                 accessibility?.calculateRecommendedTimeoutMillis(
                     originalTimeoutMillis = CONTROLS_HIDE_MILLIS,
@@ -134,10 +141,12 @@ fun MediaViewer(
                 VideoPage(
                     uri = item.uri,
                     playing = pagerState.currentPage == page,
+                    muted = muted,
                     controlsVisible = controlsVisible,
                     onPlaybackChange = { started ->
                         playingPage = if (started) page else playingPage?.takeIf { it != page }
                     },
+                    onSeekingChange = { seeking = it },
                     onTap = { controlsShown = !controlsShown },
                     modifier = Modifier.fillMaxSize()
                 )
@@ -161,7 +170,18 @@ fun MediaViewer(
                 navigationContentDescription = stringResource(R.string.memory_media_close),
                 onNavigateBack = onDismissRequest,
                 overMedia = true
-            )
+            ) {
+                if (videoPage) {
+                    TopAppBarAction(
+                        icon = if (muted) DesignSystemR.drawable.ic_volume_off else DesignSystemR.drawable.ic_volume_on,
+                        contentDescription = stringResource(
+                            if (muted) R.string.memory_video_unmute else R.string.memory_video_mute
+                        ),
+                        onClick = { muted = !muted },
+                        tint = LocalContentColor.current
+                    )
+                }
+            }
         }
 
         if (media.size > 1) {

@@ -217,6 +217,9 @@ object HereSize {
     /** Полноэкранный просмотр снимков. */
     object MediaViewer {
         val dismissDistance = 120.dp
+        val progressBottomPadding = 40.dp
+        val progressTrackHeight = 4.dp
+        val progressThumbSize = 14.dp
     }
 
     /** Экран воспоминания. */
