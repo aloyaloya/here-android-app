@@ -12,6 +12,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -21,6 +22,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.stringResource
 import androidx.core.content.FileProvider
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import ru.aloyaloya.design_system.component.media.MediaAddButton
 import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereTheme
@@ -29,12 +32,16 @@ import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.memory.R
 import java.io.File
 import java.util.UUID
+import java.util.concurrent.TimeUnit
 import ru.aloyaloya.design_system.R as DesignSystemR
 
 private const val CAMERA_DIRECTORY = "camera"
 private const val CAMERA_AUTHORITY_SUFFIX = ".camera"
 private const val PHOTO_EXTENSION = "jpg"
 private const val VIDEO_EXTENSION = "mp4"
+
+/** Снимок старше суток уже не ждет сохранения: форму с ним закрыли или убрали его из подборки. */
+private val STALE_CAPTURE_MILLIS = TimeUnit.DAYS.toMillis(1)
 
 /**
  * Кнопка камеры: меню «сфотографировать» или «снять видео» и запуск камеры.
@@ -50,6 +57,10 @@ internal fun CameraButton(
     val context = LocalContext.current
     var menuOpen by remember { mutableStateOf(false) }
     var pendingPath by rememberSaveable { mutableStateOf<String?>(null) }
+
+    LaunchedEffect(Unit) {
+        withContext(Dispatchers.IO) { context.deleteStaleCaptures() }
+    }
 
     fun finish(success: Boolean, type: MediaType) {
         val file = pendingPath?.let(::File) ?: return
@@ -136,6 +147,14 @@ private fun CameraMenuItem(
 private fun Context.newCameraFile(extension: String): File {
     val directory = File(filesDir, CAMERA_DIRECTORY).apply { mkdirs() }
     return File(directory, "${UUID.randomUUID()}.$extension").apply { createNewFile() }
+}
+
+/** Удаляет брошенные снимки: сохраненные хранилище удаляет само, сразу после копии. */
+private fun Context.deleteStaleCaptures() {
+    val threshold = System.currentTimeMillis() - STALE_CAPTURE_MILLIS
+    File(filesDir, CAMERA_DIRECTORY).listFiles()
+        ?.filter { it.lastModified() < threshold }
+        ?.forEach(File::delete)
 }
 
 /** Адрес файла для чужого приложения: прямой путь камере не открыть. */

@@ -142,13 +142,11 @@ object HereSize {
         val focusBorder = 2.dp
     }
 
-    /** Плитка медиа: превью снимка с кнопкой удаления. */
-    object MediaTile {
-        val size = 87.dp
-        val spacing = 12.dp
-        val removeSize = 26.dp
-        val removeIconSize = 11.dp
-        val removeTouchSize = 38.dp
+    /** Кнопка «убрать» поверх снимка. */
+    object MediaRemove {
+        val size = 26.dp
+        val iconSize = 11.dp
+        val touchSize = 38.dp
     }
 
     /** Пунктирная кнопка добавления медиа. */

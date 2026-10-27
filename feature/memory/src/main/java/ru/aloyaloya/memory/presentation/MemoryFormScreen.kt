@@ -23,7 +23,6 @@ import androidx.compose.ui.res.stringResource
 import ru.aloyaloya.design_system.component.button.HerePrimaryButton
 import ru.aloyaloya.design_system.component.emotion.EmotionChip
 import ru.aloyaloya.design_system.component.field.HereTextField
-import ru.aloyaloya.design_system.component.media.MediaTile
 import ru.aloyaloya.design_system.component.section.HereCardRow
 import ru.aloyaloya.design_system.component.section.HereSection
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
@@ -35,7 +34,6 @@ import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
 import ru.aloyaloya.domain.model.Emotion
-import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.domain.model.PlaceAddress
 import ru.aloyaloya.mapkit.model.MapPoint
@@ -45,6 +43,7 @@ import ru.aloyaloya.memory.model.MemoryFormUiState
 import ru.aloyaloya.memory.presentation.component.DateSheet
 import ru.aloyaloya.memory.presentation.component.MEDIA_LIMIT
 import ru.aloyaloya.memory.presentation.component.MediaAddButtons
+import ru.aloyaloya.memory.presentation.component.MediaCollage
 import ru.aloyaloya.memory.presentation.component.MemoryMiniMap
 import ru.aloyaloya.memory.presentation.component.TimeSheet
 import ru.aloyaloya.memory.presentation.component.dayCaption
@@ -205,7 +204,7 @@ fun MemoryFormScreen(
     }
 }
 
-/** Секция «Фото и видео»: ряд выбранных файлов, под ним кнопки галереи и камеры. */
+/** Секция «Фото и видео»: коллаж выбранных файлов, как на экране воспоминания, под ним кнопки галереи и камеры. */
 @Composable
 private fun MediaSection(
     media: List<MemoryMedia>,
@@ -214,25 +213,19 @@ private fun MediaSection(
 ) {
     Column(verticalArrangement = Arrangement.spacedBy(HereSpacing.s)) {
         HereSectionLabel(
-            text = stringResource(R.string.memory_media_title),
+            text = if (media.isEmpty()) {
+                stringResource(R.string.memory_media_title)
+            } else {
+                stringResource(R.string.memory_media_count_title, media.size)
+            },
             modifier = Modifier.padding(horizontal = HereSpacing.xs)
         )
 
         if (media.isNotEmpty()) {
-            Row(
-                horizontalArrangement = Arrangement.spacedBy(HereSize.MediaTile.spacing),
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState())
-            ) {
-                media.forEachIndexed { index, item ->
-                    MediaTile(
-                        uri = item.uri,
-                        onRemoveClick = { onMediaRemove(index) },
-                        video = item.type == MediaType.VIDEO
-                    )
-                }
-            }
+            MediaCollage(
+                media = media,
+                onMediaRemove = onMediaRemove
+            )
         }
 
         if (media.size < MEDIA_LIMIT) {
