@@ -2,6 +2,7 @@ package ru.aloyaloya.memory.model
 
 import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.MemoryMedia
+import ru.aloyaloya.domain.model.PlaceAddress
 import ru.aloyaloya.mapkit.model.MapPoint
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -31,7 +32,7 @@ data class MemoryFormUiState(
     val description: String = "",
     val point: MapPoint? = null,
     val media: List<MemoryMedia> = emptyList(),
-    val address: String? = null,
+    val address: PlaceAddress? = null,
     val emotionByDate: Map<LocalDate, Emotion> = emptyMap(),
     val editing: Boolean = false,
     val saving: Boolean = false,

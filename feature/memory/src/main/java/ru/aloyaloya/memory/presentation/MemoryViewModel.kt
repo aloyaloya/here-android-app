@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import ru.aloyaloya.domain.model.Memory
+import ru.aloyaloya.domain.model.MemoryMedia
 import ru.aloyaloya.domain.repository.AddressRepository
 import ru.aloyaloya.domain.repository.MemoryRepository
 import ru.aloyaloya.memory.model.MemorySheet
@@ -58,6 +59,15 @@ class MemoryViewModel @Inject constructor(
     fun onMediaClick(index: Int) = showMedia(index)
 
     fun onViewerDismiss() = showMedia(null)
+
+    fun onMediaPicked(picked: List<MemoryMedia>) {
+        val memory = (_uiState.value as? MemoryUiState.Content)?.memory ?: return
+        if (picked.isEmpty()) return
+
+        viewModelScope.launch {
+            memoryRepository.update(memory.copy(media = memory.media + picked))
+        }
+    }
 
     fun onDeleteConfirm() {
         val memory = (_uiState.value as? MemoryUiState.Content)?.memory ?: return

@@ -14,14 +14,20 @@ import javax.inject.Singleton
 
 private const val MEDIA_DIRECTORY = "media"
 
+/** Адрес FileProvider снимков камеры, тот же, что в манифесте feature/memory. */
+private const val CAMERA_AUTHORITY_SUFFIX = ".camera"
+
 /** Файлы медиа во внутреннем хранилище приложения. */
 @Singleton
 class MediaStorage @Inject constructor(context: Context) {
 
     private val resolver: ContentResolver = context.contentResolver
 
+    private val cameraAuthority = context.packageName + CAMERA_AUTHORITY_SUFFIX
+
     private val root = File(context.filesDir, MEDIA_DIRECTORY)
 
+    /** Копирует файл по [uri] в хранилище и возвращает путь к копии, снимок камеры после копии удаляет. */
     suspend fun save(uri: String): String? = withContext(Dispatchers.IO) {
         val source = Uri.parse(uri)
         val file = File(root, fileName(source))
@@ -31,6 +37,7 @@ class MediaStorage @Inject constructor(context: Context) {
             resolver.openInputStream(source)?.use { input ->
                 file.outputStream().use(input::copyTo)
             } ?: error("Не удалось открыть $uri")
+            if (source.authority == cameraAuthority) resolver.delete(source, null, null)
             file.path
         }.getOrElse {
             file.delete()

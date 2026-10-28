@@ -113,14 +113,6 @@ object HereSize {
         val characterSize = 44.dp
     }
 
-    /** Превью выбранного места. */
-    object PlacePreview {
-        val height = 180.dp
-        val addressMargin = 14.dp
-        val addressVerticalPadding = 8.dp
-        val addressHorizontalPadding = 14.dp
-    }
-
     /** Строка воспоминания и отступ между строками в списке. */
     object MemoryRow {
         val padding = 14.dp
@@ -140,16 +132,6 @@ object HereSize {
         val pinLift = 10.dp
     }
 
-    /** Панель модального экрана. */
-    object ModalTopBar {
-        val horizontalPadding = 8.dp
-        val topPadding = 8.dp
-        val bottomPadding = 8.dp
-        val closeSize = 48.dp
-        val closeIconSize = 24.dp
-        val titleSpacing = 16.dp
-    }
-
     /** Поле ввода. */
     object TextField {
         val verticalPadding = 12.dp
@@ -160,29 +142,21 @@ object HereSize {
         val focusBorder = 2.dp
     }
 
-    /** Плашка даты или времени события. */
-    object DateTimeField {
-        val border = 1.5.dp
-        val verticalPadding = 12.dp
-        val horizontalPadding = 14.dp
-        val labelSpacing = 1.dp
-        val iconSize = 24.dp
-        val spacing = 8.dp
-
-        /** Кегль подписи общий с полем ввода: это одна и та же подпись над значением. */
-        val labelSize = 12.sp
+    /** Кнопка «убрать» поверх снимка. */
+    object MediaRemove {
+        val size = 26.dp
+        val iconSize = 11.dp
+        val touchSize = 38.dp
     }
 
-    /** Плитка медиа: превью снимка и кнопка добавления. */
-    object MediaTile {
-        val size = 87.dp
+    /** Пунктирная кнопка добавления медиа. */
+    object MediaAdd {
+        val height = 52.dp
+        val iconSize = 20.dp
         val spacing = 12.dp
-        val addBorder = 2.dp
-        val addDash = 6.dp
-        val addGap = 5.dp
-        val removeSize = 26.dp
-        val removeIconSize = 11.dp
-        val removeTouchSize = 38.dp
+        val dashWidth = 1.5.dp
+        val dashLength = 6.dp
+        val dashGap = 4.dp
     }
 
     /** Круглая кнопка с иконкой поверх карты или фотографии. */
@@ -238,21 +212,18 @@ object HereSize {
         val contentTopPadding = 16.dp
         val headerSpacing = 10.dp
         val textSpacing = 12.dp
+        val quoteBarWidth = 3.dp
+        val quoteSpacing = 12.dp
         val sectionSpacing = 20.dp
         val bottomPadding = 24.dp
         val rowSpacing = 14.dp
         val miniMapHeight = 120.dp
         val miniMapHaloSize = 80.dp
         val miniMapCharacterSize = 44.dp
-        val gridSpacing = 4.dp
-        val gridBadgeSize = 24.dp
-        val gridBadgeIconSize = 14.dp
-        val gridBadgeInset = 6.dp
-        val addPhotoHeight = 52.dp
-        val addPhotoIconSize = 20.dp
-        val dashWidth = 1.5.dp
-        val dashLength = 6.dp
-        val dashGap = 4.dp
+        val stripTileSize = 96.dp
+        val mediaBadgeSize = 24.dp
+        val mediaBadgeIconSize = 14.dp
+        val mediaBadgeInset = 6.dp
         val nearbyThumbSize = 40.dp
         val nearbyCharacterSize = 30.dp
     }

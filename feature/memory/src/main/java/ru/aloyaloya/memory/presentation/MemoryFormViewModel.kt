@@ -178,7 +178,7 @@ class MemoryFormViewModel @Inject constructor(
             val address = addressRepository.resolve(
                 latitude = point.latitude,
                 longitude = point.longitude
-            )?.line
+            )
             _uiState.update { it.copy(address = address) }
         }
     }

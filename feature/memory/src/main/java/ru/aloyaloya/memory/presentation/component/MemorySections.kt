@@ -4,7 +4,6 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -12,20 +11,16 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.drawBehind
-import androidx.compose.ui.graphics.PathEffect
-import androidx.compose.ui.graphics.RectangleShape
-import androidx.compose.ui.graphics.drawOutline
-import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
@@ -34,6 +29,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import ru.aloyaloya.design_system.component.character.EmotionCharacter
 import ru.aloyaloya.design_system.component.media.MediaPhoto
 import ru.aloyaloya.design_system.component.media.MediaPlayBadge
+import ru.aloyaloya.design_system.component.media.MediaRemoveButton
 import ru.aloyaloya.design_system.component.section.HereCardRow
 import ru.aloyaloya.design_system.component.section.HereSection
 import ru.aloyaloya.design_system.component.text.HereSectionLabel
@@ -44,6 +40,7 @@ import ru.aloyaloya.design_system.theme.HereShape
 import ru.aloyaloya.design_system.theme.HereSize
 import ru.aloyaloya.design_system.theme.HereSpacing
 import ru.aloyaloya.design_system.theme.HereTheme
+import ru.aloyaloya.domain.model.Emotion
 import ru.aloyaloya.domain.model.MediaType
 import ru.aloyaloya.domain.model.Memory
 import ru.aloyaloya.domain.model.MemoryMedia
@@ -63,8 +60,6 @@ import java.time.format.DateTimeFormatter
 import java.time.temporal.ChronoUnit
 import ru.aloyaloya.design_system.R as DesignSystemR
 
-private const val GRID_COLUMNS = 3
-private const val HERO_COUNT = 3
 private const val DAYS_IN_WEEK = 7
 private const val MINI_MAP_HALO_ALPHA = 0.55f
 private val WeekdayFormat: DateTimeFormatter = DateTimeFormatter.ofPattern("cccc")
@@ -84,8 +79,6 @@ fun MemoryWhenWhere(
 ) {
     val locale = currentLocale()
     val moment = Instant.ofEpochMilli(memory.happenedAt).atZone(ZoneId.systemDefault())
-    val weekday = WeekdayFormat.withLocale(locale).format(moment).replaceFirstChar { it.titlecase(locale) }
-    val elapsed = elapsedText(moment.toLocalDate())
 
     HereSection(
         title = stringResource(R.string.memory_when_where_title),
@@ -102,7 +95,7 @@ fun MemoryWhenWhere(
                     FullDateFormat.withLocale(locale).format(moment),
                     TimeFormat.format(moment)
                 ),
-                description = elapsed?.let { stringResource(R.string.memory_dot_pair, weekday, it) } ?: weekday
+                description = dayCaption(moment.toLocalDate())
             )
 
             HereCardRow(
@@ -112,18 +105,31 @@ fun MemoryWhenWhere(
             )
 
             if (memory.media.isNotEmpty()) {
-                MiniMap(memory = memory)
+                MemoryMiniMap(
+                    point = MapPoint(memory.latitude, memory.longitude),
+                    emotion = memory.emotion
+                )
             }
         }
     }
 }
 
-/** Карта места с персонажем: только смотреть, без нажатий. */
+/**
+ * Карта места с персонажем: только смотреть, без нажатий.
+ *
+ * @param point Точка воспоминания.
+ * @param emotion Эмоция персонажа или `null`, пока ее не выбрали.
+ * @param modifier [Modifier], применяемый к карте.
+ */
 @Composable
-private fun MiniMap(memory: Memory) {
+internal fun MemoryMiniMap(
+    point: MapPoint,
+    emotion: Emotion?,
+    modifier: Modifier = Modifier
+) {
     Box(
         contentAlignment = Alignment.Center,
-        modifier = Modifier
+        modifier = modifier
             .fillMaxWidth()
             .height(HereSize.Memory.miniMapHeight)
             .clip(HereShape.bubble)
@@ -134,30 +140,32 @@ private fun MiniMap(memory: Memory) {
             interactive = false,
             locationEnabled = false,
             isDarkTheme = LocalAppDarkTheme.current,
-            startPosition = MapPoint(memory.latitude, memory.longitude),
+            startPosition = point,
             startZoom = MAP_ZOOM,
             logoPlacement = MapLogoPlacement.Card
         )
 
-        Box(
-            contentAlignment = Alignment.Center,
-            modifier = Modifier
-                .size(HereSize.Memory.miniMapHaloSize)
-                .background(
-                    color = memory.emotion.color.solid.copy(alpha = MINI_MAP_HALO_ALPHA),
-                    shape = CircleShape
+        if (emotion != null) {
+            Box(
+                contentAlignment = Alignment.Center,
+                modifier = Modifier
+                    .size(HereSize.Memory.miniMapHaloSize)
+                    .background(
+                        color = emotion.color.solid.copy(alpha = MINI_MAP_HALO_ALPHA),
+                        shape = CircleShape
+                    )
+            ) {
+                EmotionCharacter(
+                    emotion = emotion.character,
+                    size = HereSize.Memory.miniMapCharacterSize
                 )
-        ) {
-            EmotionCharacter(
-                emotion = memory.emotion.character,
-                size = HereSize.Memory.miniMapCharacterSize
-            )
+            }
         }
     }
 }
 
 /**
- * Секция «Фото и видео · N»: первый снимок крупно, остальные рядами по три и по два без пустот.
+ * Секция «Фото и видео · N»: лента снимков, листается вбок.
  *
  * @param media Снимки и ролики воспоминания.
  * @param onMediaClick Колбэк открытия снимка на весь экран.
@@ -169,10 +177,6 @@ fun MemoryMediaGrid(
     onMediaClick: (Int) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val spacing = HereSize.Memory.gridSpacing
-    val heroCount = if (media.size >= HERO_COUNT) HERO_COUNT else 0
-    val rows = remember(media.size, heroCount) { gridRows(from = heroCount, until = media.size) }
-
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
         modifier = modifier
@@ -182,123 +186,102 @@ fun MemoryMediaGrid(
             modifier = Modifier.padding(horizontal = HereSpacing.xs)
         )
 
-        BoxWithConstraints(modifier = Modifier.clip(HereShape.tile)) {
-            val gridWidth = maxWidth
-            val cell = (gridWidth - spacing * (GRID_COLUMNS - 1)) / GRID_COLUMNS
-
-            Column(verticalArrangement = Arrangement.spacedBy(spacing)) {
-                if (heroCount > 0) {
-                    Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
-                        MediaGridTile(
-                            item = media[0],
-                            onClick = { onMediaClick(0) },
-                            modifier = Modifier.size(cell * 2 + spacing)
-                        )
-
-                        Column(verticalArrangement = Arrangement.spacedBy(spacing)) {
-                            for (index in 1 until HERO_COUNT) {
-                                MediaGridTile(
-                                    item = media[index],
-                                    onClick = { onMediaClick(index) },
-                                    modifier = Modifier.size(cell)
-                                )
-                            }
-                        }
-                    }
-                }
-
-                rows.forEach { row ->
-                    val width = (gridWidth - spacing * (row.size - 1)) / row.size
-                    val height = if (row.size == 1) (gridWidth - spacing) / 2 else width
-
-                    Row(horizontalArrangement = Arrangement.spacedBy(spacing)) {
-                        row.forEach { index ->
-                            MediaGridTile(
-                                item = media[index],
-                                onClick = { onMediaClick(index) },
-                                modifier = Modifier.size(width = width, height = height)
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        MediaStrip(
+            media = media,
+            onMediaClick = onMediaClick
+        )
     }
 }
 
 /**
- * Ячейка сетки: снимок или кадр ролика со значком play.
+ * Лента квадратных снимков с прокруткой вбок.
  *
- * @param item Снимок или ролик.
- * @param onClick Колбэк открытия на весь экран.
- * @param modifier [Modifier] с размером ячейки.
+ * @param media Снимки и ролики.
+ * @param onMediaClick Колбэк открытия снимка на весь экран.
+ * @param modifier [Modifier], применяемый к ленте.
+ * @param onMediaRemove Колбэк кнопки «убрать», без него кнопки нет.
  */
 @Composable
-private fun MediaGridTile(
-    item: MemoryMedia,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier
+internal fun MediaStrip(
+    media: List<MemoryMedia>,
+    onMediaClick: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    onMediaRemove: ((Int) -> Unit)? = null
 ) {
-    val video = item.type == MediaType.VIDEO
-
-    Box(
-        modifier = modifier.clickable(
-            onClickLabel = stringResource(R.string.memory_cover_open),
-            onClick = onClick
-        )
+    LazyRow(
+        horizontalArrangement = Arrangement.spacedBy(HereSpacing.s),
+        modifier = modifier.fillMaxWidth()
     ) {
-        MediaPhoto(
-            uri = item.uri,
-            video = video,
-            shape = RectangleShape,
-            modifier = Modifier.fillMaxSize()
-        )
-
-        if (video) {
-            MediaPlayBadge(
-                size = HereSize.Memory.gridBadgeSize,
-                iconSize = HereSize.Memory.gridBadgeIconSize,
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .padding(HereSize.Memory.gridBadgeInset)
+        itemsIndexed(media) { index, item ->
+            MediaStripTile(
+                item = item,
+                onClick = { onMediaClick(index) },
+                onRemoveClick = onMediaRemove?.let { { it(index) } }
             )
         }
     }
 }
 
 /**
- * Индексы снимков по рядам из трех и двух без пустот, одинокий снимок — на всю ширину.
+ * Снимок ленты или кадр ролика со значком play.
  *
- * @param from Первый индекс.
- * @param until Индекс после последнего.
+ * @param item Снимок или ролик.
+ * @param onClick Колбэк открытия на весь экран.
+ * @param onRemoveClick Колбэк кнопки «убрать».
  */
-private fun gridRows(from: Int, until: Int): List<List<Int>> {
-    val count = until - from
-    val sizes = when {
-        count <= 0 -> emptyList()
-        count == 1 -> listOf(1)
-        count % GRID_COLUMNS == 1 -> List(count / GRID_COLUMNS - 1) { GRID_COLUMNS } + listOf(2, 2)
-        count % GRID_COLUMNS == 2 -> List(count / GRID_COLUMNS) { GRID_COLUMNS } + 2
-        else -> List(count / GRID_COLUMNS) { GRID_COLUMNS }
+@Composable
+private fun MediaStripTile(
+    item: MemoryMedia,
+    onClick: () -> Unit,
+    onRemoveClick: (() -> Unit)?
+) {
+    val video = item.type == MediaType.VIDEO
+
+    Box(
+        modifier = Modifier
+            .size(HereSize.Memory.stripTileSize)
+            .clip(HereShape.tile)
+            .clickable(
+                onClickLabel = stringResource(R.string.memory_cover_open),
+                onClick = onClick
+            )
+    ) {
+        MediaPhoto(
+            uri = item.uri,
+            video = video,
+            modifier = Modifier.fillMaxSize()
+        )
+
+        if (video) {
+            MediaPlayBadge(
+                size = HereSize.Memory.mediaBadgeSize,
+                iconSize = HereSize.Memory.mediaBadgeIconSize,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(HereSize.Memory.mediaBadgeInset)
+            )
+        }
+
+        if (onRemoveClick != null) {
+            MediaRemoveButton(
+                onClick = onRemoveClick,
+                modifier = Modifier.align(Alignment.TopEnd)
+            )
+        }
     }
-    var next = from
-    return sizes.map { size -> List(size) { next++ } }
 }
 
 /**
- * Секция «Фото и видео» без снимков: пунктирная кнопка, ведущая в редактирование.
+ * Секция «Фото и видео» без снимков: кнопки галереи и камеры.
  *
- * @param onClick Колбэк нажатия.
+ * @param onMediaPicked Колбэк выбранных или снятых файлов.
  * @param modifier [Modifier], применяемый к секции.
  */
 @Composable
-fun MemoryAddPhoto(
-    onClick: () -> Unit,
+fun MemoryAddMedia(
+    onMediaPicked: (List<MemoryMedia>) -> Unit,
     modifier: Modifier = Modifier
 ) {
-    val colors = HereTheme.colors
-    val sizes = HereSize.Memory
-
     Column(
         verticalArrangement = Arrangement.spacedBy(HereSpacing.s),
         modifier = modifier
@@ -308,43 +291,7 @@ fun MemoryAddPhoto(
             modifier = Modifier.padding(horizontal = HereSpacing.xs)
         )
 
-        Row(
-            verticalAlignment = Alignment.CenterVertically,
-            horizontalArrangement = Arrangement.spacedBy(HereSpacing.s, Alignment.CenterHorizontally),
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(sizes.addPhotoHeight)
-                .drawBehind {
-                    drawOutline(
-                        outline = HereShape.tile.createOutline(size, layoutDirection, this),
-                        color = colors.outlineStrong,
-                        style = Stroke(
-                            width = sizes.dashWidth.toPx(),
-                            pathEffect = PathEffect.dashPathEffect(
-                                floatArrayOf(sizes.dashLength.toPx(), sizes.dashGap.toPx())
-                            )
-                        )
-                    )
-                }
-                .clip(HereShape.tile)
-                .clickable(
-                    role = Role.Button,
-                    onClick = onClick
-                )
-        ) {
-            Icon(
-                painter = painterResource(DesignSystemR.drawable.ic_add),
-                contentDescription = null,
-                tint = colors.textPrimary,
-                modifier = Modifier.size(sizes.addPhotoIconSize)
-            )
-
-            Text(
-                text = stringResource(R.string.memory_add_photo),
-                style = MaterialTheme.typography.titleMedium,
-                color = colors.textPrimary
-            )
-        }
+        MediaAddButtons(onMediaPicked = onMediaPicked)
     }
 }
 
@@ -454,6 +401,14 @@ private fun NearbyThumb(memory: Memory) {
             )
         }
     }
+}
+
+/** Подпись дня: «Среда · 3 дня назад». */
+@Composable
+internal fun dayCaption(date: LocalDate): String {
+    val locale = currentLocale()
+    val weekday = WeekdayFormat.withLocale(locale).format(date).replaceFirstChar { it.titlecase(locale) }
+    return elapsedText(date)?.let { stringResource(R.string.memory_dot_pair, weekday, it) } ?: weekday
 }
 
 /** Сколько прошло с [date]: «вчера», «3 месяца назад»; `null` для дня в будущем. */

@@ -1,5 +1,6 @@
 package ru.aloyaloya.design_system.component.topbar
 
+import androidx.annotation.DrawableRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
@@ -17,12 +18,13 @@ import ru.aloyaloya.design_system.R
 import ru.aloyaloya.design_system.theme.HereSize
 
 /**
- * Верхняя панель режима: стрелка выхода, название экрана и действия справа.
+ * Верхняя панель режима: значок выхода, название экрана и действия справа.
  *
  * @param title Название режима.
  * @param navigationContentDescription Описание выхода для программ чтения с экрана.
  * @param onNavigateBack Колбэк выхода из режима.
  * @param modifier Внешний [Modifier] панели.
+ * @param navigationIcon Значок выхода: стрелка назад или крестик модального экрана.
  * @param scrolled Уехал ли контент под панель: тогда панель темнеет, отделяясь от него.
  * @param overMedia Панель поверх снимка: прозрачная и с белыми значками, пока контент не уехал.
  * @param actions Кнопки справа, цвет значков — из [LocalContentColor].
@@ -33,6 +35,7 @@ fun HereContextTopAppBar(
     navigationContentDescription: String?,
     onNavigateBack: () -> Unit,
     modifier: Modifier = Modifier,
+    @DrawableRes navigationIcon: Int = R.drawable.ic_arrow_back,
     scrolled: Boolean = false,
     overMedia: Boolean = false,
     actions: @Composable RowScope.() -> Unit = {}
@@ -50,7 +53,7 @@ fun HereContextTopAppBar(
         verticalAlignment = Alignment.CenterVertically
     ) {
         TopAppBarAction(
-            icon = R.drawable.ic_arrow_back,
+            icon = navigationIcon,
             contentDescription = navigationContentDescription,
             onClick = onNavigateBack,
             tint = contentColor

@@ -3,8 +3,10 @@
     <string name="memory_form_title_new">Новое воспоминание</string>
     <string name="memory_form_title_edit">Изменить</string>
 
-    <string name="memory_form_date_label">Дата</string>
-    <string name="memory_form_time_label">Время</string>
+    <string name="memory_form_when_title">Когда</string>
+    <string name="memory_form_where_title">Где</string>
+    <string name="memory_form_change_date">Изменить дату</string>
+    <string name="memory_form_change_time">Изменить время</string>
 
     <string name="memory_form_emotion_label">Что чувствуешь</string>
     <string name="memory_form_title_label">Как назовем воспоминание?</string>
@@ -19,6 +21,10 @@
     <string name="memory_form_save_edit">Сохранить изменения</string>
 
     <string name="memory_back">Назад</string>
+    <string name="memory_media_gallery">Галерея</string>
+    <string name="memory_media_camera">Камера</string>
+    <string name="memory_camera_photo">Сфотографировать</string>
+    <string name="memory_camera_video">Снять видео</string>
     <string name="memory_media_title">Фото и видео</string>
     <string name="memory_media_close">Закрыть просмотр</string>
     <string name="memory_video_show_controls">Показать управление</string>
@@ -58,7 +64,6 @@
     <string name="memory_cover_open">Открыть фото</string>
     <string name="memory_when_where_title">Когда и где</string>
     <string name="memory_media_count_title">Фото и видео · %1$d</string>
-    <string name="memory_add_photo">Добавить фото</string>
     <string name="memory_place_unknown">Место на карте</string>
     <string name="memory_nearby_title">Здесь же</string>
     <string name="memory_date_time">%1$s, %2$s</string>
