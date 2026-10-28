@@ -212,6 +212,8 @@ object HereSize {
         val contentTopPadding = 16.dp
         val headerSpacing = 10.dp
         val textSpacing = 12.dp
+        val quoteBarWidth = 3.dp
+        val quoteSpacing = 12.dp
         val sectionSpacing = 20.dp
         val bottomPadding = 24.dp
         val rowSpacing = 14.dp
